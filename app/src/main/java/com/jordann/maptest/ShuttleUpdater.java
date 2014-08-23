@@ -4,6 +4,10 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.util.Log;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
@@ -13,6 +17,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -24,7 +29,6 @@ import java.io.InputStreamReader;
  */
 public class ShuttleUpdater {
     private static final String TAG = "ShuttleUpdater";
-
     private boolean isBusy = false;
     private boolean stop = false;
     private Handler mHandler = new Handler();
@@ -32,21 +36,40 @@ public class ShuttleUpdater {
     private Runnable r;
     private long asyncDelay = 5000;
 
-    private String urlShuttlePoints = "http://apps-webdev.campusops.oregonstate.edu/robechar/portal/files/shuttle/GetMapVehiclePoints.txt";
+    private String urlShuttlePoints = "http://portal.campusops.oregonstate.edu/files/shuttle/GetMapVehiclePoints.txt";
     private String urlJsonTest = "http://ip.jsontest.com/";
+    private MapState mapState;
+
+    private OnMapStateUpdate listener;
+
+    //new pollNewDataTask(urlShuttlePoints)
 
 
-    public ShuttleUpdater() {
+    public interface OnMapStateUpdate{
+        void updateMap();
+    }
+
+
+    public ShuttleUpdater(OnMapStateUpdate listener) {
+        this.listener = listener;
+        mapState = MapState.get();
         Log.d(TAG, "ShuttleUpdater CONSTRUCTED");
+
+        new pollNewDataTask(urlShuttlePoints);
+
         startHandler();
     }
+
 
     private void startHandler(){
         r = new Runnable() {
             @Override
             public void run() {
                 Log.d(TAG, "--------RUN---------");
-                if(!isBusy) callAsyncTask();
+                if(!isBusy){
+                    //Log.d(TAG, "callAsyncTask");
+                    new pollNewDataTask(urlShuttlePoints).execute();
+                }
 
                 if(!stop) startHandler();
             }
@@ -59,26 +82,18 @@ public class ShuttleUpdater {
         stop = true;
         mHandler.removeCallbacks(r);
     }
+
     public void startShuttleUpdater(){
         stop = false;
         mHandler.removeCallbacks(r);
         mHandler.postDelayed(r, asyncDelay);
     }
 
-
-    private void callAsyncTask(){
-        Log.d(TAG, "callAsyncTask");
-
-        new pollNewDataTask(urlJsonTest).execute();
-
-
-    }
-
-    private class pollNewDataTask extends AsyncTask<String, Void, JSONArray>{
+    private class pollNewDataTask extends AsyncTask<String, Void, JSONArray[]>{
 
         private String url;
-        private StringBuilder builder = new StringBuilder();
-        private JSONArray jarray;
+
+        private JSONArray[] jarray;
 
         public pollNewDataTask(String url) {
             super();
@@ -86,54 +101,49 @@ public class ShuttleUpdater {
         }
 
         @Override
-        protected JSONArray doInBackground(String... params) {
-
-            HttpClient client = new DefaultHttpClient();
-            HttpGet httpGet = new HttpGet(url);
-
-            try{
-                HttpResponse response = client.execute(httpGet);
-
-                StatusLine statusLine = response.getStatusLine();
-                int statusCode = statusLine.getStatusCode();
-                Log.d(TAG, "statusCode: " + statusCode);
-                if(statusCode == 200){
-                    HttpEntity entity = response.getEntity();
-                    InputStream content = entity.getContent();
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(content));
-                    String line;
-
-                    while((line = reader.readLine()) != null){
-                        Log.d(TAG, "LINE: "+ line);
-                        builder.append(line);
-                    }
-                }//TODO: else
-
-            }catch (ClientProtocolException e){
-                e.printStackTrace();
-                Log.e(TAG, "ClientProtocolException");
-            }catch (IOException e){
-                e.printStackTrace();
-                Log.e(TAG, "IOException");
-            }
-
-            try{
-                Log.d(TAG, "builder.toString(): " + builder.toString());
-
-                jarray = new JSONArray("["+builder.toString()+"]");
-
-            }catch (JSONException e){
-                Log.e(TAG, "JSONException");
-            }
-
+        protected JSONArray[] doInBackground(String... params) {
+            JSONGetter getter = new JSONGetter();
+            jarray = getter.getJSONFromUrl(url);
             return jarray;
         }
 
         @Override
-        protected void onPostExecute(JSONArray j) {
+        protected void onPostExecute(JSONArray[] j) {
             super.onPostExecute(j);
-            Log.d(TAG, "RETURNED JsonArray: " + j.toString());
+
+            parseJSON(j);
+            listener.updateMap();
+
+            //Log.d(TAG, "RETURNED JsonArray: " + j.toString());
         }
+
+
+        //TODO: reduce number of string conversions here and JSONGetter
+       private void parseJSON(JSONArray[] j){
+            Gson gson = new Gson();
+
+            JSONArray JSONShuttles = j[0];
+
+
+            for (int i=0; i<JSONShuttles.length();i++) {
+
+                String json = null;
+
+                try {
+                    JSONObject test = JSONShuttles.getJSONObject(i);
+                    json = test.toString();
+                    //Log.d(TAG, "json in parse is: "+test);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                mapState.setShuttle(i, gson.fromJson(json, Shuttle.class));
+
+                //Log.d(TAG, ">>SHUTTLE "+ gson.fromJson(json, Shuttle.class));
+              // Log.d(TAG, "NAME SHUTTLE:"+mapState.getShuttles()[i].getName());
+            }
+
+       }
+
     }
 
 }
