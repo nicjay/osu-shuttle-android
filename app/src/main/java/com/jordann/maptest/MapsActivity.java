@@ -48,7 +48,6 @@ public class MapsActivity extends FragmentActivity implements ShuttleUpdater.OnM
     MapState mapState;
 
     private ShuttleUpdater shuttleUpdater;
-    private String[] mTestArray;
 
     //Shuttle Markers
     private Marker[] shuttleMarkers;
@@ -70,9 +69,6 @@ public class MapsActivity extends FragmentActivity implements ShuttleUpdater.OnM
         setUpMapIfNeeded();
         setUpNavigationDrawer();
 
-
-        mTestArray = new String[]{"TEST1", "Test2", "Test3"};
-
         //ASYNC Requests
         shuttleUpdater = new ShuttleUpdater(this);
 
@@ -88,7 +84,6 @@ public class MapsActivity extends FragmentActivity implements ShuttleUpdater.OnM
         // set a custom shadow that overlays the main content when the drawer opens
         mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
         // set up the drawer's list view with items and click listener
-        //mDrawerList.setAdapter(new ArrayAdapter<String>(this, R.layout.drawer_list_item, mTestArray));
         mDrawerList.setAdapter(new DrawerAdapter(this, mapState.getDrawerItems()));
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
 
@@ -103,8 +98,6 @@ public class MapsActivity extends FragmentActivity implements ShuttleUpdater.OnM
                 super.onDrawerClosed(view);
                 getActionBar().setTitle(mTitle);
                 invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
-                int isAvailable = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getApplicationContext());
-                Log.d(TAG, "DRAWER isAvailable: " + isAvailable);
             }
 
             public void onDrawerOpened(View drawerView) {
@@ -123,13 +116,6 @@ public class MapsActivity extends FragmentActivity implements ShuttleUpdater.OnM
     public void updateMap() {
         Log.d(TAG, "UPDATE MAP");
         //TODO: shadow view and show ActivityIndicator until this happens
-
-        if(firstTime){
-            setDrawerItems();
-            mDrawerList.setAdapter(new DrawerAdapter(this, mapState.getDrawerItems()));
-            firstTime = false;
-        }
-
         /*
         Route 2:  Bus 6  &  Bus 7
         Key: "Bus 6" : shuttleMarker1
@@ -175,14 +161,21 @@ public class MapsActivity extends FragmentActivity implements ShuttleUpdater.OnM
             shuttleMarkers[i].setPosition(new LatLng(shuttles[i].getLatitude(), shuttles[i].getLongitude()));
         }
 
+        if(firstTime){
+            Log.d(TAG, "setDrawerItems() CALLED");
+            setDrawerItems();
+            mDrawerList.setAdapter(new DrawerAdapter(this, mapState.getDrawerItems()));
+            firstTime = false;
+        }
         //Update InfoWindow RouteEstimates
 
     }
 
 
     private void setUpMapIfNeeded() {
-        if(mMap == null){
+        if(mMap == null) {
             mMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
+            mapState.setMap(mMap);
 
             if(mMap != null){
                 setUpMap();
@@ -250,7 +243,8 @@ public class MapsActivity extends FragmentActivity implements ShuttleUpdater.OnM
 
         //Stop items   //TODO Add Stop Items
         for(i = 0; i < 8; i++){
-            drawerItems.add(new DrawerItem(1, "Test Stop#" + i, shuttleMarkers[i%2]));
+
+            drawerItems.add(new DrawerItem(2, "Test Stop#" + i, shuttleMarkers[i%2]));
         }
 
         mapState.setDrawerItems(drawerItems);
@@ -309,11 +303,33 @@ public class MapsActivity extends FragmentActivity implements ShuttleUpdater.OnM
 
     private void selectItem(int position) {
         // update the main content by replacing fragments
-
+        ArrayList<DrawerItem> drawerItems = mapState.getDrawerItems();
         // update selected item and title, then close the drawer
+        Log.d(TAG, "selectItem[ " + position + " ]");
         mDrawerList.setItemChecked(position, true);
-        setTitle(mTestArray[position]);
-        mDrawerLayout.closeDrawer(mDrawerList);
+        setTitle(drawerItems.get(position).getTitle());
+
+        switch (drawerItems.get(position).getTypeId()){
+            case 0:
+
+                break;
+            case 1:
+                mMap.animateCamera(CameraUpdateFactory.newLatLng(drawerItems.get(position).getLatLng()));
+                drawerItems.get(position).getMarker().showInfoWindow();
+                mDrawerLayout.closeDrawer(mDrawerList);
+                break;
+            case 2:
+                mMap.animateCamera(CameraUpdateFactory.newLatLng(drawerItems.get(position).getLatLng()));
+                drawerItems.get(position).getMarker().showInfoWindow();
+                mDrawerLayout.closeDrawer(mDrawerList);
+                break;
+            default:
+                Log.d(TAG, "selectItem getTypeID DEFAULT CASE");
+
+
+        }
+
+
     }
 
 }

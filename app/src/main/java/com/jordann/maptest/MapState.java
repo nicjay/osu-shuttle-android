@@ -1,5 +1,7 @@
 package com.jordann.maptest;
 
+import com.google.android.gms.maps.GoogleMap;
+
 import java.util.ArrayList;
 
 /**
@@ -10,6 +12,7 @@ public class MapState {
     private ArrayList<Stop> mStops;
     private static MapState sMapState;
 
+    private GoogleMap mMap;
     private ArrayList<DrawerItem> mDrawerItems;
 
     private MapState(){
@@ -25,7 +28,13 @@ public class MapState {
         return sMapState;
     }
 
+    public GoogleMap getMap() {
+        return mMap;
+    }
 
+    public void setMap(GoogleMap map) {
+        mMap = map;
+    }
 
     public Shuttle[] getShuttles() {
         return mShuttles;

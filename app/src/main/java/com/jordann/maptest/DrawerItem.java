@@ -2,6 +2,7 @@ package com.jordann.maptest;
 
 import android.media.Image;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
 /**
@@ -17,6 +18,8 @@ public class DrawerItem {
 
     private Image mImage;
 
+    private LatLng mLatLng;
+
     //Section constructor
     public DrawerItem(int typeId, String title) {
         mTypeId = typeId;
@@ -28,6 +31,7 @@ public class DrawerItem {
         mTypeId = typeId;
         mTitle = title;
         mMarker = marker;
+        mLatLng = new LatLng(marker.getPosition().latitude, marker.getPosition().longitude);
     }
 
     //Image constructor
@@ -53,7 +57,10 @@ public class DrawerItem {
         return mImage;
     }
 
-    /*
+    public LatLng getLatLng() {
+        return mLatLng;
+    }
+/*
         switch(drawerItemID)
             case 0:     //Section header
                 convertView = inflator.inflate(R.layout.drawer_section, parent, false);
