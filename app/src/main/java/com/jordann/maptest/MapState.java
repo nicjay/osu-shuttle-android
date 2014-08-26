@@ -1,9 +1,13 @@
 package com.jordann.maptest;
 
+import android.graphics.Camera;
+import android.os.Bundle;
 import android.util.Log;
 
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -17,26 +21,46 @@ import java.util.Random;
 public class MapState {
     private static final String TAG = "MapState";
     //private static Shuttle[] mShuttles;
-    private ArrayList<Shuttle> mShuttles;
+    private static ArrayList<Shuttle> mShuttles;
 
-    private ArrayList<Stop> mStops;
+    private static ArrayList<Stop> mStops;
     private static MapState sMapState;
 
-    private GoogleMap mMap;
-    private ArrayList<ShuttleMarker> mShuttleMarkerList;
+    private static GoogleMap mMap;
+    private static ArrayList<ShuttleMarker> mShuttleMarkerList;
 
-    private ArrayList<DrawerItem> mDrawerItems;
+    private static ArrayList<DrawerItem> mDrawerItems;
+    private static DrawerAdapter mDrawerAdapter;
 
     private MapState(){
-
         mDrawerItems = new ArrayList<DrawerItem>();
-      //  mShuttles = new Shuttle[4];
+        //  mShuttles = new Shuttle[4];
         mShuttles = new ArrayList<Shuttle>();
 
         mShuttleMarkerList = new ArrayList<ShuttleMarker>();
 
         mStops = new ArrayList<Stop>();
     }
+
+/*
+    public static void initialize(){
+        sMapState = null;
+        mMap = null;
+        mDrawerItems = new ArrayList<DrawerItem>();
+        //  mShuttles = new Shuttle[4];
+        mShuttles = new ArrayList<Shuttle>();
+
+        mShuttleMarkerList = new ArrayList<ShuttleMarker>();
+
+        mStops = new ArrayList<Stop>();
+
+    }
+*/
+
+    public static void reset(Bundle savedInstanceState){
+
+    }
+
 
     public static MapState get(){
         if (sMapState == null){
@@ -47,7 +71,11 @@ public class MapState {
 
 
     public void animateMap(LatLng latLng){
-        mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+        //mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng), 500, null);
+        CameraPosition cameraPosition = new CameraPosition(latLng, mMap.getCameraPosition().zoom, 45, 0);
+        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
+       // mMap.setMapType(4);
     }
 
     public void showInfoWindow(int position){
@@ -56,6 +84,7 @@ public class MapState {
 
 
     public void addShuttleMarker(LatLng latLng, int vehicleId){
+
         mShuttleMarkerList.add(new ShuttleMarker(mMap.addMarker(new MarkerOptions().position(latLng).title("booya")), vehicleId));
     }
 
@@ -71,6 +100,15 @@ public class MapState {
         return mShuttleMarkerList;
     }
 
+    public ShuttleMarker getShuttleMarkerOfMarker(Marker marker){
+        for(ShuttleMarker shuttleMarker : mShuttleMarkerList){
+            if(marker.equals(shuttleMarker.getMarker())){
+                return shuttleMarker;
+            }
+        }
+        return null;
+    }
+
     public GoogleMap getMap() {
         return mMap;
     }
@@ -78,19 +116,6 @@ public class MapState {
     public void setMap(GoogleMap map) {
         mMap = map;
     }
-
-
-/*
-    public Shuttle[] getShuttles() {
-        return mShuttles;
-    }
-
-
-    public void setShuttle(int index, Shuttle shuttle) {
-        mShuttles[index] = shuttle;
-    }
-    */
-
 
     public ArrayList<Shuttle> getShuttles() {
         return mShuttles;
@@ -115,9 +140,6 @@ public class MapState {
     public void setDrawerItems() {
         //"Shuttles" section header
         mDrawerItems.add(new DrawerItem(0, "Shuttles"));
-
-
-
         //Shuttle items
         int i;
         for(i = 0; i < 4; i ++){
@@ -147,20 +169,5 @@ public class MapState {
 
     }
 
-    public void addDrawerItem(){
-        double a = Math.random()%10;
-        Random random = new Random();
-        int b = random.nextInt(100);
 
-        String str = String.valueOf(b);
-
-
-        Marker marker = mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("booya"));
-        ShuttleMarker shuttleMarker = new ShuttleMarker(marker, b);
-
-        mShuttleMarkerList.add(shuttleMarker);
-        DrawerItem drawerItem = new DrawerItem(1, str, shuttleMarker);
-        mDrawerItems.add(drawerItem);
-        Log.d(TAG, "Adding drawerItem: " + drawerItem.getTitle());
-    }
 }

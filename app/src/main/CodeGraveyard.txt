@@ -1,0 +1,16 @@
+    public void addDrawerItem(){
+        double a = Math.random()%10;
+        Random random = new Random();
+        int b = random.nextInt(100);
+
+        String str = String.valueOf(b);
+
+
+        Marker marker = mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("booya"));
+        ShuttleMarker shuttleMarker = new ShuttleMarker(marker, b);
+
+        mShuttleMarkerList.add(shuttleMarker);
+        DrawerItem drawerItem = new DrawerItem(1, str, shuttleMarker);
+        mDrawerItems.add(drawerItem);
+        Log.d(TAG, "Adding drawerItem: " + drawerItem.getTitle());
+    }

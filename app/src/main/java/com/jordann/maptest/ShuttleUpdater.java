@@ -30,9 +30,12 @@ import java.util.ArrayList;
  */
 public class ShuttleUpdater {
     private static final String TAG = "ShuttleUpdater";
+
+    private static ShuttleUpdater sShuttleUpdater;
+
     private boolean isBusy = false;
-    private boolean stop = false;
-    private Handler mHandler = new Handler();
+    private boolean stop = true;
+    private Handler mHandler;
 
     private Runnable r;
     private long asyncDelay = 5000;
@@ -51,14 +54,18 @@ public class ShuttleUpdater {
     }
 
 
-    public ShuttleUpdater(OnMapStateUpdate listener) {
+    private ShuttleUpdater(OnMapStateUpdate listener) {
         this.listener = listener;
         mapState = MapState.get();
+        mHandler = new Handler();
         Log.d(TAG, "ShuttleUpdater CONSTRUCTED");
+    }
 
-        new pollNewDataTask(urlShuttlePoints);
-
-        startHandler();
+    public static ShuttleUpdater get(OnMapStateUpdate listener){
+        if(sShuttleUpdater == null){
+            sShuttleUpdater = new ShuttleUpdater(listener);
+        }
+        return sShuttleUpdater;
     }
 
 
@@ -86,8 +93,9 @@ public class ShuttleUpdater {
 
     public void startShuttleUpdater(){
         stop = false;
-        mHandler.removeCallbacks(r);
-        mHandler.postDelayed(r, asyncDelay);
+        new pollNewDataTask(urlShuttlePoints).execute();
+        startHandler();
+        //mHandler.postDelayed(r, asyncDelay);
     }
 
     private class pollNewDataTask extends AsyncTask<String, Void, JSONArray[]>{
