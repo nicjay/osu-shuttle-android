@@ -31,30 +31,31 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public class MapsActivity extends FragmentActivity implements ShuttleUpdater.OnMapStateUpdate {
 
+
     private static final String TAG = "MapsActivity";
     private DrawerLayout mDrawerLayout;
+    private DrawerAdapter mAdapter;
     private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
     private boolean firstTime = true;
+
+
 
 
     private CharSequence mDrawerTitle;
     private CharSequence mTitle;
 
     private GoogleMap mMap = null; // Might be null if Google Play services APK is not available.
-    MapState mapState;
+    private MapState mMapState;
 
     private ShuttleUpdater shuttleUpdater;
 
     //Shuttle Markers
     private Marker[] shuttleMarkers;
-    private Marker shuttleMarker0;
-    private Marker shuttleMarker1;
-    private Marker shuttleMarker2;
-    private Marker shuttleMarker3;
 
     //private SupportMapFragment mMapFragment;
     private MapFragment mMapFragment;
@@ -63,9 +64,12 @@ public class MapsActivity extends FragmentActivity implements ShuttleUpdater.OnM
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mapState = MapState.get();
 
-        shuttleMarkers = new Marker[4];
+        mMapState = MapState.get();
+
+        //shuttleMarkers = new Marker[4];
+
+
         setUpMapIfNeeded();
         setUpNavigationDrawer();
 
@@ -84,7 +88,7 @@ public class MapsActivity extends FragmentActivity implements ShuttleUpdater.OnM
         // set a custom shadow that overlays the main content when the drawer opens
         mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
         // set up the drawer's list view with items and click listener
-        mDrawerList.setAdapter(new DrawerAdapter(this, mapState.getDrawerItems()));
+        mDrawerList.setAdapter(new DrawerAdapter(this, mMapState.getDrawerItems()));
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
 
         mDrawerToggle = new ActionBarDrawerToggle(
@@ -116,139 +120,94 @@ public class MapsActivity extends FragmentActivity implements ShuttleUpdater.OnM
     public void updateMap() {
         Log.d(TAG, "UPDATE MAP");
         //TODO: shadow view and show ActivityIndicator until this happens
-        /*
-        Route 2:  Bus 6  &  Bus 7
-        Key: "Bus 6" : shuttleMarker1
-        Key: "Bus 7  : shuttleMarker2
-        ---------------------------------
-         Key: "Bus 6" : false
-        Key: "Bus 7  : false
 
-        if(dict.contains(shuttle.getName())
-            dict[shuttle.getName()].setPosition(LatLng);
-            //dict["Bus 6"].setPosition...
-            boolDict[shuttle.getName()] = true;
-        else
-            dict.add(shuttle.getName() : new ShuttleMarkerOptions(...))
+        ArrayList<Shuttle> shuttles = mMapState.getShuttles();
 
+        //Update current marker list
+        for(Shuttle shuttle : shuttles){
 
-        if(boolDict[...] == false)
-            ....Visible = false;
-
-         */
-
-        Shuttle[] shuttles = mapState.getShuttles();
-
-        for (Shuttle shuttle : shuttles){
-            switch(shuttle.getRouteID()){
-                case 1:
-
+            ArrayList<ShuttleMarker> shuttleMarkerArrayList = mMapState.getShuttleMarkerList();
+            boolean foundMatch = false;
+            for (ShuttleMarker marker : shuttleMarkerArrayList){
+                if (marker.getVehicleId() == shuttle.getVehicleId()){
+                    mMapState.updateShuttleMarker(shuttleMarkerArrayList.indexOf(marker), shuttle.getLatLng());
+                    foundMatch = true;
                     break;
-                case 2:
+                }
+            }
+            if (!foundMatch){
+                Log.d(TAG, "Adding new shuttleMarker");
+                mMapState.addShuttleMarker(shuttle.getLatLng(), shuttle.getVehicleId());
 
-                    break;
-                case 3:
-
-                    break;
-                default:
-                    Log.d(TAG, "-------DEFAULT SWITCH-------");
             }
         }
 
-        //Update Shuttle Markers
+        ArrayList<ShuttleMarker> shuttleMarkerArrayList = mMapState.getShuttleMarkerList();
+        boolean foundMatchToRemove;
+        ShuttleMarker marker1 = null;
+        for (ShuttleMarker marker : shuttleMarkerArrayList){
+            if(marker.getVehicleId() == 7){
+                marker1 = marker;
+            }
+            foundMatchToRemove = true;
+            for (Shuttle shuttle : shuttles){
+                //Log.d(TAG, "markerVehId: " + marker.getVehicleId() +"      shuttleVehId:" + shuttle.getVehicleId());
+                if (marker.getVehicleId() == shuttle.getVehicleId()){
+                    foundMatchToRemove = false;
+                    break;
+                }
+            }
+            if (foundMatchToRemove){
+                Log.d(TAG, "FoundMatchToRemove");
+                Random random = new Random();
+                if(random.nextInt(5) == 4){
+                    Log.d(TAG, "RANDOM HIT 4");
+                    mMapState.removeDrawerItem(marker1.getVehicleId());
+                }
 
-        for(int i = 0; i < shuttles.length; i++){
-            shuttleMarkers[i].setPosition(new LatLng(shuttles[i].getLatitude(), shuttles[i].getLongitude()));
+
+
+                mMapState.removeShuttleMarker(marker);
+                mMapState.removeDrawerItem(marker.getVehicleId());
+                mAdapter.notifyDataSetChanged();
+            }
         }
 
         if(firstTime){
             Log.d(TAG, "setDrawerItems() CALLED");
-            setDrawerItems();
-            mDrawerList.setAdapter(new DrawerAdapter(this, mapState.getDrawerItems()));
+            mMapState.setDrawerItems();
+            mAdapter = new DrawerAdapter(this, mMapState.getDrawerItems());
+            mDrawerList.setAdapter(mAdapter);
             firstTime = false;
+        }else{
+            mMapState.addDrawerItem();
+            mAdapter.notifyDataSetChanged();
         }
+
         //Update InfoWindow RouteEstimates
 
     }
 
 
     private void setUpMapIfNeeded() {
+
         if(mMap == null) {
             mMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
-            mapState.setMap(mMap);
+            //mapState.setMap(mMap);
 
             if(mMap != null){
-                setUpMap();
+               // setUpMap();
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(44.563731, -123.279534), 14.5f));
+
+                mMap.setMyLocationEnabled(true);
+
             }
 
         }
+
+        mMapState.setMap(mMap);
     }
 
-
-    private void setUpMap() {
-        //LatLngBounds bounds = new LatLngBounds(new LatLng(44.556911, -123.289607), new LatLng(44.568181, -123.267406));
-        //mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 0));
-
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(44.563731, -123.279534), 14.5f));
-
-        mMap.setMyLocationEnabled(true);
-
-        //mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
-        /*
-
-                VehicleId[ 4, 2, 1, 7]
-                DictBoolSet initalize to false each time.
-
-                for(Shuttle shuttle: Shuttles){
-                    if(VehicleId.contains(shuttle.vehId))
-                        dict[shuttle.vehId].setPosition(...)
-                        DictBoolSet.add[VehId, true];
-                    else
-                        dict.add(vehId, new ShuttleMarker)
-                        VehicleId.add(vehId);
-                        DictBoolSet[VehId] = true;
-
-                }
-
-                for(Key in DictBoolSet){
-                    if(DictBoolSet[Key] == false)
-                        dict(Key).setVisible = false;
-
-
-         */
-
-        //Add Shuttle Markers
-        Shuttle[] shuttles = mapState.getShuttles();
-        for(int i = 0; i < shuttles.length; i++){
-            shuttleMarkers[i] = mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("booya"));
-        }
-
-    }
-
-    private void setDrawerItems() {
-        ArrayList<DrawerItem> drawerItems = new ArrayList<DrawerItem>();
-        Shuttle[] shuttles = mapState.getShuttles();
-        int i;
-
-        //"Shuttles" section header
-        drawerItems.add(new DrawerItem(0, "Shuttles"));
-
-        //Shuttle items
-        for(i = 0; i < 4; i ++){
-            drawerItems.add(new DrawerItem(1, shuttles[i].getName(), shuttleMarkers[i]));
-        }
-
-        //"Stops" section header
-        drawerItems.add(new DrawerItem(0, "Stops"));
-
-        //Stop items   //TODO Add Stop Items
-        for(i = 0; i < 8; i++){
-
-            drawerItems.add(new DrawerItem(2, "Test Stop#" + i, shuttleMarkers[i%2]));
-        }
-
-        mapState.setDrawerItems(drawerItems);
-    }
 
     @Override
     protected void onPause() {
@@ -303,7 +262,7 @@ public class MapsActivity extends FragmentActivity implements ShuttleUpdater.OnM
 
     private void selectItem(int position) {
         // update the main content by replacing fragments
-        ArrayList<DrawerItem> drawerItems = mapState.getDrawerItems();
+        ArrayList<DrawerItem> drawerItems = mMapState.getDrawerItems();
         // update selected item and title, then close the drawer
         Log.d(TAG, "selectItem[ " + position + " ]");
         mDrawerList.setItemChecked(position, true);
@@ -314,13 +273,16 @@ public class MapsActivity extends FragmentActivity implements ShuttleUpdater.OnM
 
                 break;
             case 1:
-                mMap.animateCamera(CameraUpdateFactory.newLatLng(drawerItems.get(position).getLatLng()));
-                drawerItems.get(position).getMarker().showInfoWindow();
+                Log.d(TAG, "Title: " + drawerItems.get(position).getTitle());
+                mMapState.animateMap(drawerItems.get(position).getLatLng());
+               // drawerItems.get(position).getMarker().showInfoWindow();
+                mMapState.showInfoWindow(position);
                 mDrawerLayout.closeDrawer(mDrawerList);
                 break;
             case 2:
-                mMap.animateCamera(CameraUpdateFactory.newLatLng(drawerItems.get(position).getLatLng()));
-                drawerItems.get(position).getMarker().showInfoWindow();
+                mMapState.animateMap(drawerItems.get(position).getLatLng());
+                //drawerItems.get(position).getMarker().showInfoWindow();
+                mMapState.showInfoWindow(position);
                 mDrawerLayout.closeDrawer(mDrawerList);
                 break;
             default:

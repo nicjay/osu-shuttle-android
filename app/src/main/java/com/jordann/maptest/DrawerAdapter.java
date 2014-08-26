@@ -38,10 +38,10 @@ public class DrawerAdapter extends ArrayAdapter<DrawerItem> {
 
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
-
+        final DrawerItem drawerItem = mDrawerItems.get(position);
         if(convertView == null){
             LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            final DrawerItem drawerItem = mDrawerItems.get(position);
+
             switch (drawerItem.getTypeId()){
                 case 0:
                     convertView = inflater.inflate(R.layout.drawer_section_header, parent, false);
@@ -49,6 +49,7 @@ public class DrawerAdapter extends ArrayAdapter<DrawerItem> {
                     break;
                 case 1:
                     convertView = inflater.inflate(R.layout.drawer_list_item, parent, false);
+                    Log.d(TAG, "Old text: " + ((TextView)convertView.findViewById(R.id.drawer_list_item_title)).getText() + "; New text: "+drawerItem.getTitle());
                     ((TextView)convertView.findViewById(R.id.drawer_list_item_title)).setText(drawerItem.getTitle());
                     break;
                 case 2:
@@ -59,6 +60,11 @@ public class DrawerAdapter extends ArrayAdapter<DrawerItem> {
                     Log.d(TAG, "----DEFAULT CASE---");
 
             }
+        }else{
+            if(drawerItem.getTypeId() == 1){
+                ((TextView)convertView.findViewById(R.id.drawer_list_item_title)).setText(drawerItem.getTitle());
+            }
+
         }
         return convertView;
     }

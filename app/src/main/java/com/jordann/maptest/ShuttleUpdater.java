@@ -23,6 +23,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 
 /**
  * Created by jordan_n on 8/21/2014.
@@ -124,11 +125,9 @@ public class ShuttleUpdater {
 
             JSONArray JSONShuttles = j[0];
 
-
+           ArrayList<Shuttle> shuttles = new ArrayList<Shuttle>();
             for (int i=0; i<JSONShuttles.length();i++) {
-
                 String json = null;
-
                 try {
                     JSONObject test = JSONShuttles.getJSONObject(i);
                     json = test.toString();
@@ -136,11 +135,15 @@ public class ShuttleUpdater {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                mapState.setShuttle(i, gson.fromJson(json, Shuttle.class));
+             //  mapState.setShuttle(i, gson.fromJson(json, Shuttle.class));
 
-                //Log.d(TAG, ">>SHUTTLE "+ gson.fromJson(json, Shuttle.class));
-              // Log.d(TAG, "NAME SHUTTLE:"+mapState.getShuttles()[i].getName());
+                Shuttle shuttle = gson.fromJson(json, Shuttle.class);
+                shuttles.add(shuttle);
             }
+
+
+
+           mapState.setShuttles(shuttles);
 
        }
 

@@ -1,5 +1,7 @@
 package com.jordann.maptest;
 
+import com.google.android.gms.maps.model.LatLng;
+
 /**
  * Created by jordan_n on 8/22/2014.
  */
@@ -23,6 +25,11 @@ public class Shuttle {
     public void setRouteID(int routeID) {
         RouteID = routeID;
     }
+
+    public LatLng getLatLng(){
+        return new LatLng(Latitude, Longitude);
+    }
+
     public double getLatitude() {
         return Latitude;
     }

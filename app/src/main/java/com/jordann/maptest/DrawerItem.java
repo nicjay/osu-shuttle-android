@@ -13,7 +13,7 @@ public class DrawerItem {
 
     private int mTypeId;
 
-    private Marker mMarker;
+    private ShuttleMarker mMarker;
     private String mTitle;
 
     private Image mImage;
@@ -27,11 +27,11 @@ public class DrawerItem {
     }
 
     //Row constructor
-    public DrawerItem(int typeId, String title, Marker marker) {
+    public DrawerItem(int typeId, String title, ShuttleMarker marker) {
         mTypeId = typeId;
         mTitle = title;
         mMarker = marker;
-        mLatLng = new LatLng(marker.getPosition().latitude, marker.getPosition().longitude);
+        mLatLng = new LatLng(marker.getMarker().getPosition().latitude, marker.getMarker().getPosition().longitude);
     }
 
     //Image constructor
@@ -45,13 +45,14 @@ public class DrawerItem {
         return mTypeId;
     }
 
-    public Marker getMarker() {
+    public ShuttleMarker getMarker() {
         return mMarker;
     }
 
     public String getTitle() {
         return mTitle;
     }
+
 
     public Image getImage() {
         return mImage;
@@ -60,27 +61,4 @@ public class DrawerItem {
     public LatLng getLatLng() {
         return mLatLng;
     }
-/*
-        switch(drawerItemID)
-            case 0:     //Section header
-                convertView = inflator.inflate(R.layout.drawer_section, parent, false);
-                var.addOnClickListerner(new OnCLickLister{
-                    toggleActive();
-                }
-
-
-            case 1:    //Map Item
-                convertView = inflator.inflate(R.layout.drawer_item, parent, false);
-                var.addOnclickListener( new OnClickListener{
-                    Map.ZoomTo(drawerItem[position].getMarker)
-                }
-            case 2:    //Extra Settings
-                convertView = inflator.inflate(R.layout.extra_settings, parent, false);
-                var.addOnclickListener( new OnClickListener{
-                    startActivity();
-                }
-
-        }
-
-         */
 }
