@@ -10,6 +10,8 @@ public class ShuttleMarker {
     private Marker mMarker;
     private int mVehicleId;
 
+    private int mTypeId;
+
     public ShuttleMarker(Marker marker, int vehicleId){
         mMarker = marker;
         mVehicleId = vehicleId;

@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * Created by jordan_n on 8/21/2014.
@@ -58,7 +59,7 @@ public class ShuttleUpdater {
         this.listener = listener;
         mapState = MapState.get();
         mHandler = new Handler();
-        Log.d(TAG, "ShuttleUpdater CONSTRUCTED");
+       // Log.d(TAG, "ShuttleUpdater CONSTRUCTED");
     }
 
     public static ShuttleUpdater get(OnMapStateUpdate listener){
@@ -73,7 +74,7 @@ public class ShuttleUpdater {
         r = new Runnable() {
             @Override
             public void run() {
-                Log.d(TAG, "--------RUN---------");
+               // Log.d(TAG, "--------RUN---------");
                 if(!isBusy){
                     //Log.d(TAG, "callAsyncTask");
                     new pollNewDataTask(urlShuttlePoints).execute();
@@ -98,11 +99,13 @@ public class ShuttleUpdater {
         //mHandler.postDelayed(r, asyncDelay);
     }
 
-    private class pollNewDataTask extends AsyncTask<String, Void, JSONArray[]>{
+    private class pollNewDataTask extends AsyncTask<String, Void, Void>{
 
         private String url;
 
-        private JSONArray[] jarray;
+        private JSONArray[] jShuttlesArray;
+        private JSONArray[] jStopsArray;
+
 
         public pollNewDataTask(String url) {
             super();
@@ -110,17 +113,21 @@ public class ShuttleUpdater {
         }
 
         @Override
-        protected JSONArray[] doInBackground(String... params) {
+        protected Void doInBackground(String... params) {
             JSONGetter getter = new JSONGetter();
-            jarray = getter.getJSONFromUrl(url);
-            return jarray;
+
+            jShuttlesArray = getter.getJSONFromUrl(url);
+           // jStopsArray = getter.getJSONFromUrl(url2);
+
+            //return jShuttlesArray;
+            return null;
         }
 
         @Override
-        protected void onPostExecute(JSONArray[] j) {
-            super.onPostExecute(j);
+        protected void onPostExecute(Void v) {
+            super.onPostExecute(v);
 
-            parseJSON(j);
+            parseJSON();
             listener.updateMap();
 
             //Log.d(TAG, "RETURNED JsonArray: " + j.toString());
@@ -128,12 +135,14 @@ public class ShuttleUpdater {
 
 
         //TODO: reduce number of string conversions here and JSONGetter
-       private void parseJSON(JSONArray[] j){
+       private void parseJSON(){
             Gson gson = new Gson();
 
-            JSONArray JSONShuttles = j[0];
+            JSONArray JSONShuttles = jShuttlesArray[0];
 
-           ArrayList<Shuttle> shuttles = new ArrayList<Shuttle>();
+
+            boolean foundFirst = false;
+            ArrayList<Shuttle> shuttles = new ArrayList<Shuttle>();
             for (int i=0; i<JSONShuttles.length();i++) {
                 String json = null;
                 try {
@@ -146,14 +155,43 @@ public class ShuttleUpdater {
              //  mapState.setShuttle(i, gson.fromJson(json, Shuttle.class));
 
                 Shuttle shuttle = gson.fromJson(json, Shuttle.class);
+                switch (shuttle.getRouteID()){
+                    case 1:
+                        shuttle.setName("East");
+                        break;
+                    case 3:
+                        shuttle.setName("North");
+                        break;
+                    case 2:  //Double route
+                        if(!foundFirst){
+                            shuttle.setName("West A");
+                            foundFirst = true;
+                        }else{
+                            shuttle.setName("West B");
+                        }
+                        break;
+                    default:
+                        shuttle.setName("DEFAULT");
+                }
                 shuttles.add(shuttle);
             }
 
+            mapState.setShuttles(shuttles);
 
 
-           mapState.setShuttles(shuttles);
+            //TEST STOPS
+            ArrayList<Stop> stops = mapState.getStops();
+           //do some code things to get times
+           Random random = new Random();
+          for (int i = 0; i < stops.size(); i++){
+               stops.get(i).setShuttleETAs(new int[]{random.nextInt(600),random.nextInt(600),random.nextInt(600),random.nextInt(600)});
+           }
+
+           mapState.setStops(stops);
+
 
        }
+
 
     }
 

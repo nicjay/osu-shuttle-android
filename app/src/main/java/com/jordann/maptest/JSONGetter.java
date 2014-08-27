@@ -38,12 +38,14 @@ public class JSONGetter {
         HttpGet httpGet = new HttpGet(url);
 
         try{
+            Log.d(TAG, "HTTP TRY");
             HttpResponse response = client.execute(httpGet);
 
             StatusLine statusLine = response.getStatusLine();
             int statusCode = statusLine.getStatusCode();
             //Log.d(TAG, "statusCode: " + statusCode);
             if(statusCode == 200){
+                Log.d(TAG, "Got the status code");
                 HttpEntity entity = response.getEntity();
                 InputStream content = entity.getContent();
                 BufferedReader reader = new BufferedReader(new InputStreamReader(content));
@@ -54,7 +56,7 @@ public class JSONGetter {
                     builder.append(line);
                 }
             }//TODO: else
-
+        Log.d(TAG, "END OF HTTP TRY");
         }catch (ClientProtocolException e){
             e.printStackTrace();
             Log.e(TAG, "ClientProtocolException");

@@ -18,7 +18,7 @@ public class MapInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
     private final View shuttleView;
     //private final View stopView;
 
-    private final MapState mMapState;
+    private static MapState mMapState;
 
     public MapInfoWindowAdapter(Context context) {
         mMapState = MapState.get();
@@ -33,9 +33,9 @@ public class MapInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
 
     @Override
     public View getInfoContents(Marker marker) {
+        mMapState = MapState.get();
         ShuttleMarker shuttleMarker = mMapState.getShuttleMarkerOfMarker(marker);
-
-        Log.d(TAG, "ShuttleView : " + shuttleView);
+        GoogleMap map = mMapState.getMap();
         String text = String.valueOf(shuttleMarker.getVehicleId());
         ((TextView)shuttleView.findViewById(R.id.info_shuttle_time1)).setText(text);
 

@@ -1,6 +1,7 @@
 package com.jordann.maptest;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 
 /**
  * Created by jordan_n on 8/22/2014.
@@ -17,6 +18,8 @@ public class Shuttle {
     private int IsOnRoute;
     private int Seconds;
     private String TimeStamp;
+
+    private Marker mMarker;
 
     public int getRouteID() {
         return RouteID;

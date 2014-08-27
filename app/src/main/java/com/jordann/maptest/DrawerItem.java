@@ -49,6 +49,10 @@ public class DrawerItem {
         return mMarker;
     }
 
+    public void setMarker(ShuttleMarker marker) {
+        mMarker = marker;
+    }
+
     public String getTitle() {
         return mTitle;
     }

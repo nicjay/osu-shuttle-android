@@ -57,10 +57,6 @@ public class MapState {
     }
 */
 
-    public static void reset(Bundle savedInstanceState){
-
-    }
-
 
     public static MapState get(){
         if (sMapState == null){
@@ -85,7 +81,18 @@ public class MapState {
 
     public void addShuttleMarker(LatLng latLng, int vehicleId){
 
-        mShuttleMarkerList.add(new ShuttleMarker(mMap.addMarker(new MarkerOptions().position(latLng).title("booya")), vehicleId));
+        ShuttleMarker shuttleMarker = new ShuttleMarker(mMap.addMarker(new MarkerOptions().position(latLng).title("booya")), vehicleId);
+       // Log.d(TAG, "NEW shuttleMarker : " + shuttleMarker + ". adding to map : " + mMap);
+        mShuttleMarkerList.add(shuttleMarker);
+
+        for (DrawerItem drawerItem : mDrawerItems){
+            if (drawerItem.getTypeId() != 0) {
+                if (vehicleId == drawerItem.getMarker().getVehicleId()) {
+                    drawerItem.setMarker(shuttleMarker);
+                }
+            }
+        }
+
     }
 
     public void updateShuttleMarker(int position, LatLng latLng){
@@ -100,8 +107,14 @@ public class MapState {
         return mShuttleMarkerList;
     }
 
+    public void clearShuttleMarkerArrayList(){
+       // Log.d(TAG, "shuttleMarkerList CLEARED");
+        mShuttleMarkerList.clear();
+    }
+
     public ShuttleMarker getShuttleMarkerOfMarker(Marker marker){
         for(ShuttleMarker shuttleMarker : mShuttleMarkerList){
+            //Log.d(TAG, "        marker: " + marker + " .equals( shuttleMarker.getMarker : " + shuttleMarker.getMarker() + ")");
             if(marker.equals(shuttleMarker.getMarker())){
                 return shuttleMarker;
             }
@@ -138,11 +151,12 @@ public class MapState {
     }
 
     public void setDrawerItems() {
+        mDrawerItems.clear();
         //"Shuttles" section header
         mDrawerItems.add(new DrawerItem(0, "Shuttles"));
         //Shuttle items
         int i;
-        for(i = 0; i < 4; i ++){
+        for(i = 0; i < mShuttles.size(); i ++){
             mDrawerItems.add(new DrawerItem(1, mShuttles.get(i).getName(), mShuttleMarkerList.get(i)));
         }
 
@@ -150,7 +164,7 @@ public class MapState {
         mDrawerItems.add(new DrawerItem(0, "Stops"));
 
         //Stop items   //TODO Add Stop Items
-        for(i = 0; i < 8; i++){
+        for(i = 0; i < mStops.size(); i++){
             //   drawerItems.add(new DrawerItem(2, "Test Stop#" + i, shuttleMarkers[i%2]));
         }
 
@@ -160,7 +174,6 @@ public class MapState {
         for(DrawerItem drawerItem : mDrawerItems){
             if(drawerItem.getTypeId() != 0) {
                 if (drawerItem.getMarker().getVehicleId() == vehicleId) {
-                    Log.d(TAG, "Removing drawerItem: " + drawerItem.getTitle());
                     mDrawerItems.remove(drawerItem);
                     break;
                 }

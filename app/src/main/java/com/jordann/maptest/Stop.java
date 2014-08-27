@@ -1,5 +1,7 @@
 package com.jordann.maptest;
 
+import com.google.android.gms.maps.model.Marker;
+
 import java.lang.reflect.Array;
 
 /**
@@ -9,7 +11,16 @@ public class Stop {
     private double mLatitude;
     private double mLongitude;
     private String mName;
-    private int[] mShuttleETAs = new int[3];
+    private int[] mShuttleETAs = new int[4];
+
+    private Marker mMarker;
+
+    public Stop(double latitude, double longitude, String name, int[] shuttleETAs){
+        mLatitude = latitude;
+        mLongitude = longitude;
+        mName = name;
+        mShuttleETAs = shuttleETAs;
+    }
 
 
     public int[] getShuttleETAs() {

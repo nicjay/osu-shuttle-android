@@ -7,13 +7,33 @@
         android:id="@+id/drawer_section_header_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Placeholder Title"
         android:padding="8dp"
-        android:textSize="24dp"
-        android:textColor="#777777"
+        android:textSize="24sp"
+        android:textColor="#666666"
         android:textStyle="bold"
 
+
         />
+
+    <TextView
+        android:id="@+id/drawer_group_item_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="16dp"
+        android:paddingRight="8dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:textSize="24sp"
+        android:textColor="#AAAAAA"
+        android:textStyle="bold"
+        />
+
+    <ImageView
+        android:id="@+id/drawer_group_image_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:padding="8dp"/>
 
 
 
