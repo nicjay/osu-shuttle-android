@@ -24,6 +24,7 @@ public class MapInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
         mMapState = MapState.get();
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         shuttleView = inflater.inflate(R.layout.info_shuttle, null);
+        shuttleView.setOnClickListener(null);
     }
 
     @Override
@@ -33,14 +34,24 @@ public class MapInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
 
     @Override
     public View getInfoContents(Marker marker) {
-        mMapState = MapState.get();
-        ShuttleMarker shuttleMarker = mMapState.getShuttleMarkerOfMarker(marker);
-        GoogleMap map = mMapState.getMap();
-        String text = String.valueOf(shuttleMarker.getVehicleId());
-        ((TextView)shuttleView.findViewById(R.id.info_shuttle_time1)).setText(text);
 
+        for (Shuttle shuttle : mMapState.getShuttles()){
+            if (shuttle.getMarker().equals(marker)){
+                ((TextView)shuttleView.findViewById(R.id.info_shuttle_title)).setText(shuttle.getName());
+                //((TextView)shuttleView.findViewById(R.id.info_shuttle_time1)).setText();
+                return shuttleView;
+            }
+        }
 
+        for (Stop stop : mMapState.getStops()){
+            if (stop.getMarker().equals(marker)){
+                //TODO: reference new layout for stop
+                ((TextView)shuttleView.findViewById(R.id.info_shuttle_title)).setText(stop.getName());
+                return shuttleView;
+            }
+        }
 
-        return shuttleView;
+        return null;
+
     }
 }

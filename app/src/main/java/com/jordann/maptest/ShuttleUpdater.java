@@ -4,6 +4,7 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.util.Log;
 
+import com.google.android.gms.internal.ge;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -94,6 +95,7 @@ public class ShuttleUpdater {
 
     public void startShuttleUpdater(){
         stop = false;
+
         new pollNewDataTask(urlShuttlePoints).execute();
         startHandler();
         //mHandler.postDelayed(r, asyncDelay);
@@ -140,9 +142,8 @@ public class ShuttleUpdater {
 
             JSONArray JSONShuttles = jShuttlesArray[0];
 
+            boolean[] onlineStates = {false,false,false,false};
 
-            boolean foundFirst = false;
-            ArrayList<Shuttle> shuttles = new ArrayList<Shuttle>();
             for (int i=0; i<JSONShuttles.length();i++) {
                 String json = null;
                 try {
@@ -155,31 +156,82 @@ public class ShuttleUpdater {
              //  mapState.setShuttle(i, gson.fromJson(json, Shuttle.class));
 
                 Shuttle shuttle = gson.fromJson(json, Shuttle.class);
+               shuttle.setOnline(true);
+
+
+
                 switch (shuttle.getRouteID()){
                     case 1:
                         shuttle.setName("East");
-                        break;
-                    case 3:
-                        shuttle.setName("North");
+                        mapState.setShuttle(0, shuttle);
+                        onlineStates[0] = true;
                         break;
                     case 2:  //Double route
+                        Log.d(TAG, "RouteID == 2\n\n");
+                        if (mapState.getShuttles().get(1).getVehicleId() == shuttle.getVehicleId()){
+                            mapState.setShuttle(1, shuttle);
+                            Log.d(TAG, "set 1");
+                            onlineStates[1] = true;
+                        }
+
+                        else if (mapState.getShuttles().get(2).getVehicleId() == shuttle.getVehicleId()){
+                            mapState.setShuttle(2, shuttle);
+                            Log.d(TAG, "set 2");
+                            onlineStates[2] = true;
+                        }
+
+                        else if (!mapState.getShuttles().get(1).isOnline()){
+                            Log.d(TAG, "before online: " + mapState.getShuttles().get(1).isOnline());
+                            mapState.setShuttle(1, shuttle);
+                            Log.d(TAG, "after online: " + mapState.getShuttles().get(1).isOnline());
+                            Log.d(TAG, "set 3");
+                            onlineStates[1] = true;
+                        }
+
+                        else if (!mapState.getShuttles().get(2).isOnline()){
+                            mapState.setShuttle(2, shuttle);
+                            Log.d(TAG, "set 4");
+                            onlineStates[2] = true;
+                        }
+
+                        //TODO:double shuttle - one goes offline
+                        /*
                         if(!foundFirst){
                             shuttle.setName("West A");
                             foundFirst = true;
+                            mapState.setShuttle(1, shuttle);
                         }else{
                             shuttle.setName("West B");
-                        }
+                            mapState.setShuttle(2, shuttle);
+                        }  */
+
                         break;
+                    case 3:
+                        shuttle.setName("North");
+                        mapState.setShuttle(3, shuttle);
+                        onlineStates[3] = true;
+                        break;
+
                     default:
                         shuttle.setName("DEFAULT");
                 }
-                shuttles.add(shuttle);
+               // shuttles.add(shuttle);
             }
 
-            mapState.setShuttles(shuttles);
+           for (int i =0; i<4;i++){
+               Shuttle shuttle = mapState.getShuttles().get(i);
+               if (onlineStates[i]==false){
+                   shuttle.setOnline(false);
+                   //TODO: see if this is actually setting
+               }else{
+                   shuttle.setOnline(true);
+               }
+
+           }
 
 
             //TEST STOPS
+
             ArrayList<Stop> stops = mapState.getStops();
            //do some code things to get times
            Random random = new Random();
@@ -187,8 +239,8 @@ public class ShuttleUpdater {
                stops.get(i).setShuttleETAs(new int[]{random.nextInt(600),random.nextInt(600),random.nextInt(600),random.nextInt(600)});
            }
 
-           mapState.setStops(stops);
-
+          // mapState.setStops(stops);
+           //TODO: see if dont need to set for sure
 
        }
 

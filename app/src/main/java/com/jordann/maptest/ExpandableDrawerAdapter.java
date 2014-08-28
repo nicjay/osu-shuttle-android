@@ -2,6 +2,7 @@ package com.jordann.maptest;
 
 import android.content.Context;
 import android.media.Image;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,11 +41,11 @@ public class ExpandableDrawerAdapter extends BaseExpandableListAdapter {
     public int getChildrenCount(int groupPosition) {
         switch (groupPosition){
             case 6:
-                return 1;
+                return mDrawerItems.get(groupPosition).getStopsIndex().size();
             case 7:
-                return 1;
+                return mDrawerItems.get(groupPosition).getStopsIndex().size();
             case 8:
-                return 1;
+                return mDrawerItems.get(groupPosition).getStopsIndex().size();
             default:
                 return 0;
         }
@@ -94,31 +95,43 @@ public class ExpandableDrawerAdapter extends BaseExpandableListAdapter {
             imageViewResId = R.drawable.ic_action_expand;
         }
 
-
+        ArrayList<Shuttle> shuttles = sMapState.getShuttles();
 
         if(groupPosition == 0){ //"Shuttles" header
             sectionTitle.setText("Shuttles");
             convertView.setEnabled(false);
             convertView.setOnClickListener(null);
         }else if(groupPosition < 5){ //Shuttle Names... "West A", "North"
-            groupTitle.setText("OBJ");
+            Shuttle shuttle = mDrawerItems.get(groupPosition).getShuttle();
+            groupTitle.setText(shuttle.getName());
+            if(!shuttle.isOnline()){
+                convertView.setEnabled(false);
+                //TODO: gray out to show disabled
+            }
         }else {
+            String title = mDrawerItems.get(groupPosition).getTitle();
             switch (groupPosition){
+
                 case 5:
-                    sectionTitle.setText("Stops");
+                    sectionTitle.setText(title);
+                    groupTitle.setText("");
+                    imageView.setVisibility(View.INVISIBLE);
                     convertView.setEnabled(false);
                     convertView.setOnClickListener(null);
                     break;
                 case 6:
-                    groupTitle.setText("North");
+                    imageView.setVisibility(View.VISIBLE);
+                    groupTitle.setText(title);
                     imageView.setImageResource(imageViewResId);
                     break;
                 case 7:
-                    groupTitle.setText("West");
+                    imageView.setVisibility(View.VISIBLE);
+                    groupTitle.setText(title);
                     imageView.setImageResource(imageViewResId);
                     break;
                 case 8:
-                    groupTitle.setText("East");
+                    imageView.setVisibility(View.VISIBLE);
+                    groupTitle.setText(title);
                     imageView.setImageResource(imageViewResId);
                     break;
                 default:
@@ -131,21 +144,23 @@ public class ExpandableDrawerAdapter extends BaseExpandableListAdapter {
 
     @Override
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
+        Log.d(TAG, "getChildView");
         if(convertView == null){
             LayoutInflater inflater = (LayoutInflater)mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(R.layout.drawer_list_item, null);
         }
         TextView childTitle = (TextView)convertView.findViewById(R.id.drawer_list_item_title);
+        int stopsIndex = mDrawerItems.get(groupPosition).getStopsIndex().get(childPosition);
+        String title = sMapState.getStops().get(stopsIndex).getName();
         switch (groupPosition){
             case 6:
-                childTitle.setText("North child");
-                convertView.setBackgroundColor(0xFF123123);
+                childTitle.setText(title);
                 break;
             case 7:
-                childTitle.setText("West child");
+                childTitle.setText(title);
                 break;
             case 8:
-                childTitle.setText("East child");
+                childTitle.setText(title);
                 break;
             default:
 
@@ -155,7 +170,7 @@ public class ExpandableDrawerAdapter extends BaseExpandableListAdapter {
 
     @Override
     public boolean isChildSelectable(int groupPosition, int childPosition) {
-        return false;
+        return true;
 
     }
 

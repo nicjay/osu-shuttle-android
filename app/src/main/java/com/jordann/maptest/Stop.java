@@ -1,5 +1,6 @@
 package com.jordann.maptest;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
 import java.lang.reflect.Array;
@@ -22,6 +23,13 @@ public class Stop {
         mShuttleETAs = shuttleETAs;
     }
 
+    public Marker getMarker() {
+        return mMarker;
+    }
+
+    public void setMarker(Marker marker) {
+        mMarker = marker;
+    }
 
     public int[] getShuttleETAs() {
         return mShuttleETAs;
@@ -31,12 +39,13 @@ public class Stop {
         mShuttleETAs = shuttleETAs;
     }
 
-
     public void setShuttleETA(int index, int ETA){
         mShuttleETAs[index] = ETA;
     }
 
-
+    public LatLng getLatLng(){
+        return new LatLng(mLatitude, mLongitude);
+    }
 
     public double getLatitude() {
         return mLatitude;

@@ -41,6 +41,9 @@ public class MapsActivity extends FragmentActivity implements ShuttleUpdater.OnM
 
     private static final String TAG = "MapsActivity";
 
+    private static final String mStopsUrl = "http://www.osushuttles.com/Services/JSONPRelay.svc/GetRoutesForMapWithSchedule";
+
+
     private static final String KEY_FIRST_TIME = "first_time";
 
     private DrawerLayout mDrawerLayout;
@@ -69,6 +72,15 @@ public class MapsActivity extends FragmentActivity implements ShuttleUpdater.OnM
         }
 
         mMapState = MapState.get();
+        setUpMapIfNeeded();
+
+        Log.d(TAG, "onCreate getStops : " + mMapState.getStops());
+        if (mMapState.getStops() == null){
+            InitialStopsTask stopsTask = new InitialStopsTask(mStopsUrl);
+            stopsTask.execute();
+        }
+
+        mMapState.initShuttles();
 
 
         //ASYNC Requests
@@ -85,68 +97,67 @@ public class MapsActivity extends FragmentActivity implements ShuttleUpdater.OnM
     @Override
     protected void onResume() {
         super.onResume();
-
-
-
-        setUpStops();
+       // setUpStops();
         shuttleUpdater.startShuttleUpdater();
-
-        setUpMapIfNeeded();
-
-        setUpNavigationDrawer();
-        mDrawerToggle.syncState();
+       // setUpMapIfNeeded();
 
         Log.d(TAG, "onResume");
     }
 
+    /*
     private void setUpStops(){
         ArrayList<Stop> stops = new ArrayList<Stop>();
-        stops.add(new Stop(44.55832, -123.28162, "Reser Stadium", new int[]{0,0,0,0}));
-        stops.add(new Stop(44.560524,-123.282411, "Ralph Miller Way", new int[]{0,0,0,0}));
-        stops.add(new Stop(44.56344,-123.27964, "Dixon Rec Center", new int[]{0,0,0,0}));
+        stops.add(new Stop(44.55832, -123.28162, "Reser Stadium", new int[]{-1,-1,-1,-1}));
+        stops.add(new Stop(44.560524,-123.282411, "Ralph Miller Way", new int[]{-1,-1,-1,-1}));
+        stops.add(new Stop(44.56344,-123.27964, "Dixon Rec Center", new int[]{-1,-1,-1,-1}));
         mMapState.setStops(stops);
 
     }
+    */
 
-    private void setUpNavigationDrawer(){
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mDrawerList = (ExpandableListView) findViewById(R.id.left_drawer);
+    private void initNavigationDrawer(){
+        if(mDrawerLayout == null && mDrawerList == null) {
+            mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+            mDrawerList = (ExpandableListView) findViewById(R.id.left_drawer);
 
 
-        // set a custom shadow that overlays the main content when the drawer opens
-        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
-        // set up the drawer's list view with items and click listener
-        //mAdapter = new DrawerAdapter(this, mMapState.getDrawerItems());
-        mAdapter = new ExpandableDrawerAdapter(this, mMapState.getDrawerItems());
-        mDrawerList.setAdapter(mAdapter);
-        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+            // set a custom shadow that overlays the main content when the drawer opens
+            mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
+            // set up the drawer's list view with items and click listener
+            //mAdapter = new DrawerAdapter(this, mMapState.getDrawerItems());
 
-        ExpandableListView listView = (ExpandableListView)findViewById(R.id.left_drawer);
-        
 
-        mDrawerToggle = new ActionBarDrawerToggle(
-                this,                  /* host Activity */
-                mDrawerLayout,         /* DrawerLayout object */
-                R.drawable.ic_drawer,  /* nav drawer image to replace 'Up' caret */
-                R.string.drawer_open,  /* "open drawer" description for accessibility */
-                R.string.drawer_close  /* "close drawer" description for accessibility */
-        ) {
-            public void onDrawerClosed(View view) {
-                super.onDrawerClosed(view);
-                //getActionBar().setTitle(mTitle);
-                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
-            }
+            mDrawerList.setOnGroupClickListener(new DrawerItemClickListener());
+            mDrawerList.setOnChildClickListener(new DrawerItemClickListener());
 
-            public void onDrawerOpened(View drawerView) {
-                super.onDrawerOpened(drawerView);
-                //getActionBar().setTitle(mDrawerTitle);
-                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()'
+            ExpandableListView listView = (ExpandableListView) findViewById(R.id.left_drawer);
 
-            }
-        };
-        mDrawerLayout.setDrawerListener(mDrawerToggle);
-        getActionBar().setDisplayHomeAsUpEnabled(true);
-        getActionBar().setHomeButtonEnabled(true);
+
+            mDrawerToggle = new ActionBarDrawerToggle(
+                    this,                  /* host Activity */
+                    mDrawerLayout,         /* DrawerLayout object */
+                    R.drawable.ic_drawer,  /* nav drawer image to replace 'Up' caret */
+                    R.string.drawer_open,  /* "open drawer" description for accessibility */
+                    R.string.drawer_close  /* "close drawer" description for accessibility */
+            ) {
+                public void onDrawerClosed(View view) {
+                    super.onDrawerClosed(view);
+                    //getActionBar().setTitle(mTitle);
+                    invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+                }
+
+                public void onDrawerOpened(View drawerView) {
+                    super.onDrawerOpened(drawerView);
+                    //getActionBar().setTitle(mDrawerTitle);
+                    invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()'
+
+                }
+            };
+            mDrawerLayout.setDrawerListener(mDrawerToggle);
+            getActionBar().setDisplayHomeAsUpEnabled(true);
+            getActionBar().setHomeButtonEnabled(true);
+            mDrawerToggle.syncState();
+        }
 
     }
 
@@ -154,53 +165,36 @@ public class MapsActivity extends FragmentActivity implements ShuttleUpdater.OnM
         Log.d(TAG, "UPDATE MAP : " + mMapState.getMap());
         //TODO: shadow view and show ActivityIndicator until this happens
 
-        ArrayList<Shuttle> shuttles = mMapState.getShuttles();
+      //  ArrayList<Shuttle> shuttles = mMapState.getShuttles();
 
         //Update current marker list
-        for(Shuttle shuttle : shuttles){
-
-            ArrayList<ShuttleMarker> shuttleMarkerArrayList = mMapState.getShuttleMarkerList();
-            boolean foundMatch = false;
-            for (ShuttleMarker marker : shuttleMarkerArrayList){
-                if (marker.getVehicleId() == shuttle.getVehicleId()){
-                    mMapState.updateShuttleMarker(shuttleMarkerArrayList.indexOf(marker), shuttle.getLatLng());
-                    foundMatch = true;
-                    break;
-                }
-            }
-            if (!foundMatch){
-
-                mMapState.addShuttleMarker(shuttle.getLatLng(), shuttle.getVehicleId());
+        ArrayList<Shuttle> shuttles = mMapState.getShuttles();
+        Log.d(TAG, "Shuttles: " + shuttles);
+        //for(int i = 0, len = shuttles.size(); i < len; i++){
+        //Shuttle shuttle = shuttles.get(i);
+        for(Shuttle shuttle : mMapState.getShuttles()) {
+            Log.d(TAG, "Shuttle onlineBool: " + shuttle.isOnline());
+            if (!shuttle.isOnline()) {
+                shuttle.getMarker().setVisible(false);
+                //TODO: see if really set
+            } else {
+                shuttle.getMarker().setVisible(true);
 
             }
+
+            if (shuttle.getLatLng() != shuttle.getMarker().getPosition()) {
+                shuttle.updateMarker();
+            }
+            //Update InfoWindow RouteEstimates
         }
+        mMapState.initStops();
+        initNavigationDrawer();
+        if (mMapState.initDrawerItems()) {
+            mAdapter = new ExpandableDrawerAdapter(this, mMapState.getDrawerItems());
+            mDrawerList.setAdapter(mAdapter);
 
-        ArrayList<ShuttleMarker> shuttleMarkerArrayList = mMapState.getShuttleMarkerList();
-        boolean foundMatchToRemove;
-
-        for (ShuttleMarker marker : shuttleMarkerArrayList){
-            foundMatchToRemove = true;
-            for (Shuttle shuttle : shuttles){
-                if (marker.getVehicleId() == shuttle.getVehicleId()){
-                    foundMatchToRemove = false;
-                    break;
-                }
-            }
-            if (foundMatchToRemove){
-
-                mMapState.removeShuttleMarker(marker);
-                mMapState.removeDrawerItem(marker.getVehicleId());
-            }
         }
-
-        if(firstTime){
-            mMapState.setDrawerItems();
-            firstTime = false;
-        }else{
-            mAdapter.notifyDataSetChanged();
-        }
-
-        //Update InfoWindow RouteEstimates
+        mAdapter.notifyDataSetChanged();
 
     }
 
@@ -211,7 +205,6 @@ public class MapsActivity extends FragmentActivity implements ShuttleUpdater.OnM
 
         Log.d(TAG, "setUpMapIfNeeded");
         if(mMap == null) {
-            mMapState.clearShuttleMarkerArrayList();
             MapFragment mapFragment = ((MapFragment) getFragmentManager().findFragmentById(R.id.map));
             mapFragment.setRetainInstance(true);
 
@@ -362,38 +355,74 @@ public class MapsActivity extends FragmentActivity implements ShuttleUpdater.OnM
         return super.onPrepareOptionsMenu(menu);
     }
 
+/*
 
-    /* The click listner for ListView in the navigation drawer */
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             selectItem(position);
         }
     }
+*/
 
-    private void selectItem(int position) {
+    private class DrawerItemClickListener implements ExpandableListView.OnGroupClickListener, ExpandableListView.OnChildClickListener {
+
+        @Override
+        public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
+
+            selectItemGroup(groupPosition);
+
+            return false;
+        }
+
+        @Override
+        public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+            selectItemChild(groupPosition, childPosition);
+            return false;
+        }
+
+    }
+
+
+
+
+
+
+
+    private void selectItemGroup(int groupPosition) {
         // update the main content by replacing fragments
         ArrayList<DrawerItem> drawerItems = mMapState.getDrawerItems();
         // update selected item and title, then close the drawer
-        mDrawerList.setItemChecked(position, true);
-        setTitle(drawerItems.get(position).getTitle());
+        //mDrawerList.setItemChecked(groupPosition, true);
+       // setTitle(drawerItems.get(groupPosition).getTitle());
 
-        switch (drawerItems.get(position).getTypeId()){
-            case 0:
+        switch (drawerItems.get(groupPosition).getTypeId()){
+            case 0://Section
 
                 break;
-            case 1:
-                mMapState.animateMap(drawerItems.get(position).getLatLng());
-                mMapState.showInfoWindow(position);
+            case 1://Shuttle
+                mMapState.animateMap(drawerItems.get(groupPosition).getShuttle().getLatLng());
+                Log.d(TAG, "Marker: " + drawerItems.get(groupPosition).getShuttle().getMarker());
+                drawerItems.get(groupPosition).getShuttle().getMarker().showInfoWindow();
+               // mMapState.showInfoWindow(groupPosition);
                 mDrawerLayout.closeDrawer(mDrawerList);
                 break;
-            case 2:
-                mMapState.animateMap(drawerItems.get(position).getLatLng());
-                mMapState.showInfoWindow(position);
-                mDrawerLayout.closeDrawer(mDrawerList);
+            case 2://Route
+
                 break;
             default:
 
         }
+    }
+    private void selectItemChild(int groupPosition, int childPosition){
+        ArrayList<DrawerItem> drawerItems = mMapState.getDrawerItems();
+        ArrayList<Stop> stops = mMapState.getStops();
+
+        Log.d(TAG, "ch "+ childPosition +" : stopsIndex for drawerItem#" + groupPosition + " is " + drawerItems.get(groupPosition).getStopsIndex() );
+        int index = drawerItems.get(groupPosition).getStopsIndex().get(childPosition);
+        mMapState.animateMap(stops.get(index).getLatLng());
+        //mMapState.showInfoWindow(position);
+        stops.get(index).getMarker().showInfoWindow();
+        mDrawerLayout.closeDrawer(mDrawerList);
     }
 }

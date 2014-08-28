@@ -3,6 +3,8 @@ package com.jordann.maptest;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
+import java.sql.Time;
+
 /**
  * Created by jordan_n on 8/22/2014.
  */
@@ -20,6 +22,46 @@ public class Shuttle {
     private String TimeStamp;
 
     private Marker mMarker;
+
+    private boolean isOnline;
+
+    public Shuttle(String name, boolean isOnline) {
+        this.isOnline = isOnline;
+        this.Name = name;
+    }
+
+    public void updateAll(Shuttle shuttle){
+        Latitude = shuttle.getLatitude();
+        Longitude = shuttle.getLongitude();
+        Heading = shuttle.getHeading();
+        GroundSpeed = shuttle.getGroundSpeed();
+        VehicleId = shuttle.getVehicleId();
+        RouteID = shuttle.getRouteID();
+        IsOnRoute = shuttle.getIsOnRoute();
+        Seconds = shuttle.getSeconds();
+        TimeStamp = shuttle.getTimeStamp();
+        isOnline = shuttle.isOnline();
+    }
+
+    public boolean isOnline() {
+        return isOnline;
+    }
+
+    public void setOnline(boolean isOnline) {
+        this.isOnline = isOnline;
+    }
+
+    public Marker getMarker() {
+        return mMarker;
+    }
+
+    public void setMarker(Marker marker) {
+        mMarker = marker;
+    }
+
+    public void updateMarker(){
+        mMarker.setPosition(getLatLng());
+    }
 
     public int getRouteID() {
         return RouteID;
@@ -103,5 +145,9 @@ public class Shuttle {
 
     public void setTimeStamp(String timeStamp) {
         TimeStamp = timeStamp;
+    }
+
+    public int getIsOnRoute() {
+        return IsOnRoute;
     }
 }
