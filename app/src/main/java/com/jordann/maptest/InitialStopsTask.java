@@ -1,31 +1,25 @@
 package com.jordann.maptest;
 
 import android.os.AsyncTask;
-import android.util.Log;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
 
-/**
- * Created by sellersk on 8/28/2014.
+/*
+  Created by sellersk on 8/28/2014.
  */
 public class InitialStopsTask extends AsyncTask<String, Void, JSONArray> {
     private static final String TAG = "InitialStopsTask";
 
     private String url;
-    private MapState mMapState;
-   // private JSONArray jStopsArray;
-   // private JSONObject jStopsArray2;
+    private static MapState sMapState;
 
     public InitialStopsTask(String url){
         super();
+        sMapState = MapState.get();
         this.url = url;
-        mMapState = MapState.get();
     }
-
 
     @Override
     protected void onPostExecute(JSONArray j) {
@@ -36,20 +30,17 @@ public class InitialStopsTask extends AsyncTask<String, Void, JSONArray> {
     @Override
     protected JSONArray doInBackground(String... params) {
         JSONGetter getter = new JSONGetter();
-
-        JSONArray jStopsArray = getter.getJSONFromUrl(url)[0];
+        JSONArray jStopsArray = getter.getJSONFromUrl(url);
 
         return jStopsArray;
     }
 
-
     private void parseJSON(JSONArray jStopsArray){
-
         ArrayList<Stop> stops = new ArrayList<Stop>();
         ArrayList<String> stopNames = new ArrayList<String>();
 
         for (int i = 0, len = jStopsArray.length(); i < len; i++){
-            JSONObject route = null;
+            JSONObject route;
             try {
                 route = jStopsArray.getJSONObject(i);
                 JSONArray landmarks = route.getJSONArray("Landmarks");
@@ -63,19 +54,11 @@ public class InitialStopsTask extends AsyncTask<String, Void, JSONArray> {
                         stops.add(stop);
                     }
                 }
-
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-
-
         }
 
-
-        mMapState.setStops(stops);
-        Log.d(TAG, "SetStops! size: " + stops.size());
+        sMapState.setStops(stops);
     }
-
-
-
 }

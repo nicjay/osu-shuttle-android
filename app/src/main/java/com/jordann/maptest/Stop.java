@@ -3,10 +3,8 @@ package com.jordann.maptest;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
-import java.lang.reflect.Array;
-
-/**
- * Created by jordan_n on 8/22/2014.
+/*
+  Created by jordan_n on 8/22/2014.
  */
 public class Stop {
     private double mLatitude;
@@ -47,27 +45,8 @@ public class Stop {
         return new LatLng(mLatitude, mLongitude);
     }
 
-    public double getLatitude() {
-        return mLatitude;
-    }
-
-    public void setLatitude(double latitude) {
-        mLatitude = latitude;
-    }
-
-    public double getLongitude() {
-        return mLongitude;
-    }
-
-    public void setLongitude(double longitude) {
-        mLongitude = longitude;
-    }
-
     public String getName() {
         return mName;
     }
 
-    public void setName(String name) {
-        mName = name;
-    }
 }
