@@ -1,5 +1,6 @@
 package com.jordann.maptest;
 
+import android.content.res.Configuration;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
@@ -9,7 +10,10 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.ExpandableListView;
+import android.widget.ListAdapter;
+
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -18,7 +22,7 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import java.util.ArrayList;
 
-public class MapsActivity extends FragmentActivity implements ShuttleUpdater.OnMapStateUpdate {
+public class MapsActivity extends FragmentActivity implements ShuttleUpdater.OnMapStateUpdate, InitialStopsTask.OnStopsComplete {
     private static final String TAG = "MapsActivity";
 
     private static final String mStopsUrl = "http://www.osushuttles.com/Services/JSONPRelay.svc/GetRoutesForMapWithSchedule";
@@ -36,24 +40,41 @@ public class MapsActivity extends FragmentActivity implements ShuttleUpdater.OnM
 
     private ShuttleUpdater shuttleUpdater;
 
+    private MapFragment mapFragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "LIFECYCLE - onCreate");
+
         setContentView(R.layout.activity_main);
 
+        Log.d(TAG, "callingActivity : " + this);
         mMapState = MapState.get();
-        setUpMapIfNeeded();
+
+
 
         if (mMapState.getStops() == null){
-            InitialStopsTask stopsTask = new InitialStopsTask(mStopsUrl);
+            InitialStopsTask stopsTask = new InitialStopsTask(mStopsUrl, this);
             stopsTask.execute();
+        } else {
+            setUpMapIfNeeded();
         }
 
-        mMapState.initShuttles();
-
+       // Log.d(TAG, "mMapState shuttles before: "+mMapState.getShuttles());
+        //mMapState.initShuttles();
+       // Log.d(TAG, "mMapState shuttles after: "+mMapState.getShuttles());
         //Asynchronous task that fetches Shuttle positions and estimates on interval
         shuttleUpdater = ShuttleUpdater.get(this);
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        this.mDrawerLayout = (DrawerLayout) this.findViewById(R.id.drawer_layout);
+        this.mDrawerList = (ExpandableListView) this.findViewById(R.id.left_drawer);
+        Log.d(TAG, "mdrawerlayout : " + mDrawerLayout + " ; mdrawerList: " + mDrawerList);
+
     }
 
     @Override
@@ -68,14 +89,32 @@ public class MapsActivity extends FragmentActivity implements ShuttleUpdater.OnM
         super.onResume();
         Log.d(TAG, "LIFECYCLE - onResume");
         shuttleUpdater.startShuttleUpdater();
+
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "LIFECYCLE - onDestroy");
+        mMap = null;
+        mMapState.setMap(null);
+        mDrawerList = null;
+        mDrawerLayout = null;
+        mAdapter = null;
+        mDrawerToggle = null;
+        finish();
+      //  mMapState.setStops(null);
+       // mMapState.destroyMapState();
+       // mMapState = null;
+
     }
 
     public void updateMap() {
         Log.d(TAG, "updateMap");
         //TODO: shadow view and show ActivityIndicator until this happens
-
         //Update current marker list
-        ArrayList<Shuttle> shuttles = mMapState.getShuttles();
+       // ArrayList<Shuttle> shuttles = mMapState.getShuttles();
         for(Shuttle shuttle : mMapState.getShuttles()) {
             if (!shuttle.isOnline()) {
                 shuttle.getMarker().setVisible(false);
@@ -87,60 +126,121 @@ public class MapsActivity extends FragmentActivity implements ShuttleUpdater.OnM
             }
             //TODO: Update InfoWindow RouteEstimates
         }
-        mMapState.initStops();
-        initNavigationDrawer();
+        mMapState.initStopsArrays();
+
+        /*
         if (mMapState.initDrawerItems()) {  //If navigation drawer is newly initialized
-            mAdapter = new ExpandableDrawerAdapter(this, mMapState.getDrawerItems());
-            mDrawerList.setAdapter(mAdapter);
+
         }
+*/
+        mMapState.initDrawerItems();
+
+        initNavigationDrawer();
         mAdapter.notifyDataSetChanged();
+        Log.d(TAG, "end updateMap");
     }
 
     private void initNavigationDrawer(){
-        Log.d(TAG, "initNavigationDrawer");
-        if(mDrawerLayout == null && mDrawerList == null) {
-            mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-            mDrawerList = (ExpandableListView) findViewById(R.id.left_drawer);
+        Log.d(TAG, "initNavigationDrawer: " + mDrawerLayout + " ; " + mDrawerList);
+        if(/*mDrawerLayout == null && mDrawerList == null*/ true) {
 
-            mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
+
+            mDrawerList.setBackgroundColor(0xFFFFFFFF);
+
+            Log.d(TAG, "adapter is: "+mDrawerList.getAdapter());
+
+            Log.d(TAG, "POST Set: " + mDrawerLayout + " ; " + mDrawerList);
+
+            //mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
             mDrawerList.setOnGroupClickListener(new DrawerItemClickListener(mDrawerLayout, mDrawerList));
             mDrawerList.setOnChildClickListener(new DrawerItemClickListener(mDrawerLayout, mDrawerList));
+
+
 
             mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close) {
                 public void onDrawerClosed(View view) {
                     super.onDrawerClosed(view);
                     invalidateOptionsMenu();
+                    Log.d(TAG, "mDrawerToggle closed: " + mDrawerToggle);
                 }
                 public void onDrawerOpened(View drawerView) {
                     super.onDrawerOpened(drawerView);
                     invalidateOptionsMenu();
+                    Log.d(TAG, "mDrawerToggle open: " + mDrawerToggle);
                 }
             };
+
+
+
             mDrawerLayout.setDrawerListener(mDrawerToggle);
             getActionBar().setDisplayHomeAsUpEnabled(true);
             getActionBar().setHomeButtonEnabled(true);
+
+            mAdapter = new ExpandableDrawerAdapter(this, mMapState.getDrawerItems());
+
+            //ListAdapter mAdapterTest = new ListAdapter<DrawerItem>(this, R.layout.drawer_list_item, mMapState.getDrawerItems());
+            Log.d(TAG, "DrawerItems: " + mMapState.getDrawerItems().toString());
+            //mDrawerList.setAdapter(mAdapter);
+            mDrawerList.setAdapter(mAdapter);
+            //mDrawerList.setAdapter(mAdapterTest);
+
             mDrawerToggle.syncState();
         }
+
     }
 
-    private void setUpMapIfNeeded() {
-        Log.d(TAG, "setUpMapIfNeeded");
+    public void setUpMapIfNeeded() {
+        Log.d(TAG, "setUpMapIfNeeded...");
+
+/*
+
+        mapFragment = ((MapFragment) getFragmentManager().findFragmentById(R.id.map));
+        mapFragment.setRetainInstance(true);
+
+
+        mMap = mapFragment.getMap();
+
+
+       // if(mMap != null){
+            setUpRouteLines();
+            mMap.setMyLocationEnabled(true);
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(MAP_CENTER, MAP_ZOOM_LEVEL));
+       // }
+
+        mMap.setInfoWindowAdapter(new MapInfoWindowAdapter(this));
+
+
+        mMapState.setMap(mMap);
+*/
+
+
+        mMap = mMapState.getMap();
+
+
+
         if(mMap == null) {
+            Log.d(TAG, "Needed...");
             MapFragment mapFragment = ((MapFragment) getFragmentManager().findFragmentById(R.id.map));
             mapFragment.setRetainInstance(true);
 
             mMap = mapFragment.getMap();
             mMap.clear();
-            mMapState.setMap(mMap);
 
             if(mMap != null){
                 setUpRouteLines();
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(MAP_CENTER, MAP_ZOOM_LEVEL));
                 mMap.setMyLocationEnabled(true);
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(MAP_CENTER, MAP_ZOOM_LEVEL));
             }
             mMap.setInfoWindowAdapter(new MapInfoWindowAdapter(this));
             mMapState.setMap(mMap);
+            mMapState.initShuttles();
+            mMapState.setStopsMarkers();
         }
+
+
+
+        Log.d(TAG, "mMap center: "+ mMap.getCameraPosition());
+
     }
 
     @Override

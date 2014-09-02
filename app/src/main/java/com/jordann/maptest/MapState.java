@@ -1,5 +1,6 @@
 package com.jordann.maptest;
 
+import android.nfc.Tag;
 import android.util.Log;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -32,13 +33,16 @@ public class MapState {
 
     public static MapState get(){
         if (sMapState == null){
+            Log.d(TAG, "mapState null, creating new...");
             sMapState = new MapState();
+
+            Log.d(TAG, "getshuttles: " +mShuttles);
         }
         return sMapState;
     }
 
     public void initShuttles(){
-        if (mShuttles == null){
+       // if (mShuttles == null){
             mShuttles = new ArrayList<Shuttle>();
 
             Shuttle newShuttle = new Shuttle("North", false);
@@ -56,7 +60,7 @@ public class MapState {
             newShuttle = new Shuttle("East", false);
             newShuttle.setMarker(mMap.addMarker(new MarkerOptions().position(new LatLng(0,0)).title("Init Shuttle")));
             mShuttles.add(newShuttle);
-        }
+      //  }
     }
 
     public void setShuttle(int index, Shuttle shuttle){
@@ -90,13 +94,17 @@ public class MapState {
 
     public void setStops(ArrayList<Stop> stops){
         mStops = stops;
+    }
+
+    public void setStopsMarkers(){
         for (Stop stop : mStops) {
             stop.setMarker(mMap.addMarker(new MarkerOptions().position(stop.getLatLng()).title(stop.getName())));
         }
     }
 
-    public void initStops() {
+    public void initStopsArrays() {
         if (mNorthStopIndex == null && mWestStopIndex == null && mEastStopIndex == null) {
+            Log.d(TAG, "initStopsArrays null. recreating...");
             mNorthStopIndex = new ArrayList<Integer>();
             mWestStopIndex = new ArrayList<Integer>();
             mEastStopIndex = new ArrayList<Integer>();
@@ -130,6 +138,7 @@ public class MapState {
 
     public boolean initDrawerItems() {
         if (mDrawerItems == null) {
+            Log.d(TAG, "mDrawerItems null");
             mDrawerItems = new ArrayList<DrawerItem>();
 
             mDrawerItems.add(new DrawerItem(0, "Shuttles"));
@@ -146,4 +155,12 @@ public class MapState {
         }
         return false;
     }
+
+
+    public void destroyMapState(){
+        sMapState = null;
+
+    }
+
+
 }
