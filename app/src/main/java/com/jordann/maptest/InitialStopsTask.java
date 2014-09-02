@@ -14,17 +14,25 @@ public class InitialStopsTask extends AsyncTask<String, Void, JSONArray> {
 
     private String url;
     private static MapState sMapState;
+    private OnStopsComplete listener;
 
-    public InitialStopsTask(String url){
+
+    public interface OnStopsComplete{
+        void setUpMapIfNeeded();
+    }
+
+    public InitialStopsTask(String url, OnStopsComplete listener){
         super();
         sMapState = MapState.get();
         this.url = url;
+        this.listener = listener;
     }
 
     @Override
     protected void onPostExecute(JSONArray j) {
         super.onPostExecute(j);
         parseJSON(j);
+        listener.setUpMapIfNeeded();
     }
 
     @Override
@@ -60,5 +68,6 @@ public class InitialStopsTask extends AsyncTask<String, Void, JSONArray> {
         }
 
         sMapState.setStops(stops);
+        //sMapState.setStopsMarkers();
     }
 }
