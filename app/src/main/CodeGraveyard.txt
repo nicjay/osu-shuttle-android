@@ -1,3 +1,12 @@
+
+    Nav drawer style:
+    black = 191b1b
+    red = fd4f1a
+    white = e9e9e9
+    white2 = efefef
+    white3 = dddddd
+
+
     public void addDrawerItem(){
         double a = Math.random()%10;
         Random random = new Random();

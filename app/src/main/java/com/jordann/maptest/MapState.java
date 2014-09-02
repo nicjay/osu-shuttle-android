@@ -28,7 +28,7 @@ public class MapState {
     private static ArrayList<DrawerItem> mDrawerItems;
 
     private MapState(){
-
+        mDrawerItems = new ArrayList<DrawerItem>();
     }
 
     public static MapState get(){
@@ -136,10 +136,14 @@ public class MapState {
         return mDrawerItems;
     }
 
+    public void setDrawerItems(ArrayList<DrawerItem> drawerItems){
+        mDrawerItems = drawerItems;
+    }
+
     public boolean initDrawerItems() {
-        if (mDrawerItems == null) {
+        if (mDrawerItems.size() == 0) {
             Log.d(TAG, "mDrawerItems null");
-            mDrawerItems = new ArrayList<DrawerItem>();
+
 
             mDrawerItems.add(new DrawerItem(0, "Shuttles"));
             mDrawerItems.add(new DrawerItem(1, "North", mShuttles.get(0)));

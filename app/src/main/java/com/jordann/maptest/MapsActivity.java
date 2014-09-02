@@ -88,6 +88,9 @@ public class MapsActivity extends FragmentActivity implements ShuttleUpdater.OnM
     protected void onResume() {
         super.onResume();
         Log.d(TAG, "LIFECYCLE - onResume");
+
+        initNavigationDrawer();
+
         shuttleUpdater.startShuttleUpdater();
 
     }
@@ -99,11 +102,12 @@ public class MapsActivity extends FragmentActivity implements ShuttleUpdater.OnM
         Log.d(TAG, "LIFECYCLE - onDestroy");
         mMap = null;
         mMapState.setMap(null);
-        mDrawerList = null;
+        mMapState.setDrawerItems(new ArrayList<DrawerItem>());
+        /*mDrawerList = null;
         mDrawerLayout = null;
         mAdapter = null;
         mDrawerToggle = null;
-        finish();
+        finish();*/
       //  mMapState.setStops(null);
        // mMapState.destroyMapState();
        // mMapState = null;
@@ -135,8 +139,8 @@ public class MapsActivity extends FragmentActivity implements ShuttleUpdater.OnM
 */
         mMapState.initDrawerItems();
 
-        initNavigationDrawer();
         mAdapter.notifyDataSetChanged();
+
         Log.d(TAG, "end updateMap");
     }
 
@@ -216,7 +220,7 @@ public class MapsActivity extends FragmentActivity implements ShuttleUpdater.OnM
 
         mMap = mMapState.getMap();
 
-
+         Log.d(TAG, "Got the map from mapstate");
 
         if(mMap == null) {
             Log.d(TAG, "Needed...");
