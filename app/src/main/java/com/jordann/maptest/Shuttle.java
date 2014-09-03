@@ -1,5 +1,8 @@
 package com.jordann.maptest;
 
+import android.graphics.Color;
+
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 

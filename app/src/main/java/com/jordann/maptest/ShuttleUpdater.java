@@ -27,6 +27,10 @@ public class ShuttleUpdater {
     private static final long ASYNC_DELAY = 5000;
     private String urlShuttlePoints = "http://portal.campusops.oregonstate.edu/files/shuttle/GetMapVehiclePoints.txt";
 
+    private static final int NORTH_ROUTE_ID = 3;
+    private static final int WEST_ROUTE_ID = 2;
+    private static final int EAST_ROUTE_ID = 1;
+
     public interface OnMapStateUpdate{
         void updateMap();
     }
@@ -111,11 +115,11 @@ public class ShuttleUpdater {
                 shuttle.setOnline(true);
 
                 switch (shuttle.getRouteID()){
-                    case 1:
+                    case NORTH_ROUTE_ID:
                         sMapState.setShuttle(0, shuttle);
                         onlineStates[0] = true;
                         break;
-                    case 2:  //Double route
+                    case WEST_ROUTE_ID:  //Double route
                         if (sMapState.getShuttles().get(1).getVehicleId() == shuttle.getVehicleId()){
                             sMapState.setShuttle(1, shuttle);
                             onlineStates[1] = true;
@@ -136,7 +140,7 @@ public class ShuttleUpdater {
                             onlineStates[2] = true;
                         }
                         break;
-                    case 3:
+                    case EAST_ROUTE_ID:
                         sMapState.setShuttle(3, shuttle);
                         onlineStates[3] = true;
                         break;

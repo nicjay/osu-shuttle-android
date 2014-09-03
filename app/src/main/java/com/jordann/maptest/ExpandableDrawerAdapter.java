@@ -31,7 +31,6 @@ public class ExpandableDrawerAdapter extends BaseExpandableListAdapter {
 
     @Override
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
-        Log.d(TAG, "GetGroupView");
         if(convertView == null){
             LayoutInflater inflater = (LayoutInflater)mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(R.layout.drawer_section_header, parent, false);
@@ -91,7 +90,6 @@ public class ExpandableDrawerAdapter extends BaseExpandableListAdapter {
 
     @Override
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
-        Log.d(TAG, "getChildView");
         if(convertView == null){
             LayoutInflater inflater = (LayoutInflater)mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(R.layout.drawer_list_item, parent, false);
@@ -117,8 +115,6 @@ public class ExpandableDrawerAdapter extends BaseExpandableListAdapter {
 
     @Override
     public int getGroupCount() {
-
-        Log.d(TAG, "GetGroupCount : " +sMapState.getDrawerItems().size());
         return sMapState.getDrawerItems().size();
     }
 

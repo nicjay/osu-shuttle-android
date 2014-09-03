@@ -1,11 +1,12 @@
 package com.jordann.maptest;
 
-import android.nfc.Tag;
 import android.util.Log;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import java.util.ArrayList;
 
@@ -46,19 +47,19 @@ public class MapState {
             mShuttles = new ArrayList<Shuttle>();
 
             Shuttle newShuttle = new Shuttle("North", false);
-            newShuttle.setMarker(mMap.addMarker(new MarkerOptions().position(new LatLng(0,0)).title("Init Shuttle")));
+            newShuttle.setMarker(mMap.addMarker(new MarkerOptions().position(new LatLng(0,0)).title("Init Shuttle").icon(BitmapDescriptorFactory.fromResource(R.drawable.shuttle_green)).flat(true).anchor(0.5f, 0.5f)));
             mShuttles.add(newShuttle);
 
             newShuttle = new Shuttle("West #1", false);
-            newShuttle.setMarker(mMap.addMarker(new MarkerOptions().position(new LatLng(0,0)).title("Init Shuttle")));
+            newShuttle.setMarker(mMap.addMarker(new MarkerOptions().position(new LatLng(0,0)).title("Init Shuttle").icon(BitmapDescriptorFactory.fromResource(R.drawable.shuttle_purple)).flat(true).anchor(0.5f, 0.5f)));
             mShuttles.add(newShuttle);
 
             newShuttle = new Shuttle("West #2", false);
-            newShuttle.setMarker(mMap.addMarker(new MarkerOptions().position(new LatLng(0,0)).title("Init Shuttle")));
+            newShuttle.setMarker(mMap.addMarker(new MarkerOptions().position(new LatLng(0,0)).title("Init Shuttle").icon(BitmapDescriptorFactory.fromResource(R.drawable.shuttle_purple)).flat(true).anchor(0.5f, 0.5f)));
             mShuttles.add(newShuttle);
 
             newShuttle = new Shuttle("East", false);
-            newShuttle.setMarker(mMap.addMarker(new MarkerOptions().position(new LatLng(0,0)).title("Init Shuttle")));
+            newShuttle.setMarker(mMap.addMarker(new MarkerOptions().position(new LatLng(0,0)).title("Init Shuttle").icon(BitmapDescriptorFactory.fromResource(R.drawable.shuttle_orange)).flat(true).anchor(0.5f, 0.5f)));
             mShuttles.add(newShuttle);
       //  }
     }

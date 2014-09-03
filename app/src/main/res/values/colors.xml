@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="OSU_black">#373737</color>
+    <color name="OSU_white">#f5f2ed</color>
+    <color name="OSU_orange">#c34500</color>
+    <color name="transparent_OSU_white">#E7f5f2ed</color>
+    <color name="infowindow_font">#373737</color>
+
+</resources>
