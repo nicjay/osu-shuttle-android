@@ -11,35 +11,40 @@
                   android:layout_height="wrap_content"
                   android:background="@drawable/border"
         >
-
-        <TextView
-            android:id="@+id/info_shuttle_title"
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/OSU_black"
-            android:text="South Central"
-            android:textSize="20sp"
-            android:textColor="#f5f2ed"
-            android:textStyle="bold"
-            android:gravity="center"
-            android:padding="8dp"
-            />
+            android:orientation="horizontal"
+            android:background="@color/transparent_OSU_black"
+            >
+            <TextView
+                android:id="@+id/info_shuttle_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="East"
+                android:textSize="20sp"
+                android:textColor="#f5f2ed"
+                android:textStyle="bold"
+                android:padding="8dp"
+                android:layout_centerInParent="true"
 
+                />
+
+
+        </RelativeLayout>
         <GridLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:columnCount="4"
             android:rowCount="3"
-            android:paddingLeft="12dp"
-            android:paddingRight="12dp"
-            android:paddingTop="4dp"
-            android:paddingBottom="4dp">
+            android:paddingLeft="12dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_column="0"
                 android:layout_columnSpan="3"
+                android:paddingTop="4dp"
                 android:text="Jefferson Peavy"
                 android:textSize="20dp"
 
@@ -49,12 +54,13 @@
 
             <RelativeLayout
                 android:id="@+id/time1_layout"
-                android:layout_width="78dp"
+                android:layout_width="90dp"
                 android:layout_height="wrap_content"
                 android:layout_column="3"
-                android:paddingTop="4dp"
+                android:paddingTop="8dp"
                 android:paddingBottom="3dp"
                 android:paddingLeft="12dp"
+                android:paddingRight="12dp"
                 >
 
                 <TextView
@@ -73,7 +79,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="2"
-                    android:textSize="36dp"
+                    android:textSize="30dp"
                     android:textStyle="bold"
                     android:textColor="@color/OSU_orange"
                     android:layout_toLeftOf="@id/min1"
@@ -90,7 +96,7 @@
                 android:layout_height="wrap_content"
                 android:layout_column="0"
                 android:layout_columnSpan="3"
-                android:text="Washington Ave. &amp; 15th"
+                android:text="Monroe &amp; 14th"
                 android:textSize="20dp"
                 android:textColor="@color/infowindow_font"
                 android:layout_gravity="center_vertical"
@@ -98,12 +104,13 @@
 
             <RelativeLayout
                 android:id="@+id/time2_layout"
-                android:layout_width="78dp"
+                android:layout_width="90dp"
                 android:layout_height="wrap_content"
                 android:layout_column="3"
                 android:paddingTop="3dp"
                 android:paddingBottom="3dp"
                 android:paddingLeft="12dp"
+                android:paddingRight="12dp"
                 >
 
                 <TextView
@@ -121,7 +128,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="16"
-                    android:textSize="36dp"
+                    android:textSize="30dp"
                     android:textStyle="bold"
                     android:textColor="@color/OSU_orange"
                     android:layout_toLeftOf="@id/min2"
@@ -143,16 +150,18 @@
                 android:textSize="20dp"
                 android:textColor="@color/infowindow_font"
                 android:layout_gravity="center_vertical"
+                android:paddingBottom="4dp"
                 />
 
             <RelativeLayout
                 android:id="@+id/time3_layout"
-                android:layout_width="78dp"
+                android:layout_width="90dp"
                 android:layout_height="wrap_content"
                 android:layout_column="3"
                 android:paddingTop="3dp"
-                android:paddingBottom="4dp"
+                android:paddingBottom="8dp"
                 android:paddingLeft="12dp"
+                android:paddingRight="12dp"
                 >
 
                 <TextView
@@ -170,7 +179,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="28"
-                    android:textSize="36dp"
+                    android:textSize="30dp"
                     android:textStyle="bold"
                     android:textColor="@color/OSU_orange"
                     android:layout_toLeftOf="@id/min3"

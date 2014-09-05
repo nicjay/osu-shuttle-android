@@ -102,51 +102,45 @@ public class ShuttleUpdater {
        private void parseJSON(){
             Gson gson = new Gson();
             boolean[] onlineStates = {false,false,false,false};
+            if(JSONShuttles != null) {
+                for (int i = 0; i < JSONShuttles.length(); i++) {
+                    String json = null;
+                    try {
+                        JSONObject rawJson = JSONShuttles.getJSONObject(i);
+                        json = rawJson.toString();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    Shuttle shuttle = gson.fromJson(json, Shuttle.class);
+                    shuttle.setOnline(true);
 
-            for (int i = 0; i < JSONShuttles.length(); i++) {
-                String json = null;
-                try {
-                    JSONObject rawJson = JSONShuttles.getJSONObject(i);
-                    json = rawJson.toString();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                Shuttle shuttle = gson.fromJson(json, Shuttle.class);
-                shuttle.setOnline(true);
-
-                switch (shuttle.getRouteID()){
-                    case NORTH_ROUTE_ID:
-                        sMapState.setShuttle(0, shuttle);
-                        onlineStates[0] = true;
-                        break;
-                    case WEST_ROUTE_ID:  //Double route
-                        if (sMapState.getShuttles().get(1).getVehicleId() == shuttle.getVehicleId()){
-                            sMapState.setShuttle(1, shuttle);
-                            onlineStates[1] = true;
-                        }
-
-                        else if (sMapState.getShuttles().get(2).getVehicleId() == shuttle.getVehicleId()){
-                            sMapState.setShuttle(2, shuttle);
-                            onlineStates[2] = true;
-                        }
-
-                        else if (!sMapState.getShuttles().get(1).isOnline()){
-                            sMapState.setShuttle(1, shuttle);
-                            onlineStates[1] = true;
-                        }
-
-                        else if (!sMapState.getShuttles().get(2).isOnline()){
-                            sMapState.setShuttle(2, shuttle);
-                            onlineStates[2] = true;
-                        }
-                        break;
-                    case EAST_ROUTE_ID:
-                        sMapState.setShuttle(3, shuttle);
-                        onlineStates[3] = true;
-                        break;
+                    switch (shuttle.getRouteID()) {
+                        case NORTH_ROUTE_ID:
+                            sMapState.setShuttle(0, shuttle);
+                            onlineStates[0] = true;
+                            break;
+                        case WEST_ROUTE_ID:  //Double route
+                            if (sMapState.getShuttles().get(1).getVehicleId() == shuttle.getVehicleId()) {
+                                sMapState.setShuttle(1, shuttle);
+                                onlineStates[1] = true;
+                            } else if (sMapState.getShuttles().get(2).getVehicleId() == shuttle.getVehicleId()) {
+                                sMapState.setShuttle(2, shuttle);
+                                onlineStates[2] = true;
+                            } else if (!sMapState.getShuttles().get(1).isOnline()) {
+                                sMapState.setShuttle(1, shuttle);
+                                onlineStates[1] = true;
+                            } else if (!sMapState.getShuttles().get(2).isOnline()) {
+                                sMapState.setShuttle(2, shuttle);
+                                onlineStates[2] = true;
+                            }
+                            break;
+                        case EAST_ROUTE_ID:
+                            sMapState.setShuttle(3, shuttle);
+                            onlineStates[3] = true;
+                            break;
+                    }
                 }
             }
-
             for (int i = 0; i < 4; i++) {
                Shuttle shuttle = sMapState.getShuttles().get(i);
                if (!onlineStates[i]) shuttle.setOnline(false);

@@ -15,10 +15,13 @@ import android.widget.ArrayAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ListAdapter;
 
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import java.util.ArrayList;
@@ -51,7 +54,7 @@ public class MapsActivity extends FragmentActivity implements ShuttleUpdater.OnM
         setContentView(R.layout.activity_main);
 
         Log.d(TAG, "callingActivity : " + this);
-        mMapState = MapState.get();
+        mMapState = MapState.get(this);
 
 
         if (mMapState.getStops() == null) {
@@ -60,7 +63,7 @@ public class MapsActivity extends FragmentActivity implements ShuttleUpdater.OnM
         } else {
             setUpMapIfNeeded();
         }
-
+        getActionBar().setTitle(" Beaver Bus Tracker");
         // Log.d(TAG, "mMapState shuttles before: "+mMapState.getShuttles());
         //mMapState.initShuttles();
         // Log.d(TAG, "mMapState shuttles after: "+mMapState.getShuttles());
@@ -236,11 +239,18 @@ public class MapsActivity extends FragmentActivity implements ShuttleUpdater.OnM
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(MAP_CENTER, MAP_ZOOM_LEVEL));
             }
             mMap.setInfoWindowAdapter(new MapInfoWindowAdapter(this));
+            mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                @Override
+                public boolean onMarkerClick(Marker marker) {
+                    mMapState.animateMap(marker.getPosition());
+                    marker.showInfoWindow();
+                    return true;
+                }
+            });
             mMapState.setMap(mMap);
             mMapState.initShuttles();
             mMapState.setStopsMarkers();
         }
-
 
         Log.d(TAG, "mMap center: " + mMap.getCameraPosition());
 

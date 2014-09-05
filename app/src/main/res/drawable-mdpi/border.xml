@@ -5,7 +5,7 @@
 
     <stroke
         android:width="2dp"
-        android:color="@color/OSU_black"/>
+        android:color="@color/transparent_OSU_black"/>
 
     <solid
         android:color="@color/transparent_OSU_white"/>

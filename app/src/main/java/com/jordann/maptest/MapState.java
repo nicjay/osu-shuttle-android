@@ -1,12 +1,17 @@
 package com.jordann.maptest;
 
+import android.content.Context;
+import android.content.res.Configuration;
 import android.util.Log;
+import android.view.Display;
+import android.view.Surface;
+import android.view.WindowManager;
+
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import java.util.ArrayList;
 
@@ -28,6 +33,15 @@ public class MapState {
 
     private static ArrayList<DrawerItem> mDrawerItems;
 
+    private static Context sCurrentContext;
+
+    private static final double PORTRAIT_OFFSET = .002;
+    private static final double LANDSCAPE_OFFSET = .0058;
+    private static final int CAMERA_ANIMATION_SPEED = 600;
+
+    private static final float CAMERA_TILT = 0;
+    private static final float CAMERA_BEARING = 0;
+
     private MapState(){
         mDrawerItems = new ArrayList<DrawerItem>();
     }
@@ -42,24 +56,36 @@ public class MapState {
         return sMapState;
     }
 
+    public static MapState get(Context context){
+        sCurrentContext = context;
+        if (sMapState == null){
+            Log.d(TAG, "mapState null, creating new...");
+            sMapState = new MapState();
+
+            Log.d(TAG, "getshuttles: " +mShuttles);
+        }
+        return sMapState;
+    }
+
     public void initShuttles(){
        // if (mShuttles == null){
             mShuttles = new ArrayList<Shuttle>();
+            LatLng initLatLng = new LatLng(0,0);
 
             Shuttle newShuttle = new Shuttle("North", false);
-            newShuttle.setMarker(mMap.addMarker(new MarkerOptions().position(new LatLng(0,0)).title("Init Shuttle").icon(BitmapDescriptorFactory.fromResource(R.drawable.shuttle_green)).flat(true).anchor(0.5f, 0.5f)));
+            newShuttle.setMarker(mMap.addMarker(new MarkerOptions().position(initLatLng).title("Init Shuttle").icon(BitmapDescriptorFactory.fromResource(R.drawable.shuttle_green)).flat(true).anchor(0.5f, 0.5f)));
             mShuttles.add(newShuttle);
 
             newShuttle = new Shuttle("West #1", false);
-            newShuttle.setMarker(mMap.addMarker(new MarkerOptions().position(new LatLng(0,0)).title("Init Shuttle").icon(BitmapDescriptorFactory.fromResource(R.drawable.shuttle_purple)).flat(true).anchor(0.5f, 0.5f)));
+            newShuttle.setMarker(mMap.addMarker(new MarkerOptions().position(initLatLng).title("Init Shuttle").icon(BitmapDescriptorFactory.fromResource(R.drawable.shuttle_purple)).flat(true).anchor(0.5f, 0.5f)));
             mShuttles.add(newShuttle);
 
             newShuttle = new Shuttle("West #2", false);
-            newShuttle.setMarker(mMap.addMarker(new MarkerOptions().position(new LatLng(0,0)).title("Init Shuttle").icon(BitmapDescriptorFactory.fromResource(R.drawable.shuttle_purple)).flat(true).anchor(0.5f, 0.5f)));
+            newShuttle.setMarker(mMap.addMarker(new MarkerOptions().position(initLatLng).title("Init Shuttle").icon(BitmapDescriptorFactory.fromResource(R.drawable.shuttle_purple)).flat(true).anchor(0.5f, 0.5f)));
             mShuttles.add(newShuttle);
 
             newShuttle = new Shuttle("East", false);
-            newShuttle.setMarker(mMap.addMarker(new MarkerOptions().position(new LatLng(0,0)).title("Init Shuttle").icon(BitmapDescriptorFactory.fromResource(R.drawable.shuttle_orange)).flat(true).anchor(0.5f, 0.5f)));
+            newShuttle.setMarker(mMap.addMarker(new MarkerOptions().position(initLatLng).title("Init Shuttle").icon(BitmapDescriptorFactory.fromResource(R.drawable.shuttle_orange)).flat(true).anchor(0.5f, 0.5f)));
             mShuttles.add(newShuttle);
       //  }
     }
@@ -69,8 +95,16 @@ public class MapState {
     }
 
     public void animateMap(LatLng latLng){
-        CameraPosition cameraPosition = new CameraPosition(latLng, mMap.getCameraPosition().zoom, 0, 0);
-        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+        Display display = ((WindowManager) sCurrentContext.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+        int rotation = display.getRotation();
+        LatLng newPosition = new LatLng(latLng.latitude + PORTRAIT_OFFSET, latLng.longitude);
+
+        if (rotation == Surface.ROTATION_90 || rotation == Surface.ROTATION_270) {
+           newPosition = new LatLng(latLng.latitude + LANDSCAPE_OFFSET, latLng.longitude);
+        }
+
+        CameraPosition cameraPosition = new CameraPosition(newPosition, mMap.getCameraPosition().zoom, CAMERA_TILT, CAMERA_BEARING);
+        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), CAMERA_ANIMATION_SPEED, null);
     }
 
     public GoogleMap getMap() {
