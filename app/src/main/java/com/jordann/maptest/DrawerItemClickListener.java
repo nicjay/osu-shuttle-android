@@ -1,5 +1,6 @@
 package com.jordann.maptest;
 
+import android.graphics.drawable.Drawable;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.View;
@@ -25,7 +26,9 @@ public class DrawerItemClickListener implements ExpandableListView.OnGroupClickL
 
     @Override
     public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
+
         selectItemGroup(groupPosition);
+
         return false;
     }
 
@@ -34,6 +37,7 @@ public class DrawerItemClickListener implements ExpandableListView.OnGroupClickL
         selectItemChild(groupPosition, childPosition);
         return false;
     }
+
 
     private void selectItemGroup(int groupPosition) {
         Log.d(TAG, "selectItemGroup");
@@ -45,6 +49,7 @@ public class DrawerItemClickListener implements ExpandableListView.OnGroupClickL
             drawerItems.get(groupPosition).getShuttle().getMarker().showInfoWindow();
             mDrawerLayout.closeDrawer(mDrawerList);
         }
+
     }
 
     private void selectItemChild(int groupPosition, int childPosition){
@@ -54,7 +59,15 @@ public class DrawerItemClickListener implements ExpandableListView.OnGroupClickL
 
         int index = drawerItems.get(groupPosition).getStopsIndex().get(childPosition);
         sMapState.animateMap(stops.get(index).getLatLng());
+
+        if (sMapState.getSelectedStopMarker() != null && !sMapState.isStopsVisible()){
+            sMapState.setSelectedStopMarkerVisibility(false);
+        }
+        sMapState.setSelectedStopMarker(stops.get(index).getMarker());
+
+        stops.get(index).getMarker().setVisible(true);
         stops.get(index).getMarker().showInfoWindow();
+
         mDrawerLayout.closeDrawer(mDrawerList);
     }
 }

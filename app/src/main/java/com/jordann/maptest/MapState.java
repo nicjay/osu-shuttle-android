@@ -12,6 +12,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import java.util.ArrayList;
 
@@ -26,6 +27,9 @@ public class MapState {
 
     private static ArrayList<Shuttle> mShuttles;
     private static ArrayList<Stop> mStops;
+    private boolean mStopsVisible;
+
+    private Marker mSelectedStopMarker;
 
     private static ArrayList<Integer> mNorthStopIndex;
     private static ArrayList<Integer> mWestStopIndex;
@@ -44,6 +48,7 @@ public class MapState {
 
     private MapState(){
         mDrawerItems = new ArrayList<DrawerItem>();
+        mStopsVisible = true;
     }
 
     public static MapState get(){
@@ -76,11 +81,11 @@ public class MapState {
             newShuttle.setMarker(mMap.addMarker(new MarkerOptions().position(initLatLng).title("Init Shuttle").icon(BitmapDescriptorFactory.fromResource(R.drawable.shuttle_green)).flat(true).anchor(0.5f, 0.5f)));
             mShuttles.add(newShuttle);
 
-            newShuttle = new Shuttle("West #1", false);
+            newShuttle = new Shuttle("West 1", false);
             newShuttle.setMarker(mMap.addMarker(new MarkerOptions().position(initLatLng).title("Init Shuttle").icon(BitmapDescriptorFactory.fromResource(R.drawable.shuttle_purple)).flat(true).anchor(0.5f, 0.5f)));
             mShuttles.add(newShuttle);
 
-            newShuttle = new Shuttle("West #2", false);
+            newShuttle = new Shuttle("West 2", false);
             newShuttle.setMarker(mMap.addMarker(new MarkerOptions().position(initLatLng).title("Init Shuttle").icon(BitmapDescriptorFactory.fromResource(R.drawable.shuttle_purple)).flat(true).anchor(0.5f, 0.5f)));
             mShuttles.add(newShuttle);
 
@@ -132,9 +137,16 @@ public class MapState {
     }
 
     public void setStopsMarkers(){
-        for (Stop stop : mStops) {
-            stop.setMarker(mMap.addMarker(new MarkerOptions().position(stop.getLatLng()).title(stop.getName())));
+        if (mStopsVisible){
+            for (Stop stop : mStops) {
+                stop.setMarker(mMap.addMarker(new MarkerOptions().position(stop.getLatLng()).title(stop.getName())));
+            }
+        } else {
+            for (Stop stop : mStops) {
+                stop.setMarker(mMap.addMarker(new MarkerOptions().position(stop.getLatLng()).title(stop.getName()).visible(false)));
+            }
         }
+
     }
 
     public void initStopsArrays() {
@@ -180,15 +192,15 @@ public class MapState {
             Log.d(TAG, "mDrawerItems null");
 
 
-            mDrawerItems.add(new DrawerItem(0, "Shuttles"));
+            mDrawerItems.add(new DrawerItem(0, "Buses"));
             mDrawerItems.add(new DrawerItem(1, "North", mShuttles.get(0)));
-            mDrawerItems.add(new DrawerItem(1, "West #1", mShuttles.get(1)));
-            mDrawerItems.add(new DrawerItem(1, "West #2", mShuttles.get(2)));
+            mDrawerItems.add(new DrawerItem(1, "West 1", mShuttles.get(1)));
+            mDrawerItems.add(new DrawerItem(1, "West 2", mShuttles.get(2)));
             mDrawerItems.add(new DrawerItem(1, "East", mShuttles.get(3)));
             mDrawerItems.add(new DrawerItem(0, "Stops"));
-            mDrawerItems.add(new DrawerItem(2, "North1", mNorthStopIndex));
-            mDrawerItems.add(new DrawerItem(2, "West1", mWestStopIndex));
-            mDrawerItems.add(new DrawerItem(2, "East", mEastStopIndex));
+            mDrawerItems.add(new DrawerItem(2, "North Route", mNorthStopIndex));
+            mDrawerItems.add(new DrawerItem(2, "West Route", mWestStopIndex));
+            mDrawerItems.add(new DrawerItem(2, "East Route", mEastStopIndex));
 
             return true;
         }
@@ -196,10 +208,29 @@ public class MapState {
     }
 
 
-    public void destroyMapState(){
-        sMapState = null;
+    public boolean isStopsVisible() {
+        return mStopsVisible;
+    }
 
+    public void setStopsVisible(boolean stopsVisible) {
+        mStopsVisible = stopsVisible;
     }
 
 
+    public void setSelectedStopMarkerVisibility(boolean isVisible) {
+        mSelectedStopMarker.setVisible(isVisible);
+    }
+
+    public boolean getSelectedStopMarkerVisibility() {
+        return mSelectedStopMarker.isVisible();
+    }
+
+    public Marker getSelectedStopMarker(){
+        return mSelectedStopMarker;
+    }
+
+
+    public void setSelectedStopMarker(Marker selectedStopMarker) {
+        mSelectedStopMarker = selectedStopMarker;
+    }
 }

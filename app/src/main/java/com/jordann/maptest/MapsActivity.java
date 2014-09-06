@@ -1,11 +1,14 @@
 package com.jordann.maptest;
 
+import android.app.ActionBar;
 import android.content.res.Configuration;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -14,6 +17,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ListAdapter;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -53,6 +57,16 @@ public class MapsActivity extends FragmentActivity implements ShuttleUpdater.OnM
 
         setContentView(R.layout.activity_main);
 
+        SpannableString s = new SpannableString("Beaver Bus Tracker");
+        s.setSpan(new TypefaceSpan(this, "Gudea-Bold.ttf"), 0, s.length(),
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+
+        // Update the action bar title with the TypefaceSpan instance
+        ActionBar actionBar = getActionBar();
+        actionBar.setTitle(s);
+
+
         Log.d(TAG, "callingActivity : " + this);
         mMapState = MapState.get(this);
 
@@ -63,7 +77,7 @@ public class MapsActivity extends FragmentActivity implements ShuttleUpdater.OnM
         } else {
             setUpMapIfNeeded();
         }
-        getActionBar().setTitle(" Beaver Bus Tracker");
+        //getActionBar().setTitle(" " +"Beaver Bus Tracker");
         // Log.d(TAG, "mMapState shuttles before: "+mMapState.getShuttles());
         //mMapState.initShuttles();
         // Log.d(TAG, "mMapState shuttles after: "+mMapState.getShuttles());
@@ -75,6 +89,7 @@ public class MapsActivity extends FragmentActivity implements ShuttleUpdater.OnM
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         this.mDrawerLayout = (DrawerLayout) this.findViewById(R.id.drawer_layout);
+
         this.mDrawerList = (ExpandableListView) this.findViewById(R.id.left_drawer);
         Log.d(TAG, "mdrawerlayout : " + mDrawerLayout + " ; mdrawerList: " + mDrawerList);
 
@@ -151,8 +166,7 @@ public class MapsActivity extends FragmentActivity implements ShuttleUpdater.OnM
         Log.d(TAG, "initNavigationDrawer: " + mDrawerLayout + " ; " + mDrawerList);
         if (/*mDrawerLayout == null && mDrawerList == null*/ true) {
 
-
-            mDrawerList.setBackgroundColor(0xFF191b1b);
+            mDrawerList.setBackgroundColor(0xFF191b1b);   //0xFF191b1b
 
             Log.d(TAG, "adapter is: " + mDrawerList.getAdapter());
 
@@ -185,7 +199,7 @@ public class MapsActivity extends FragmentActivity implements ShuttleUpdater.OnM
 
             mAdapter = new ExpandableDrawerAdapter(this, mMapState.getDrawerItems());
 
-            //ListAdapter mAdapterTest = new ListAdapter<DrawerItem>(this, R.layout.drawer_list_item, mMapState.getDrawerItems());
+            //ListAdapter mAdapterTest = new ListAdapter<DrawerItem>(this, R.layout.drawer_child_item, mMapState.getDrawerItems());
             Log.d(TAG, "DrawerItems: " + mMapState.getDrawerItems().toString());
             //mDrawerList.setAdapter(mAdapter);
             mDrawerList.setAdapter(mAdapter);
@@ -198,28 +212,6 @@ public class MapsActivity extends FragmentActivity implements ShuttleUpdater.OnM
 
     public void setUpMapIfNeeded() {
         Log.d(TAG, "setUpMapIfNeeded...");
-
-/*
-
-        mapFragment = ((MapFragment) getFragmentManager().findFragmentById(R.id.map));
-        mapFragment.setRetainInstance(true);
-
-
-        mMap = mapFragment.getMap();
-
-
-       // if(mMap != null){
-            setUpRouteLines();
-            mMap.setMyLocationEnabled(true);
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(MAP_CENTER, MAP_ZOOM_LEVEL));
-       // }
-
-        mMap.setInfoWindowAdapter(new MapInfoWindowAdapter(this));
-
-
-        mMapState.setMap(mMap);
-*/
-
 
         mMap = mMapState.getMap();
 
@@ -242,17 +234,42 @@ public class MapsActivity extends FragmentActivity implements ShuttleUpdater.OnM
             mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                 @Override
                 public boolean onMarkerClick(Marker marker) {
+                    if (mMapState.getSelectedStopMarker() != null && !mMapState.isStopsVisible()){
+                        mMapState.setSelectedStopMarkerVisibility(false);
+                    }
+
                     mMapState.animateMap(marker.getPosition());
+                    marker.setVisible(true);
                     marker.showInfoWindow();
+                    //TODO: are we really using flat?
+                    if (!marker.isFlat())
+                        mMapState.setSelectedStopMarker(marker);
                     return true;
                 }
             });
+
+
+            mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+                @Override
+                public void onMapClick(LatLng latLng) {
+                    Log.d(TAG, "outside onmapclick if : "+mMapState.getSelectedStopMarker() + "; global visibility: "+mMapState.isStopsVisible());
+                    if (mMapState.getSelectedStopMarker() != null && !mMapState.isStopsVisible()){
+                        //selectedStopMarker.setVisible(!selectedStopMarker.isVisible());
+                        Log.d(TAG, "Got to onMapClick selectedstop");
+                        mMapState.setSelectedStopMarkerVisibility(false);
+                        mMapState.setSelectedStopMarker(null);
+                    }
+                }
+            });
+
+
             mMapState.setMap(mMap);
             mMapState.initShuttles();
             mMapState.setStopsMarkers();
+
         }
 
-        Log.d(TAG, "mMap center: " + mMap.getCameraPosition());
+
 
     }
 
@@ -268,6 +285,7 @@ public class MapsActivity extends FragmentActivity implements ShuttleUpdater.OnM
         switch (item.getItemId()) {
             case R.id.toggle_stops:
                 //do stuff
+                toggleStopsVisibility(item);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -277,12 +295,28 @@ public class MapsActivity extends FragmentActivity implements ShuttleUpdater.OnM
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         Log.d(TAG, "onPrepareOptionsMenu");
+        if (mMapState != null){
+            if (mMapState.isStopsVisible())
+                menu.findItem(R.id.toggle_stops).setTitle("Hide Stops");
+            else
+                menu.findItem(R.id.toggle_stops).setTitle("Show Stops");
+        }
         return super.onPrepareOptionsMenu(menu);
     }
 
 
-    public void toggleStopsVisibility(){
+    public void toggleStopsVisibility(MenuItem item){
+        boolean stopsVisible = mMapState.isStopsVisible();
+        mMapState.setStopsVisible(!stopsVisible);
 
+        if (mMapState.isStopsVisible()) item.setTitle("Hide Stops");
+        else item.setTitle("Show Stops");
+
+        Log.d(TAG, "map global vis was: "+stopsVisible+"; set to: "+mMapState.isStopsVisible());
+
+        for (Stop stop : mMapState.getStops()){
+            stop.getMarker().setVisible(!stopsVisible);
+        }
 
     }
 
