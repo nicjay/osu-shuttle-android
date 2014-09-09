@@ -12,4 +12,6 @@
 
     <color name="Navigation_Drawer_Item_Child_Bg">#383838</color>
     <color name="Navigation_Drawer_Item_Child_Bg_Selected">#525252</color>
+
+    <color name="transparent_load">#B3000000</color>
 </resources>

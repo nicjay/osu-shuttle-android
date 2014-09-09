@@ -4,7 +4,7 @@
                 android:id="@+id/drawer_item_relative_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-    android:background="@drawable/navigation_item_selector">
+                android:background="@drawable/navigation_item_selector">
 
 
 

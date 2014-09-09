@@ -3,6 +3,7 @@ package com.jordann.maptest;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -112,7 +113,7 @@ public class ExpandableDrawerAdapter extends BaseExpandableListAdapter {
 
                 ((RelativeLayout)itemView.findViewById(R.id.drawer_item_relative_layout)).addView(square);
 
-                if(!shuttle.isOnline()){
+                if(!mDrawerItems.get(groupPosition).isRowEnabled()){
                     itemView.setEnabled(false);
                     //TODO: gray out to show disabled
                 }

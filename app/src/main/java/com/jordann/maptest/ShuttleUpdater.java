@@ -1,5 +1,7 @@
 package com.jordann.maptest;
 
+import android.app.ProgressDialog;
+import android.nfc.Tag;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.util.Log;
@@ -19,6 +21,8 @@ public class ShuttleUpdater {
     private static ShuttleUpdater sShuttleUpdater;
     private static MapState sMapState;
     private OnMapStateUpdate listener;
+    private pollNewDataTask currentTask;
+
 
     private Handler mHandler;
     private boolean isBusy = false;
@@ -30,6 +34,7 @@ public class ShuttleUpdater {
     private static final int NORTH_ROUTE_ID = 3;
     private static final int WEST_ROUTE_ID = 2;
     private static final int EAST_ROUTE_ID = 1;
+
 
     public interface OnMapStateUpdate{
         void updateMap();
@@ -48,54 +53,81 @@ public class ShuttleUpdater {
             sShuttleUpdater = new ShuttleUpdater(listener);
         }
         return sShuttleUpdater;
+
     }
 
     private void startHandler(){
         r = new Runnable() {
             @Override
             public void run() {
-                if(!isBusy) new pollNewDataTask(urlShuttlePoints).execute();
+                if(!isBusy){
+                    currentTask = new pollNewDataTask(urlShuttlePoints);
+                    currentTask.execute();
+                }
                 if(!stop) startHandler();
             }
         };
         mHandler.postDelayed(r, ASYNC_DELAY);
+
     }
 
     public void stopShuttleUpdater(){
         stop = true;
+        currentTask.cancel(true);
         mHandler.removeCallbacks(r);
     }
 
     public void startShuttleUpdater(){
+
         stop = false;
-        new pollNewDataTask(urlShuttlePoints).execute();
+        currentTask = new pollNewDataTask(urlShuttlePoints);
+        currentTask.execute();
+
         startHandler();
     }
 
     private class pollNewDataTask extends AsyncTask<String, Void, Void>{
+
         private static final String TAG = "pollNewDataTask";
 
         private String url;
         private JSONArray JSONShuttles;
         private JSONArray[] jStopsArray;
 
+        long stopTime, startTime;
+
+
         public pollNewDataTask(String url) {
             super();
             this.url = url;
         }
 
+
         @Override
         protected Void doInBackground(String... params) {
+            startTime = System.currentTimeMillis();
             JSONGetter getter = new JSONGetter();
             JSONShuttles = getter.getJSONFromUrl(url);
             return null;
         }
+// mProgressDialog = ProgressDialog.show(this, "", "Loading...", true, false);
+
+
+
 
         @Override
         protected void onPostExecute(Void v) {
             super.onPostExecute(v);
             parseJSON();
-            listener.updateMap();
+            stopTime = System.currentTimeMillis();
+            Log.d(TAG, "elapsedTime = " + (stopTime - startTime));
+
+            //if(mProgressDialog != null && mProgressDialog.isShowing())
+           // {
+             //   mProgressDialog.dismiss();
+           // }
+
+            if(!stop) listener.updateMap();
         }
 
         //TODO: reduce number of string conversions here and JSONGetter
@@ -104,6 +136,7 @@ public class ShuttleUpdater {
             boolean[] onlineStates = {false,false,false,false};
             if(JSONShuttles != null) {
                 for (int i = 0; i < JSONShuttles.length(); i++) {
+
                     String json = null;
                     try {
                         JSONObject rawJson = JSONShuttles.getJSONObject(i);
@@ -143,7 +176,11 @@ public class ShuttleUpdater {
             }
             for (int i = 0; i < 4; i++) {
                Shuttle shuttle = sMapState.getShuttles().get(i);
-               if (!onlineStates[i]) shuttle.setOnline(false);
+               Log.d(TAG, "SET SHUTTLE OFFLINE " + shuttle.isOnline());
+               if (!onlineStates[i]){
+                   shuttle.setOnline(false);
+
+               }
                else shuttle.setOnline(true);
             }
 

@@ -28,7 +28,7 @@ public class DrawerItemClickListener implements ExpandableListView.OnGroupClickL
     public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
 
         selectItemGroup(groupPosition);
-
+        Log.d(TAG, "DrawableStates: " + v.getDrawableState().length);
         return false;
     }
 

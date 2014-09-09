@@ -1,7 +1,10 @@
 package com.jordann.maptest;
 
 import android.app.ActionBar;
+import android.app.ProgressDialog;
 import android.content.res.Configuration;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
@@ -10,19 +13,27 @@ import android.support.v4.widget.DrawerLayout;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ExpandableListView;
+import android.widget.LinearLayout;
 import android.widget.ListAdapter;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -32,14 +43,22 @@ import java.util.ArrayList;
 
 public class MapsActivity extends FragmentActivity implements ShuttleUpdater.OnMapStateUpdate, InitialStopsTask.OnStopsComplete {
     private static final String TAG = "MapsActivity";
+    private static final String TAG_PD = "ProgressDialog";
 
     private static final String mStopsUrl = "http://www.osushuttles.com/Services/JSONPRelay.svc/GetRoutesForMapWithSchedule";
 
     //Navigation Drawer variables
     private DrawerLayout mDrawerLayout;
     private ExpandableDrawerAdapter mAdapter;
+
+    //Temp
+    private ExpandableDrawerAdapter oldAdapter;
+
     private ExpandableListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
+
+
+    private LinearLayout mLoadingLayout;
 
     private GoogleMap mMap;
     private MapState mMapState;
@@ -50,12 +69,19 @@ public class MapsActivity extends FragmentActivity implements ShuttleUpdater.OnM
 
     private MapFragment mapFragment;
 
+    ActionBar actionBar;
+    LinearLayout loadLayout;
+    private static ProgressDialog sProgressDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "LIFECYCLE - onCreate");
 
+
         setContentView(R.layout.activity_main);
+
+        loadLayout = (LinearLayout)findViewById(R.id.loading_layout);
 
         SpannableString s = new SpannableString("Beaver Bus Tracker");
         s.setSpan(new TypefaceSpan(this, "Gudea-Bold.ttf"), 0, s.length(),
@@ -63,9 +89,8 @@ public class MapsActivity extends FragmentActivity implements ShuttleUpdater.OnM
 
 
         // Update the action bar title with the TypefaceSpan instance
-        ActionBar actionBar = getActionBar();
+        actionBar = getActionBar();
         actionBar.setTitle(s);
-
 
         Log.d(TAG, "callingActivity : " + this);
         mMapState = MapState.get(this);
@@ -85,12 +110,23 @@ public class MapsActivity extends FragmentActivity implements ShuttleUpdater.OnM
         shuttleUpdater = ShuttleUpdater.get(this);
     }
 
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.d(TAG, "LIFECYCLE - onStart");
+
+        sProgressDialog = ProgressDialog.show(this, "", "Loading...", true, false);
+
+    }
+
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
+        /*
         this.mDrawerLayout = (DrawerLayout) this.findViewById(R.id.drawer_layout);
 
-        this.mDrawerList = (ExpandableListView) this.findViewById(R.id.left_drawer);
+        this.mDrawerList = (ExpandableListView) this.findViewById(R.id.left_drawer);   */
         Log.d(TAG, "mdrawerlayout : " + mDrawerLayout + " ; mdrawerList: " + mDrawerList);
 
     }
@@ -108,11 +144,22 @@ public class MapsActivity extends FragmentActivity implements ShuttleUpdater.OnM
         Log.d(TAG, "LIFECYCLE - onResume");
 
         initNavigationDrawer();
-
         shuttleUpdater.startShuttleUpdater();
-
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d(TAG, "LIFECYCLE - onStop");
+
+        //sProgressDialog = null;
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        Log.d(TAG, "LIFECYCLE - onRestart");
+    }
 
     @Override
     protected void onDestroy() {
@@ -121,10 +168,10 @@ public class MapsActivity extends FragmentActivity implements ShuttleUpdater.OnM
         mMap = null;
         mMapState.setMap(null);
         mMapState.setDrawerItems(new ArrayList<DrawerItem>());
-        /*mDrawerList = null;
+        mDrawerList = null;
         mDrawerLayout = null;
-        mAdapter = null;
-        mDrawerToggle = null;
+        //mAdapter = null;
+        /*mDrawerToggle = null;
         finish();*/
         //  mMapState.setStops(null);
         // mMapState.destroyMapState();
@@ -132,12 +179,13 @@ public class MapsActivity extends FragmentActivity implements ShuttleUpdater.OnM
 
     }
 
-    public void updateMap() {
+    public void updateMap(){
         Log.d(TAG, "updateMap");
-        //TODO: shadow view and show ActivityIndicator until this happens
+
         //Update current marker list
         // ArrayList<Shuttle> shuttles = mMapState.getShuttles();
         for (Shuttle shuttle : mMapState.getShuttles()) {
+            Log.d(TAG, "Shuttle status : " + shuttle.isOnline());
             if (!shuttle.isOnline()) {
                 shuttle.getMarker().setVisible(false);
             } else {
@@ -148,23 +196,38 @@ public class MapsActivity extends FragmentActivity implements ShuttleUpdater.OnM
             }
             //TODO: Update InfoWindow RouteEstimates
         }
-        mMapState.initStopsArrays();
+      //  mMapState.initStopsArrays();
 
         /*
         if (mMapState.initDrawerItems()) {  //If navigation drawer is newly initialized
 
         }
 */
-        mMapState.initDrawerItems();
+        //mMapState.initDrawerItems();
 
-        mAdapter.notifyDataSetChanged();
 
+        //adapter.notifyDataSetInvalidated();
+
+        Log.d(TAG, "!!__ IN UPDATE __!! Adapter : " + mAdapter);
+        if(!oldAdapter.equals(mAdapter)){
+            Log.d(TAG, "!!!!!!!!!!!!!!!! \n         NO MATCH          \n !!!!!!!!!!!!!!!" + mAdapter);
+        }
+        mAdapter.notifyDataSetInvalidated();
+
+        Log.d(TAG_PD, "updateMap -- ProgressDialog isShowing: " + sProgressDialog.isShowing());
+        sProgressDialog.dismiss();
+        Log.d(TAG_PD, "POST DISMISS updateMap -- ProgressDialog : " + sProgressDialog);
         Log.d(TAG, "end updateMap");
+
+
     }
 
     private void initNavigationDrawer() {
         Log.d(TAG, "initNavigationDrawer: " + mDrawerLayout + " ; " + mDrawerList);
-        if (/*mDrawerLayout == null && mDrawerList == null*/ true) {
+        if (mDrawerLayout == null || mDrawerList == null) {
+
+            mDrawerLayout = (DrawerLayout) this.findViewById(R.id.drawer_layout);
+            mDrawerList = (ExpandableListView) this.findViewById(R.id.left_drawer);
 
             mDrawerList.setBackgroundColor(0xFF191b1b);   //0xFF191b1b
 
@@ -197,12 +260,16 @@ public class MapsActivity extends FragmentActivity implements ShuttleUpdater.OnM
             getActionBar().setDisplayHomeAsUpEnabled(true);
             getActionBar().setHomeButtonEnabled(true);
 
+
             mAdapter = new ExpandableDrawerAdapter(this, mMapState.getDrawerItems());
+            Log.d(TAG, "!! __ !! _ !! Adapter : " + mAdapter);
+            oldAdapter = mAdapter;
 
             //ListAdapter mAdapterTest = new ListAdapter<DrawerItem>(this, R.layout.drawer_child_item, mMapState.getDrawerItems());
             Log.d(TAG, "DrawerItems: " + mMapState.getDrawerItems().toString());
             //mDrawerList.setAdapter(mAdapter);
             mDrawerList.setAdapter(mAdapter);
+
             //mDrawerList.setAdapter(mAdapterTest);
 
             mDrawerToggle.syncState();
@@ -215,12 +282,13 @@ public class MapsActivity extends FragmentActivity implements ShuttleUpdater.OnM
 
         mMap = mMapState.getMap();
 
-        Log.d(TAG, "Got the map from mapstate");
-
         if (mMap == null) {
-            Log.d(TAG, "Needed...");
             MapFragment mapFragment = ((MapFragment) getFragmentManager().findFragmentById(R.id.map));
             mapFragment.setRetainInstance(true);
+
+
+//            MapView mapView = (MapView)mapFragment.getView();
+
 
             mMap = mapFragment.getMap();
             mMap.clear();
@@ -229,6 +297,8 @@ public class MapsActivity extends FragmentActivity implements ShuttleUpdater.OnM
                 setUpRouteLines();
                 mMap.setMyLocationEnabled(true);
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(MAP_CENTER, MAP_ZOOM_LEVEL));
+
+
             }
             mMap.setInfoWindowAdapter(new MapInfoWindowAdapter(this));
             mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
@@ -252,7 +322,7 @@ public class MapsActivity extends FragmentActivity implements ShuttleUpdater.OnM
             mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
                 @Override
                 public void onMapClick(LatLng latLng) {
-                    Log.d(TAG, "outside onmapclick if : "+mMapState.getSelectedStopMarker() + "; global visibility: "+mMapState.isStopsVisible());
+                    Log.d(TAG, "LatLng : " + latLng);
                     if (mMapState.getSelectedStopMarker() != null && !mMapState.isStopsVisible()){
                         //selectedStopMarker.setVisible(!selectedStopMarker.isVisible());
                         Log.d(TAG, "Got to onMapClick selectedstop");
@@ -262,11 +332,27 @@ public class MapsActivity extends FragmentActivity implements ShuttleUpdater.OnM
                 }
             });
 
+            mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
+                @Override
+                public void onCameraChange(CameraPosition cameraPosition) {
+                    if (cameraPosition.zoom < 13){
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mMap.getCameraPosition().target, 13));
+                        //Log.d(TAG, "latlng bounds: "+mMap.getProjection().getVisibleRegion().latLngBounds);
+
+
+                        //LatLngBounds{southwest=lat/lng: (44.53115410989141,-123.31205293536186), northeast=lat/lng: (44.594630368776166,-123.25025483965874)}
+                    }
+
+                }
+            });
+
 
             mMapState.setMap(mMap);
             mMapState.initShuttles();
             mMapState.setStopsMarkers();
 
+            mMapState.initStopsArrays();
+            mMapState.initDrawerItems();
         }
 
 
@@ -381,6 +467,11 @@ XXH         144x144
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main_menu, menu);
         return true;
+    }
+
+
+    public void loadNoClick(View v){
+        //doing nothing!
     }
 
 
