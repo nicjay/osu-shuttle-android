@@ -33,15 +33,8 @@ public class ExpandableDrawerAdapter extends BaseExpandableListAdapter {
         sMapState = MapState.get();
     }
 
-
-
-
-
-
     @Override
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
-
-
         View sectionView;
         View itemView;
 

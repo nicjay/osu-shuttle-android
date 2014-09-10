@@ -7,6 +7,8 @@
     <color name="transparent_OSU_white">#E7f5f2ed</color>
     <color name="infowindow_font">#373737</color>
 
+    <color name="Navigation_Drawer_Background">#191b1b</color>
+
     <color name="Navigation_Drawer_Item_Bg">#282828</color>
     <color name="Navigation_Drawer_Item_Bg_Selected">#424242</color>
 

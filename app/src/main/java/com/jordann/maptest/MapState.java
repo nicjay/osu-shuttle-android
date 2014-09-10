@@ -40,8 +40,6 @@ public class MapState {
 
     private static Context sCurrentContext;
 
-    private static double PORTRAIT_OFFSET;
-    private static double LANDSCAPE_OFFSET;
     private static final int CAMERA_ANIMATION_SPEED = 600;
 
     private static final float CAMERA_TILT = 0;
@@ -54,92 +52,83 @@ public class MapState {
 
     public static MapState get(){
         if (sMapState == null){
-            Log.d(TAG, "mapState null, creating new...");
             sMapState = new MapState();
-
-            Log.d(TAG, "getshuttles: " +mShuttles);
         }
         return sMapState;
     }
 
-    public static MapState get(Context context){
-        sCurrentContext = context;
-        if (sMapState == null){
-            Log.d(TAG, "mapState null, creating new...");
-            sMapState = new MapState();
-
-            Log.d(TAG, "getshuttles: " +mShuttles);
-        }
-        return sMapState;
+    public static void setCurrentContext(Context currentContext) {
+        sCurrentContext = currentContext;
     }
 
+    //Creates shuttle objects and their markers, initializing them to (0,0) on the map.
     public void initShuttles(){
-       // if (mShuttles == null){
-            mShuttles = new ArrayList<Shuttle>();
-            LatLng initLatLng = new LatLng(0,0);
+        mShuttles = new ArrayList<Shuttle>();
+        LatLng initLatLng = new LatLng(0,0);
 
-            Shuttle newShuttle = new Shuttle("North", false);
-            newShuttle.setMarker(mMap.addMarker(new MarkerOptions().position(initLatLng).title("Init Shuttle").icon(BitmapDescriptorFactory.fromResource(R.drawable.shuttle_green)).flat(true).anchor(0.5f, 0.5f)));
-            mShuttles.add(newShuttle);
+        Shuttle newShuttle = new Shuttle("North", false);
+        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().position(initLatLng).title("Init Shuttle").icon(BitmapDescriptorFactory.fromResource(R.drawable.shuttle_green)).flat(true).anchor(0.5f, 0.5f)));
+        mShuttles.add(newShuttle);
 
-            newShuttle = new Shuttle("West 1", false);
-            newShuttle.setMarker(mMap.addMarker(new MarkerOptions().position(initLatLng).title("Init Shuttle").icon(BitmapDescriptorFactory.fromResource(R.drawable.shuttle_purple)).flat(true).anchor(0.5f, 0.5f)));
-            mShuttles.add(newShuttle);
+        newShuttle = new Shuttle("West 1", false);
+        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().position(initLatLng).title("Init Shuttle").icon(BitmapDescriptorFactory.fromResource(R.drawable.shuttle_purple)).flat(true).anchor(0.5f, 0.5f)));
+        mShuttles.add(newShuttle);
 
-            newShuttle = new Shuttle("West 2", false);
-            newShuttle.setMarker(mMap.addMarker(new MarkerOptions().position(initLatLng).title("Init Shuttle").icon(BitmapDescriptorFactory.fromResource(R.drawable.shuttle_purple)).flat(true).anchor(0.5f, 0.5f)));
-            mShuttles.add(newShuttle);
+        newShuttle = new Shuttle("West 2", false);
+        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().position(initLatLng).title("Init Shuttle").icon(BitmapDescriptorFactory.fromResource(R.drawable.shuttle_purple)).flat(true).anchor(0.5f, 0.5f)));
+        mShuttles.add(newShuttle);
 
-            newShuttle = new Shuttle("East", false);
-            newShuttle.setMarker(mMap.addMarker(new MarkerOptions().position(initLatLng).title("Init Shuttle").icon(BitmapDescriptorFactory.fromResource(R.drawable.shuttle_orange)).flat(true).anchor(0.5f, 0.5f)));
-            mShuttles.add(newShuttle);
-      //  }
+        newShuttle = new Shuttle("East", false);
+        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().position(initLatLng).title("Init Shuttle").icon(BitmapDescriptorFactory.fromResource(R.drawable.shuttle_orange)).flat(true).anchor(0.5f, 0.5f)));
+        mShuttles.add(newShuttle);
     }
 
     public void setShuttle(int index, Shuttle shuttle){
         mShuttles.get(index).updateAll(shuttle);
     }
 
+    //Called on marker selection. Moves camera, accounting for infoWindow height and display orientation.
     public void animateMap(LatLng latLng){
         Display display = ((WindowManager) sCurrentContext.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
         int rotation = display.getRotation();
 
-        Log.d(TAG, "zoom level: "+mMap.getCameraPosition().zoom);
-        getInfoWindowOffset(mMap.getCameraPosition().zoom);
+        //[0] = portraitOffset  ,   [1] = landscapeOffset
+        double[] orientationOffset = getInfoWindowOffset(mMap.getCameraPosition().zoom);
 
-        LatLng newPosition = new LatLng(latLng.latitude + PORTRAIT_OFFSET, latLng.longitude);
+        LatLng newPosition = new LatLng(latLng.latitude + orientationOffset[0], latLng.longitude);
 
         if (rotation == Surface.ROTATION_90 || rotation == Surface.ROTATION_270) {
-           newPosition = new LatLng(latLng.latitude + LANDSCAPE_OFFSET, latLng.longitude);
+           newPosition = new LatLng(latLng.latitude + orientationOffset[1], latLng.longitude);
         }
 
         CameraPosition cameraPosition = new CameraPosition(newPosition, mMap.getCameraPosition().zoom, CAMERA_TILT, CAMERA_BEARING);
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), CAMERA_ANIMATION_SPEED, null);
     }
 
-    public int getInfoWindowOffset(float zoom){
-        int offset = 0;
+    public double[] getInfoWindowOffset(float zoom){
+        double[] offset = new double[2];
+        double portraitOffset = 0;
+        double landscapeOffset = 0;
 
         if (zoom >= 13 && zoom < 14){
-            PORTRAIT_OFFSET = .002;
-            LANDSCAPE_OFFSET = .0059;
+            portraitOffset = .002;
+            landscapeOffset = .0059;
         }
         else if (zoom >= 14 && zoom < 16){
-            PORTRAIT_OFFSET = .002;
-            LANDSCAPE_OFFSET = .0029;
+            portraitOffset = .002;
+            landscapeOffset = .0029;
         }
         else if (zoom >= 16 && zoom < 17){
-            PORTRAIT_OFFSET = .0008;
-            LANDSCAPE_OFFSET = .00105;
+            portraitOffset = .0008;
+            landscapeOffset = .00105;
         }
         else if (zoom >= 17 && zoom < 18){
-            PORTRAIT_OFFSET = .0006;
-            LANDSCAPE_OFFSET = .00060;
+            portraitOffset = .0006;
+            landscapeOffset = .00060;
         }
-        else if (zoom >= 18) {
-            PORTRAIT_OFFSET = 0;
-            LANDSCAPE_OFFSET = 0;
-        }
+
+        offset[0] = portraitOffset;
+        offset[1] = landscapeOffset;
         return offset;
     }
 
@@ -168,29 +157,25 @@ public class MapState {
     }
 
     public void setStopsMarkers(){
-        if (mStopsVisible){
-            for (Stop stop : mStops) {
-                stop.setMarker(mMap.addMarker(new MarkerOptions().position(stop.getLatLng()).title(stop.getName())));
-            }
-        } else {
-            for (Stop stop : mStops) {
-                stop.setMarker(mMap.addMarker(new MarkerOptions().position(stop.getLatLng()).title(stop.getName()).visible(false)));
-            }
+        for (Stop stop : mStops) {
+            stop.setMarker(mMap.addMarker(new MarkerOptions().position(stop.getLatLng()).title(stop.getName()).visible(mStopsVisible)));
         }
-
     }
 
+    //Uses shuttleETAs to determine which stops belong to each route.
     public void initStopsArrays() {
-        if (mNorthStopIndex == null && mWestStopIndex == null && mEastStopIndex == null) {
-            Log.d(TAG, "initStopsArrays null. recreating...");
+        if (mNorthStopIndex == null || mWestStopIndex == null || mEastStopIndex == null) {
             mNorthStopIndex = new ArrayList<Integer>();
             mWestStopIndex = new ArrayList<Integer>();
             mEastStopIndex = new ArrayList<Integer>();
+
             for (Stop stop : mStops) {
+                //Log.d(TAG, "stopShuttleETAS: " + stops.get(i).getShuttleETAs()[0] + " , "+ stops.get(i).getShuttleETAs()[1] + " , "+ stops.get(i).getShuttleETAs()[2] + " , "+ stops.get(i).getShuttleETAs()[3] + " , ");
                 int[] shuttleETAs = stop.getShuttleETAs();
                 int index = mStops.indexOf(stop);
+                //TODO: input shuttleETAs
                 for (int i = 0; i < 4; i++) {
-                    if (/*shuttleETAs[i] != -1*/true) {
+                    if (true/*shuttleETAs[i] != -1*/) {
                         switch (i) {
                             case 0:
                                 mNorthStopIndex.add(index);
@@ -220,9 +205,6 @@ public class MapState {
 
     public boolean initDrawerItems() {
         if (mDrawerItems.size() == 0 || mDrawerItems == null) {
-            Log.d(TAG, "mDrawerItems null");
-
-
             mDrawerItems.add(new DrawerItem(0, "Buses"));
             mDrawerItems.add(new DrawerItem(1, "North", mShuttles.get(0), true));
             mDrawerItems.add(new DrawerItem(1, "West 1", mShuttles.get(1), true));
@@ -232,7 +214,6 @@ public class MapState {
             mDrawerItems.add(new DrawerItem(2, "North Route", mNorthStopIndex));
             mDrawerItems.add(new DrawerItem(2, "West Route", mWestStopIndex));
             mDrawerItems.add(new DrawerItem(2, "East Route", mEastStopIndex));
-
             return true;
         }
         return false;

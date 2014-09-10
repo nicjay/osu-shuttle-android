@@ -94,8 +94,6 @@ public class ShuttleUpdater {
         private JSONArray JSONShuttles;
         private JSONArray[] jStopsArray;
 
-        long stopTime, startTime;
-
 
         public pollNewDataTask(String url) {
             super();
@@ -105,28 +103,17 @@ public class ShuttleUpdater {
 
         @Override
         protected Void doInBackground(String... params) {
-            startTime = System.currentTimeMillis();
             JSONGetter getter = new JSONGetter();
             JSONShuttles = getter.getJSONFromUrl(url);
             return null;
         }
-// mProgressDialog = ProgressDialog.show(this, "", "Loading...", true, false);
-
-
 
 
         @Override
         protected void onPostExecute(Void v) {
             super.onPostExecute(v);
+
             parseJSON();
-            stopTime = System.currentTimeMillis();
-            Log.d(TAG, "elapsedTime = " + (stopTime - startTime));
-
-            //if(mProgressDialog != null && mProgressDialog.isShowing())
-           // {
-             //   mProgressDialog.dismiss();
-           // }
-
             if(!stop) listener.updateMap();
         }
 
@@ -191,7 +178,12 @@ public class ShuttleUpdater {
             int maxNum = 600;
             for (int i = 0, len = stops.size(); i < len; i++){
                 stops.get(i).setShuttleETAs(new int[]{random.nextInt(maxNum),random.nextInt(maxNum),random.nextInt(maxNum),random.nextInt(maxNum)});
+
             }
+           stops = sMapState.getStops();
+           for(int i = 0; i < stops.size(); i++) {
+               Log.d(TAG, "1stopShuttleETAS: " + stops.get(i).getShuttleETAs()[0] + " , " + stops.get(i).getShuttleETAs()[1] + " , " + stops.get(i).getShuttleETAs()[2] + " , " + stops.get(i).getShuttleETAs()[3] + " , ");
+           }
        }
     }
 }

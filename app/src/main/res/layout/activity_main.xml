@@ -45,7 +45,7 @@
             android:layout_height="match_parent"
             android:layout_gravity="start"
 
-            android:background="@color/OSU_orange"
+            android:background="@color/Navigation_Drawer_Background"
             android:choiceMode="singleChoice"
             android:divider="#333333"
             android:dividerHeight="1dp"
