@@ -2,10 +2,13 @@ package com.jordann.maptest;
 
 import android.content.Context;
 import android.content.res.Configuration;
+import android.nfc.Tag;
+import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Display;
 import android.view.Surface;
 import android.view.WindowManager;
+import android.widget.ExpandableListView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -22,6 +25,7 @@ import java.util.ArrayList;
  */
 public class MapState {
     private static final String TAG = "MapState";
+    private static final String TAG_DB = "SpecialTag";
 
     private static MapState sMapState;
     private static GoogleMap mMap;
@@ -45,9 +49,63 @@ public class MapState {
     private static final float CAMERA_TILT = 0;
     private static final float CAMERA_BEARING = 0;
 
+    private boolean stopsTaskStatus;
+
+    private DrawerLayout mDrawerLayout;
+    private ExpandableDrawerAdapter mAdapter;
+    private ExpandableListView mDrawerList;
+
+    private boolean reInitDrawerItems = false;
+
+    public boolean isReInitDrawerItems() {
+        return reInitDrawerItems;
+    }
+
+    public void setReInitDrawerItems(boolean reInitDrawerItems, ExpandableDrawerAdapter adapter) {
+        this.reInitDrawerItems = reInitDrawerItems;
+        mAdapter = adapter;
+    }
+
+    public DrawerLayout getDrawerLayout() {
+        return mDrawerLayout;
+    }
+
+    public void setDrawerLayout(DrawerLayout drawerLayout) {
+        mDrawerLayout = drawerLayout;
+    }
+
+    public ExpandableDrawerAdapter getAdapter() {
+        return mAdapter;
+    }
+
+
+    public void setAdapter(ExpandableDrawerAdapter adapter) {
+        mAdapter = adapter;
+    }
+
+    public ExpandableListView getDrawerList() {
+        return mDrawerList;
+    }
+
+    public void setDrawerList(ExpandableListView drawerList) {
+        mDrawerList = drawerList;
+    }
+
+    public boolean isStopsTaskStatus() {
+        return stopsTaskStatus;
+    }
+
+    public void setStopsTaskStatus(boolean stopsTaskStatus) {
+        this.stopsTaskStatus = stopsTaskStatus;
+    }
+
+
+
+
     private MapState(){
         mDrawerItems = new ArrayList<DrawerItem>();
         mStopsVisible = true;
+        stopsTaskStatus = true;
     }
 
     public static MapState get(){
@@ -61,8 +119,13 @@ public class MapState {
         sCurrentContext = currentContext;
     }
 
+    public static Context getCurrentContext() {
+        return sCurrentContext;
+    }
+
     //Creates shuttle objects and their markers, initializing them to (0,0) on the map.
     public void initShuttles(){
+        Log.d(TAG_DB, "initShuttles");
         mShuttles = new ArrayList<Shuttle>();
         LatLng initLatLng = new LatLng(0,0);
 
@@ -81,6 +144,14 @@ public class MapState {
         newShuttle = new Shuttle("East", false);
         newShuttle.setMarker(mMap.addMarker(new MarkerOptions().position(initLatLng).title("Init Shuttle").icon(BitmapDescriptorFactory.fromResource(R.drawable.shuttle_orange)).flat(true).anchor(0.5f, 0.5f)));
         mShuttles.add(newShuttle);
+
+        if(mDrawerItems != null && mDrawerItems.size() != 0){
+            //mDrawerItems[1] through mDrawerItems[4] are shuttles. Update new markers
+            for(int i = 1; i < 5; i++){
+                mDrawerItems.get(i).setShuttle(mShuttles.get(i-1));
+            }
+
+        }
     }
 
     public void setShuttle(int index, Shuttle shuttle){
@@ -153,10 +224,12 @@ public class MapState {
     }
 
     public void setStops(ArrayList<Stop> stops){
+        Log.d(TAG_DB, "setStops");
         mStops = stops;
     }
 
     public void setStopsMarkers(){
+        Log.d(TAG_DB, "setStopMarkers");
         for (Stop stop : mStops) {
             stop.setMarker(mMap.addMarker(new MarkerOptions().position(stop.getLatLng()).title(stop.getName()).visible(mStopsVisible)));
         }
@@ -164,6 +237,7 @@ public class MapState {
 
     //Uses shuttleETAs to determine which stops belong to each route.
     public void initStopsArrays() {
+        Log.d(TAG_DB, "initStopsArrays");
         if (mNorthStopIndex == null || mWestStopIndex == null || mEastStopIndex == null) {
             mNorthStopIndex = new ArrayList<Integer>();
             mWestStopIndex = new ArrayList<Integer>();
@@ -200,10 +274,13 @@ public class MapState {
     }
 
     public void setDrawerItems(ArrayList<DrawerItem> drawerItems){
+        Log.d(TAG_DB, "setDrawerItems");
         mDrawerItems = drawerItems;
     }
 
     public boolean initDrawerItems() {
+        Log.d(TAG_DB, "initDrawerItems");
+        Log.d(TAG, "mDrawerItems: "+mDrawerItems+" ; ");
         if (mDrawerItems.size() == 0 || mDrawerItems == null) {
             mDrawerItems.add(new DrawerItem(0, "Buses"));
             mDrawerItems.add(new DrawerItem(1, "North", mShuttles.get(0), true));

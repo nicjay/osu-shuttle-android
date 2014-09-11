@@ -38,6 +38,10 @@ public class DrawerItem {
         mStopsIndex = stopsIndex;
     }
 
+    public void setShuttle(Shuttle shuttle) {
+        mShuttle = shuttle;
+    }
+
     public int getTypeId() {
         return mTypeId;
     }

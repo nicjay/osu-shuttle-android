@@ -59,7 +59,9 @@ public class Shuttle {
     }
 
     public void updateMarker(){
+
         mMarker.setPosition(getLatLng());
+        mMarker.setRotation(getHeading());
     }
 
     public int getRouteID() {

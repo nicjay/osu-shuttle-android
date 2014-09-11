@@ -1,6 +1,8 @@
 package com.jordann.maptest;
 
 import android.os.AsyncTask;
+import android.util.Log;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -11,6 +13,7 @@ import java.util.ArrayList;
  */
 public class InitialStopsTask extends AsyncTask<String, Void, JSONArray> {
     private static final String TAG = "InitialStopsTask";
+    private static final String TAG_DB = "SpecialTag";
 
     private String url;
     private static MapState sMapState;
@@ -18,7 +21,8 @@ public class InitialStopsTask extends AsyncTask<String, Void, JSONArray> {
 
 
     public interface OnStopsComplete{
-        void setUpMapIfNeeded();
+        void onPostStopsTask();
+        void showNoConnectionDialog();
     }
 
     public InitialStopsTask(String url, OnStopsComplete listener){
@@ -31,15 +35,21 @@ public class InitialStopsTask extends AsyncTask<String, Void, JSONArray> {
     @Override
     protected void onPostExecute(JSONArray j) {
         super.onPostExecute(j);
-        parseJSON(j);
-        listener.setUpMapIfNeeded();
+        Log.d(TAG_DB, "initialStopsTask");
+        if (j != null) {
+            parseJSON(j);
+            listener.onPostStopsTask();
+        } else{
+            listener.showNoConnectionDialog();
+            sMapState.setStopsTaskStatus(false);
+        }
     }
 
     @Override
     protected JSONArray doInBackground(String... params) {
         JSONGetter getter = new JSONGetter();
-        JSONArray jStopsArray = getter.getJSONFromUrl(url);
-
+       // JSONArray jStopsArray = getter.getJSONFromUrl(url);
+        JSONArray jStopsArray = getter.getJSONFromUrl("http://www.google.com");
         return jStopsArray;
     }
 

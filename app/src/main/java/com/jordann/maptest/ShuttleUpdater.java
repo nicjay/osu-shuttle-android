@@ -37,7 +37,7 @@ public class ShuttleUpdater {
 
 
     public interface OnMapStateUpdate{
-        void updateMap();
+        void onPostShuttleRequest(boolean success);
     }
 
 
@@ -79,21 +79,21 @@ public class ShuttleUpdater {
 
     public void startShuttleUpdater(){
 
-        stop = false;
-        currentTask = new pollNewDataTask(urlShuttlePoints);
-        currentTask.execute();
+        if (stop == true) {
+            stop = false;
+            currentTask = new pollNewDataTask(urlShuttlePoints);
+            currentTask.execute();
 
-        startHandler();
+            startHandler();
+        }
     }
 
-    private class pollNewDataTask extends AsyncTask<String, Void, Void>{
+    private class pollNewDataTask extends AsyncTask<String, Void, Boolean>{
 
         private static final String TAG = "pollNewDataTask";
 
         private String url;
         private JSONArray JSONShuttles;
-        private JSONArray[] jStopsArray;
-
 
         public pollNewDataTask(String url) {
             super();
@@ -102,19 +102,22 @@ public class ShuttleUpdater {
 
 
         @Override
-        protected Void doInBackground(String... params) {
+        protected Boolean doInBackground(String... params) {
             JSONGetter getter = new JSONGetter();
             JSONShuttles = getter.getJSONFromUrl(url);
-            return null;
+            if(JSONShuttles != null){
+                return true;
+            }
+            return false;
         }
 
 
         @Override
-        protected void onPostExecute(Void v) {
-            super.onPostExecute(v);
+        protected void onPostExecute(Boolean success) {
+            super.onPostExecute(success);
 
             parseJSON();
-            if(!stop) listener.updateMap();
+            if(!stop) listener.onPostShuttleRequest(success);
         }
 
         //TODO: reduce number of string conversions here and JSONGetter
@@ -163,7 +166,7 @@ public class ShuttleUpdater {
             }
             for (int i = 0; i < 4; i++) {
                Shuttle shuttle = sMapState.getShuttles().get(i);
-               Log.d(TAG, "SET SHUTTLE OFFLINE " + shuttle.isOnline());
+               //Log.d(TAG, "SET SHUTTLE OFFLINE " + shuttle.isOnline());
                if (!onlineStates[i]){
                    shuttle.setOnline(false);
 
@@ -173,17 +176,19 @@ public class ShuttleUpdater {
 
 
             //Test Times
-            ArrayList<Stop> stops = sMapState.getStops();
-            Random random = new Random();
-            int maxNum = 600;
-            for (int i = 0, len = stops.size(); i < len; i++){
-                stops.get(i).setShuttleETAs(new int[]{random.nextInt(maxNum),random.nextInt(maxNum),random.nextInt(maxNum),random.nextInt(maxNum)});
+           if (sMapState.getStops() != null) {
+               ArrayList<Stop> stops = sMapState.getStops();
+               Random random = new Random();
+               int maxNum = 600;
+               for (int i = 0, len = stops.size(); i < len; i++) {
+                   stops.get(i).setShuttleETAs(new int[]{random.nextInt(maxNum), random.nextInt(maxNum), random.nextInt(maxNum), random.nextInt(maxNum)});
 
-            }
-           stops = sMapState.getStops();
-           for(int i = 0; i < stops.size(); i++) {
-               Log.d(TAG, "1stopShuttleETAS: " + stops.get(i).getShuttleETAs()[0] + " , " + stops.get(i).getShuttleETAs()[1] + " , " + stops.get(i).getShuttleETAs()[2] + " , " + stops.get(i).getShuttleETAs()[3] + " , ");
+               }
            }
+          /* stops = sMapState.getStops();
+           for(int i = 0; i < stops.size(); i++) {
+               //Log.d(TAG, "1stopShuttleETAS: " + stops.get(i).getShuttleETAs()[0] + " , " + stops.get(i).getShuttleETAs()[1] + " , " + stops.get(i).getShuttleETAs()[2] + " , " + stops.get(i).getShuttleETAs()[3] + " , ");
+           }*/
        }
     }
 }
