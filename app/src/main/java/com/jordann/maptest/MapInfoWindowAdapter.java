@@ -22,6 +22,9 @@ import com.google.android.gms.maps.model.Marker;
 
 import org.w3c.dom.Text;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.ResourceBundle;
 
 /*
@@ -47,6 +50,13 @@ public class MapInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
 
     //private final ImageView shuttleIcon;
     private final TextView shuttleTitle;
+    private final TextView shuttleName1;
+    private final TextView shuttleName2;
+    private final TextView shuttleName3;
+
+    private final TextView shuttleTime1;
+    private final TextView shuttleTime2;
+    private final TextView shuttleTime3;
     //private final TextView stopTitle;
 
     //private final TextView stopRouteName;
@@ -90,6 +100,15 @@ public class MapInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
         newParams.addRule(RelativeLayout.ALIGN_BASELINE,R.id.info_shuttle_time3);
         shuttleView.findViewById(R.id.min3).setLayoutParams(newParams);
 
+
+        shuttleName1 = ((TextView)shuttleView.findViewById(R.id.shuttle_stop_name1));
+        shuttleName2 = ((TextView)shuttleView.findViewById(R.id.shuttle_stop_name2));
+        shuttleName3 = ((TextView)shuttleView.findViewById(R.id.shuttle_stop_name3));
+
+        shuttleTime1 = ((TextView)shuttleView.findViewById(R.id.info_shuttle_time1));
+        shuttleTime2 = ((TextView)shuttleView.findViewById(R.id.info_shuttle_time2));
+        shuttleTime3 = ((TextView)shuttleView.findViewById(R.id.info_shuttle_time3));
+
         /*TextView tv = (TextView)shuttleView.findViewById(R.id.info_shuttle_title);
         Typeface typeface = Typeface.createFromAsset(context.getAssets(), "fonts/Gudea-Bold.ttf");
         tv.setTypeface(typeface);*/
@@ -101,9 +120,20 @@ public class MapInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
     @Override
     public View getInfoWindow(final Marker marker) {
 
-        for (Shuttle shuttle : mMapState.getShuttles()){
+        ArrayList<Shuttle> shuttles = mMapState.getShuttles();
+
+        for (Shuttle shuttle : shuttles){
             if (shuttle.getMarker().equals(marker)){
                 shuttleTitle.setText(shuttle.getName());
+                LinkedList<Shuttle.ShuttleEta> upcomingStops = shuttle.getUpcomingStops();
+
+                shuttleName1.setText(upcomingStops.get(0).name);
+                shuttleName2.setText(upcomingStops.get(1).name);
+                shuttleName3.setText(upcomingStops.get(2).name);
+
+                shuttleTime1.setText(String.valueOf(upcomingStops.get(0).time));
+                shuttleTime2.setText(String.valueOf(upcomingStops.get(1).time));
+                shuttleTime3.setText(String.valueOf(upcomingStops.get(2).time));
 
                 return shuttleView;
             }
@@ -122,39 +152,70 @@ public class MapInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
                 stopTitle.setText(marker.getTitle());
 
                 LinearLayout containerLayout = (LinearLayout)stopView.findViewById(R.id.eta_container);
+//                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams)containerLayout.getLayoutParams();
+//                params.setMargins(0,0,0,0);
+//                containerLayout.setLayoutParams(params);
+
 
                 Context c = containerLayout.getContext();
 
-                LinearLayout.LayoutParams lps = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1);
 
-                for (int i = 0; i < 3; i++){
-                    LinearLayout ll = new LinearLayout(c);
-                    ll.setOrientation(LinearLayout.VERTICAL);
-                   // ll.setGravity(Gravity.CENTER);
+                LinearLayout.LayoutParams lps = new LinearLayout.LayoutParams(135, LinearLayout.LayoutParams.WRAP_CONTENT);
+                //lps.setMargins(16, 16, 16, 16);
 
-                    TextView tv = new TextView(c);
-                    tv.setText("East");
-                    tv.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
-                    tv.setGravity(Gravity.CENTER);
-                    ll.addView(tv);
+                //containerLayout.setPadding(8,8,8,8);
 
-                    TextView tv2 = new TextView(c);
-                    tv2.setText(String.valueOf(i));
-                    tv2.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 30);
-                    tv2.setTextColor(c.getResources().getColor(R.color.OSU_orange));
-                    tv2.setTypeface(null, Typeface.BOLD);
-                    tv2.setGravity(Gravity.CENTER);
-                    ll.addView(tv2);
 
-                    TextView tv3 = new TextView(c);
-                    tv3.setText("min");
-                    tv3.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12);
-                    tv3.setGravity(Gravity.CENTER);
-                    ll.addView(tv3);
 
-                    ll.setLayoutParams(lps);
-                    containerLayout.addView(ll);
+                int[] shuttleETAs = stop.getShuttleETAs();
 
+
+
+                int length = shuttleETAs.length;
+                int eta;
+                for (int i = 0; i < length; i++){
+                    eta = shuttleETAs[i];
+                    Shuttle shuttle = shuttles.get(i);
+                    Log.d(TAG, "ETA is : " + eta + " ; shuttlesETAs : " + shuttleETAs);
+                    if(eta != -1) {
+
+                        LinearLayout ll = new LinearLayout(c);
+                        //ll.setBackgroundColor(mContext.getResources().getColor(shuttle.getColorID()));
+                        Log.d(TAG, "shuttleColor: " + shuttle.getColorID());
+
+                        ll.setOrientation(LinearLayout.VERTICAL);
+                        // ll.setGravity(Gravity.CENTER);
+
+
+
+
+                        TextView tv = new TextView(c);
+                        tv.setText(shuttle.getName());
+                        tv.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
+                        tv.setGravity(Gravity.CENTER);
+                        tv.setPadding(16, 16, 16, 8);
+
+                        ll.addView(tv);
+
+                        TextView tv2 = new TextView(c);
+                        tv2.setMaxLines(1);
+                        tv2.setText(String.valueOf(eta));
+                        tv2.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 30);
+                        tv2.setTextColor(c.getResources().getColor(shuttle.getColorID()));
+                        tv2.setTypeface(null, Typeface.BOLD);
+                        tv2.setGravity(Gravity.CENTER);
+                        ll.addView(tv2);
+
+                        TextView tv3 = new TextView(c);
+                        tv3.setText("min");
+                        tv3.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12);
+                        tv3.setGravity(Gravity.CENTER);
+                        tv3.setPadding(0,0,0,16);
+                        ll.addView(tv3);
+
+                        ll.setLayoutParams(lps);
+                        containerLayout.addView(ll);
+                    }
                 }
 
 

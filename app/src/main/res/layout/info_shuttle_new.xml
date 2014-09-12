@@ -40,6 +40,7 @@
             android:paddingLeft="12dp">
 
             <TextView
+                android:id="@+id/shuttle_stop_name1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_column="0"
@@ -78,7 +79,7 @@
                     android:id="@+id/info_shuttle_time1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="2"
+                    android:text="0"
                     android:textSize="30dp"
                     android:textStyle="bold"
                     android:textColor="@color/OSU_orange"
@@ -92,6 +93,7 @@
 
 
             <TextView
+                android:id="@+id/shuttle_stop_name2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_column="0"
@@ -127,7 +129,7 @@
                     android:id="@+id/info_shuttle_time2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="16"
+                    android:text="0"
                     android:textSize="30dp"
                     android:textStyle="bold"
                     android:textColor="@color/OSU_orange"
@@ -142,6 +144,7 @@
 
 
             <TextView
+                android:id="@+id/shuttle_stop_name3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_column="0"
@@ -178,7 +181,7 @@
                     android:id="@+id/info_shuttle_time3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="28"
+                    android:text="0"
                     android:textSize="30dp"
                     android:textStyle="bold"
                     android:textColor="@color/OSU_orange"

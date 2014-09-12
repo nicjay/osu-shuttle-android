@@ -47,6 +47,7 @@ public class DrawerItemClickListener implements ExpandableListView.OnGroupClickL
             sMapState.animateMap(drawerItems.get(groupPosition).getShuttle().getLatLng());
             Log.d(TAG, "The marker is: " + drawerItems.get(groupPosition).getShuttle().getMarker());
             drawerItems.get(groupPosition).getShuttle().getMarker().showInfoWindow();
+            sMapState.setSelectedStopMarker(drawerItems.get(groupPosition).getShuttle().getMarker());
             mDrawerLayout.closeDrawer(mDrawerList);
         }
 

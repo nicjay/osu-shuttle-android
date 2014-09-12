@@ -65,6 +65,7 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
     private boolean firstTime = true;
     private static boolean errorShown = false;
     private static LinearLayout errorLayout;
+    AlertDialog networkFailureDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,6 +103,9 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
         initialNetworkRequestor = new InitialNetworkRequestor();
         initialNetworkRequestor.execute();
 
+
+        createNetworkFailureDialog();
+
 /*
         //getStops returns null on first run. onDestroy into another onCreate and getStops is no longer null. setUpMapIfNeeded is called in both cases.
         if(networkAvailable) {
@@ -118,6 +122,27 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
         //Async task that fetches Shuttle positions and estimates on interval
         shuttleUpdater = ShuttleUpdater.get(this);
 */
+    }
+
+    public void createNetworkFailureDialog(){
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setMessage("Network unavailable")
+                .setPositiveButton("Try Again", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        initialNetworkRequestor = new InitialNetworkRequestor();
+                        initialNetworkRequestor.execute();
+                    }
+                })
+                .setNegativeButton("Exit", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                        Log.d(TAG, "TEST NO LINE");
+                    }
+                })
+                .setCancelable(false);
+        networkFailureDialog = alertDialogBuilder.create();
     }
 
     public void onPostInitialRequest(boolean success){
@@ -148,7 +173,8 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
         }else{
             Log.d(TAG, "onPostShuttleRequest fail");
             sProgressDialog.dismiss();
-            if(errorLayout.getVisibility() == View.INVISIBLE) {
+
+            if(errorLayout.getVisibility() == View.INVISIBLE && !networkFailureDialog.isShowing()) {
                 Log.d(TAG, "Error not shown, setting to visible");
                 //Animation animationSlideLeft = AnimationUtils.loadAnimation(this, android.R.anim.slide_in_left);
                 Animation animationSlideLeft = AnimationUtils.makeInAnimation(this, true);
@@ -197,25 +223,7 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
 */
     public void showNoConnectionDialog(){
         Log.d(TAG, "showNoConnectionDialog");
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Network unavailable")
-                .setPositiveButton("Try Again", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        initialNetworkRequestor = new InitialNetworkRequestor();
-                        initialNetworkRequestor.execute();
-                    }
-                })
-                .setNegativeButton("Exit", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        finish();
-                        Log.d(TAG, "TEST NO LINE");
-                    }
-                })
-                .setCancelable(false)
-                .create();
-        builder.show();
+        networkFailureDialog.show();
     }
     @Override
     protected void onStart() {
@@ -288,18 +296,26 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
             if (!shuttle.isOnline()) {
                 shuttle.getMarker().setVisible(false);
             } else {
+
+                if (shuttle.getLatLng() != shuttle.getMarker().getPosition()) {
+                    shuttle.updateMarker();
+                }
+
                 shuttle.getMarker().setVisible(true);
+
+
+
+
             }
-            if (shuttle.getLatLng() != shuttle.getMarker().getPosition()) {
-                shuttle.updateMarker();
-            }
+
             //TODO: Update InfoWindow RouteEstimates
         }
         mMapState.initStopsArrays();
-        mAdapter.notifyDataSetInvalidated();
+
         //mMapState.getAdapter().notifyDataSetInvalidated();
         if(mMapState.initDrawerItems()){
-
+            Log.d(TAG, "!!! INIT DRAWER ITEMS SUCCESS");
+            mAdapter.notifyDataSetInvalidated();
         }
 
         //Notify navigation drawer of data change, remove ProgressDialog, update complete
@@ -451,8 +467,15 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
                     marker.setVisible(true);
                     marker.showInfoWindow();
                     //TODO: are we really using flat?
-                    if (!marker.isFlat())
+
+                    mMapState.setSelectedStopMarker(marker);
+
+                    if (!marker.isFlat()) {
                         mMapState.setSelectedStopMarker(marker);
+                    } else {
+                        mMapState.setSelectedStopMarker(null);
+                    }
+
                     return true;
                 }
             });
@@ -460,9 +483,14 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
             mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
                 @Override
                 public void onMapClick(LatLng latLng) {
-                    if (mMapState.getSelectedStopMarker() != null && !mMapState.isStopsVisible()){
-                        mMapState.setSelectedStopMarkerVisibility(false);
+                    if (mMapState.getSelectedStopMarker() != null){
+
                         mMapState.setSelectedStopMarker(null);
+
+                        if (!mMapState.isStopsVisible()) {
+                            mMapState.setSelectedStopMarkerVisibility(false);
+                        }
+
                     }
                 }
             });
@@ -472,7 +500,8 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
                 @Override
                 public void onCameraChange(CameraPosition cameraPosition) {
                     if (cameraPosition.zoom < 13){
-                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mMap.getCameraPosition().target, 13));
+                        //TODO: put this back
+                       // mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mMap.getCameraPosition().target, 13));
                     }
                 }
             });

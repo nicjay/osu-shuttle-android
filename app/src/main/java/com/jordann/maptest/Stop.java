@@ -33,6 +33,12 @@ public class Stop {
         return mShuttleETAs;
     }
 
+    public int getShuttleETA(int index){
+        if (index < mShuttleETAs.length)
+            return mShuttleETAs[index];
+        else return 0;
+    }
+
     public void setShuttleETAs(int[] shuttleETAs) {
         mShuttleETAs = shuttleETAs;
     }

@@ -19,11 +19,15 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 /*
   Created by jordan_n on 8/22/2014.
  */
 public class MapState {
+
+
+
     private static final String TAG = "MapState";
     private static final String TAG_DB = "SpecialTag";
 
@@ -35,6 +39,7 @@ public class MapState {
     private boolean mStopsVisible;
 
     private Marker mSelectedStopMarker;
+    private int[] mSelectedStopMarkerTimes;
 
     private static ArrayList<Integer> mNorthStopIndex;
     private static ArrayList<Integer> mWestStopIndex;
@@ -130,21 +135,30 @@ public class MapState {
         LatLng initLatLng = new LatLng(0,0);
 
         Shuttle newShuttle = new Shuttle("North", false);
-        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().position(initLatLng).title("Init Shuttle").icon(BitmapDescriptorFactory.fromResource(R.drawable.shuttle_green)).flat(true).anchor(0.5f, 0.5f)));
+        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().position(initLatLng).title("Init Shuttle").icon(BitmapDescriptorFactory.fromResource(R.drawable.shuttle_green)).flat(true).anchor(0.5f, 0.5f).infoWindowAnchor(.5f, .5f)));
+        newShuttle.setColorID(R.color.shuttle_green);
+        Log.d(TAG, "Shuttle color: " + newShuttle.getColorID());
         mShuttles.add(newShuttle);
 
         newShuttle = new Shuttle("West 1", false);
-        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().position(initLatLng).title("Init Shuttle").icon(BitmapDescriptorFactory.fromResource(R.drawable.shuttle_purple)).flat(true).anchor(0.5f, 0.5f)));
+        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().position(initLatLng).title("Init Shuttle").icon(BitmapDescriptorFactory.fromResource(R.drawable.shuttle_purple)).flat(true).anchor(0.5f, 0.5f).infoWindowAnchor(.5f, .5f)));
+        newShuttle.setColorID(R.color.shuttle_purple);
+        Log.d(TAG, "Shuttle color: " + newShuttle.getColorID());
         mShuttles.add(newShuttle);
 
         newShuttle = new Shuttle("West 2", false);
-        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().position(initLatLng).title("Init Shuttle").icon(BitmapDescriptorFactory.fromResource(R.drawable.shuttle_purple)).flat(true).anchor(0.5f, 0.5f)));
+        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().position(initLatLng).title("Init Shuttle").icon(BitmapDescriptorFactory.fromResource(R.drawable.shuttle_purple)).flat(true).anchor(0.5f, 0.5f).infoWindowAnchor(.5f, .5f)));
+        newShuttle.setColorID(R.color.shuttle_purple);
+        Log.d(TAG, "Shuttle color: " + newShuttle.getColorID());
         mShuttles.add(newShuttle);
 
         newShuttle = new Shuttle("East", false);
-        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().position(initLatLng).title("Init Shuttle").icon(BitmapDescriptorFactory.fromResource(R.drawable.shuttle_orange)).flat(true).anchor(0.5f, 0.5f)));
+        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().position(initLatLng).title("Init Shuttle").icon(BitmapDescriptorFactory.fromResource(R.drawable.shuttle_orange)).flat(true).anchor(.5f, .5f).infoWindowAnchor(.5f, .5f)));
+        newShuttle.setColorID(R.color.shuttle_orange);
+        Log.d(TAG, "Shuttle color: " + newShuttle.getColorID());
         mShuttles.add(newShuttle);
 
+        Log.d(TAG, "---------------------------------");
         if(mDrawerItems != null && mDrawerItems.size() != 0){
             //mDrawerItems[1] through mDrawerItems[4] are shuttles. Update new markers
             for(int i = 1; i < 5; i++){
@@ -320,6 +334,23 @@ public class MapState {
 
 
     public void setSelectedStopMarker(Marker selectedStopMarker) {
-        mSelectedStopMarker = selectedStopMarker;
+        if (selectedStopMarker != null) {
+            for(Stop stop: mStops){
+                if(stop.getMarker().equals(selectedStopMarker)){
+                    mSelectedStopMarkerTimes = stop.getShuttleETAs();
+                }
+            }
+            mSelectedStopMarker = selectedStopMarker;
+
+        } else {
+            mSelectedStopMarkerTimes = null;
+            mSelectedStopMarker = null;
+        }
     }
+
+    public int[] getSelectedStopMarkerTimes() {
+        return mSelectedStopMarkerTimes;
+    }
+
+
 }

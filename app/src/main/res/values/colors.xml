@@ -17,4 +17,9 @@
 
     <color name="transparent_load">#B3000000</color>
     <color name="transparent_error">#B3FF0000</color>
+
+
+    <color name="shuttle_green">#70a800</color>
+    <color name="shuttle_purple">#aa66cd</color>
+    <color name="shuttle_orange">#e0aa0f</color>
 </resources>
