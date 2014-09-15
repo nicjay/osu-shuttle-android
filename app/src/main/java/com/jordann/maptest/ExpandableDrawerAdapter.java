@@ -136,75 +136,8 @@ public class ExpandableDrawerAdapter extends BaseExpandableListAdapter {
                 }
 
             }
-
             return itemView;
-
         }
-
-
-
-
-
-/*
-
-
-        if(convertView == null){
-            LayoutInflater inflater = (LayoutInflater)mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.drawer_section_header, parent, false);
-        }
-        TextView sectionTitle = (TextView)convertView.findViewById(R.id.drawer_section_header_title);
-        TextView groupTitle = (TextView)convertView.findViewById(R.id.drawer_group_item_title);
-        ImageView imageView = (ImageView)convertView.findViewById(R.id.drawer_group_image_view);
-
-        int imageViewResId;
-        if(isExpanded){
-            imageViewResId = R.drawable.ic_action_collapse;
-        }else{
-            imageViewResId = R.drawable.ic_action_expand;
-        }
-
-        if(groupPosition == 0){ //"Shuttles" header
-            sectionTitle.setText("Shuttles");
-            convertView.setEnabled(false);
-            convertView.setOnClickListener(null);
-        }else if(groupPosition < 5){ //Shuttle Names... "West A", "North"
-            Shuttle shuttle = mDrawerItems.get(groupPosition).getShuttle();
-            groupTitle.setText(shuttle.getName());
-
-            if(!shuttle.isOnline()){
-                convertView.setEnabled(false);
-                //TODO: gray out to show disabled
-            }
-        }else {
-            String title = mDrawerItems.get(groupPosition).getTitle();
-            groupTitle.setText("");
-            sectionTitle.setText("");
-            imageView.setVisibility(View.VISIBLE);
-            switch (groupPosition){
-                case 5:
-                    sectionTitle.setText(title);
-                    imageView.setVisibility(View.INVISIBLE);
-                    convertView.setEnabled(false);
-                    convertView.setOnClickListener(null);
-                    break;
-                case NORTH:
-                    groupTitle.setText(title);
-                    imageView.setImageResource(imageViewResId);
-                    break;
-                case WEST:
-                    groupTitle.setText(title);
-                    imageView.setImageResource(imageViewResId);
-                    break;
-                case EAST:
-                    groupTitle.setText(title);
-                    imageView.setImageResource(imageViewResId);
-                    break;
-                default:
-                    groupTitle.setText("DEFAULT");
-            }
-        }
-        return convertView;
-        */
     }
 
     @Override

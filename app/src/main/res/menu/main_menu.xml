@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/toggle_stops"
+          android:title="Hide Stops"/>
 
-          android:title="Hide Stops"
-/>
-    <item
-
-          android:title="Change Map Type" />
+    <item android:id="@+id/view_info"
+          android:title="Bus Information" />
 
     <item
-
-          android:title="Switch Map Tilt" />
+        android:title="A third option" />
 </menu>

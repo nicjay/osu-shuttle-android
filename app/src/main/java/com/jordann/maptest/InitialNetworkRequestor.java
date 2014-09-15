@@ -22,9 +22,13 @@ import java.util.Random;
 
 /**
  * Created by sellersk on 9/11/2014.
+ *
+ * CLASS - InitialNetworkRequestor
+ * Pulls stop, shuttle, and ETA JSON URLS a single time, to determine if initial JSON or network errors.
+ * Determines online states of shuttles.
+ * Determines next three stops of shuttles.
  */
 public class InitialNetworkRequestor extends AsyncTask<Void, Void, Boolean> {
-
     private static final String TAG = "InitialNetworkRequestor";
 
     private static MapState sMapState;
@@ -49,7 +53,7 @@ public class InitialNetworkRequestor extends AsyncTask<Void, Void, Boolean> {
 
     @Override
     protected Boolean doInBackground(Void... params) {
-
+        //False return at any point indicates a network or JSON error
         if(!isNetworkAvailable()){
             return false;
         }
@@ -57,13 +61,11 @@ public class InitialNetworkRequestor extends AsyncTask<Void, Void, Boolean> {
         JSONGetter getter = new JSONGetter();
 
         JSONArray jStopsArray = getter.getJSONFromUrl(stopUrl);
-
         if (jStopsArray == null){
             return false;
         }
 
         JSONArray jShuttlesArray = getter.getJSONFromUrl(shuttleUrl);
-
         if (jShuttlesArray == null){
             return false;
         }
@@ -78,22 +80,14 @@ public class InitialNetworkRequestor extends AsyncTask<Void, Void, Boolean> {
 
         boolean jsonSuccess = parseJSON(jStopsArray, jShuttlesArray);
 
-
         return jsonSuccess;
     }
 
     @Override
     protected void onPostExecute(Boolean success) {
         listener.onPostInitialRequest(success);
-        //super.onPostExecute(success);
     }
 
-
-//    class ShuttleEta
-//    {
-//        String name;
-//        int time;
-//    }
 
     //TODO: reduce number of string conversions here and JSONGetter
     private boolean parseJSON(JSONArray jStopsArray, JSONArray jShuttlesArray/*, JSONArray jEtaArray*/){
@@ -120,7 +114,6 @@ public class InitialNetworkRequestor extends AsyncTask<Void, Void, Boolean> {
                 return false;
             }
         }
-
 
         ArrayList<Shuttle> shuttles = sMapState.getShuttles();
         Gson gson = new Gson();
@@ -171,17 +164,14 @@ public class InitialNetworkRequestor extends AsyncTask<Void, Void, Boolean> {
             //Log.d(TAG, "SET SHUTTLE OFFLINE " + shuttle.isOnline());
             if (!onlineStates[i]){
                 shuttle.setOnline(false);
-
             }
             else shuttle.setOnline(true);
         }
 
 
         //Test Times
-
         Random random = new Random();
         int maxNum = 600;
-
 
         for (int i = 0, len = stops.size(); i < len; i++) {
             Stop stop = stops.get(i);
@@ -195,6 +185,7 @@ public class InitialNetworkRequestor extends AsyncTask<Void, Void, Boolean> {
         LinkedList<Shuttle.ShuttleEta> west2LinkedList = new LinkedList<Shuttle.ShuttleEta>();
         LinkedList<Shuttle.ShuttleEta> eastLinkedList = new LinkedList<Shuttle.ShuttleEta>();
 
+        //Determine the closest three stops for each shuttle
         for(int i = 0, len = stops.size(); i < len; i++) {
             Stop stop = stops.get(i);
             int[] ETAs = stop.getShuttleETAs();
@@ -227,6 +218,7 @@ public class InitialNetworkRequestor extends AsyncTask<Void, Void, Boolean> {
 
         return true;
     }
+
     private void logList(LinkedList<Shuttle.ShuttleEta> list, String name){
         Log.d(TAG, name + " : " + list.get(0).time + " , " + list.get(1).time + " , " + list.get(2).time + "\n");
     }
@@ -269,120 +261,5 @@ public class InitialNetworkRequestor extends AsyncTask<Void, Void, Boolean> {
         return(cm.getActiveNetworkInfo() != null);
     }
 
-
-
-
-
-
-
-
-/*
-        for(int i = 0, len = stops.size(); i < len; i++){
-            Stop stop = stops.get(i);
-            int[] eta = stop.getShuttleETAs();
-            if(i < 3){
-                if(eta[0] > northMax) northMax = eta[0];
-                shuttleNorthDict.put(stop.getName(), stop.getShuttleETA(0));
-                if(eta[1] > west1Max) west1Max = eta[1];
-                shuttleWest1Dict.put(stop.getName(), stop.getShuttleETA(1));
-                if(eta[2] > west2Max) west2Max = eta[2];
-                shuttleWest2Dict.put(stop.getName(), stop.getShuttleETA(2));
-                if(eta[3] > eastMax) eastMax = eta[3];
-                shuttleEastDict.put(stop.getName(), stop.getShuttleETA(3));
-            }else{
-                if(eta[0] < northMax){
-                    shuttleNorthDict.remove(northMax);
-                    shuttleNorthDict.put(stop.getName(), stop.getShuttleETA(0));
-                    northMax = stop.getShuttleETA(0);
-                    Iterator<Integer> iter = shuttleNorthDict.values().iterator();
-                    while(iter.hasNext()){
-                        if(shuttleNorthDict.get(iter) > northMax) northMax = shuttleNorthDict.get(iter);
-                    }
-                }else if(eta[1] < west1Max){
-                    shuttleNorthDict.remove(northMax);
-                    shuttleNorthDict.put(stop.getName(), stop.getShuttleETA(0));
-                    northMax = stop.getShuttleETA(0);
-                    Iterator<Integer> iter = shuttleNorthDict.values().iterator();
-                    while(iter.hasNext()){
-                        if(shuttleNorthDict.get(iter) > northMax) northMax = shuttleNorthDict.get(iter);
-                    }
-                }else if(eta[2] < west2Max){
-                    shuttleNorthDict.remove(northMax);
-                    shuttleNorthDict.put(stop.getName(), stop.getShuttleETA(0));
-                    northMax = stop.getShuttleETA(0);
-                    Iterator<Integer> iter = shuttleNorthDict.values().iterator();
-                    while(iter.hasNext()){
-                        if(shuttleNorthDict.get(iter) > northMax) northMax = shuttleNorthDict.get(iter);
-                    }
-                }else if(eta[4] < northMax){
-                    shuttleNorthDict.remove(northMax);
-                    shuttleNorthDict.put(stop.getName(), stop.getShuttleETA(0));
-                    northMax = stop.getShuttleETA(0);
-                    Iterator<Integer> iter = shuttleNorthDict.values().iterator();
-                    while(iter.hasNext()){
-                        if(shuttleNorthDict.get(iter) > northMax) northMax = shuttleNorthDict.get(iter);
-                    }
-                }
-            }
-
-
-        }
-*/
-        /*
-        ArrayList<String[]> sortedStopsWithTimes0 = new ArrayList<String[]>();
-        ArrayList<String[]> sortedStopsWithTimes1 = new ArrayList<String[]>();
-        ArrayList<String[]> sortedStopsWithTimes2 = new ArrayList<String[]>();
-        ArrayList<String[]> sortedStopsWithTimes3 = new ArrayList<String[]>();
-
-            for (int i = 0, len = stops.size(); i < len; i++) {
-                Stop stop = stops.get(i);
-                stop.setShuttleETAs(new int[]{random.nextInt(maxNum), random.nextInt(maxNum), random.nextInt(maxNum), random.nextInt(maxNum)});
-
-
-                String[] stopWithTime = new String[2];
-
-                stopWithTime[0] = stop.getName();
-                stopWithTime[1] = String.valueOf(stop.getShuttleETA(0));
-                sortedStopsWithTimes0.add(stopWithTime);
-
-                stopWithTime = new String[2];
-                stopWithTime[0] = stop.getName();
-                stopWithTime[1] = String.valueOf(stop.getShuttleETA(1));
-                sortedStopsWithTimes1.add(stopWithTime);
-
-                stopWithTime = new String[2];
-                stopWithTime[0] = stop.getName();
-                stopWithTime[1] = String.valueOf(stop.getShuttleETA(2));
-                sortedStopsWithTimes2.add(stopWithTime);
-
-                stopWithTime = new String[2];
-                stopWithTime[0] = stop.getName();
-                stopWithTime[1] = String.valueOf(stop.getShuttleETA(3));
-                sortedStopsWithTimes3.add(stopWithTime);
-            }
-
-        Collections.sort(sortedStopsWithTimes0,new Comparator<String[]>() {
-            @Override
-            public int compare(String[] lhs, String[] rhs) {
-                int a = Integer.parseInt(lhs[1]);
-                int b = Integer.parseInt(rhs[1]);
-
-                if (a < b) return -1;
-                if (a > b) return 1;
-                return 0;
-            }
-        });
-
-        for (int i = 0; i < sortedStopsWithTimes0.size();i++) {
-            Log.d(TAG, "sortedStops0 name: " + sortedStopsWithTimes0.get(i)[0] + "; ETA: "+sortedStopsWithTimes0.get(i)[1]);
-        }
-
-        */
-
-
-          /* stops = sMapState.getStops();
-           for(int i = 0; i < stops.size(); i++) {
-               //Log.d(TAG, "1stopShuttleETAS: " + stops.get(i).getShuttleETAs()[0] + " , " + stops.get(i).getShuttleETAs()[1] + " , " + stops.get(i).getShuttleETAs()[2] + " , " + stops.get(i).getShuttleETAs()[3] + " , ");
-           }*/
 
 }

@@ -16,8 +16,11 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Random;
 
-/*
-  Created by jordan_n on 8/21/2014.
+/**
+ * Created by jordan_n on 8/21/2014.
+ *
+ * CLASS - ShuttleUpdater
+ * Contains repeatable logic to repeat the inner poll task
 */
 public class ShuttleUpdater {
     private static final String TAG = "ShuttleUpdater";
@@ -27,13 +30,12 @@ public class ShuttleUpdater {
     private OnMapStateUpdate listener;
     private pollNewDataTask currentTask;
 
-
     private Handler mHandler;
     private boolean isBusy = false;
     private boolean stop = true;
     private Runnable r;
     private static final long ASYNC_DELAY = 5000;
-    private String urlShuttlePoints = "http://portal.campusops.oregonstate.edu/files/shuttle/GetMapVehiclePoints.txt";
+    private String shuttleUrl = "http://portal.campusops.oregonstate.edu/files/shuttle/GetMapVehiclePoints.txt";
 
     private static final int NORTH_ROUTE_ID = 3;
     private static final int WEST_ROUTE_ID = 2;
@@ -65,7 +67,7 @@ public class ShuttleUpdater {
             @Override
             public void run() {
                 if(!isBusy){
-                    currentTask = new pollNewDataTask(urlShuttlePoints);
+                    currentTask = new pollNewDataTask(shuttleUrl);
                     currentTask.execute();
                 }
                 if(!stop) startHandler();
@@ -87,13 +89,19 @@ public class ShuttleUpdater {
 
         if (stop == true) {
             stop = false;
-            currentTask = new pollNewDataTask(urlShuttlePoints);
+            currentTask = new pollNewDataTask(shuttleUrl);
             currentTask.execute();
 
             startHandler();
         }
     }
 
+    /**
+     * CLASS - pollNewDataTask
+     * Pulls the shuttle JSON URL a single time.
+     * Determines online states of shuttles.
+     * Determines next three stops of shuttles.
+     */
     private class pollNewDataTask extends AsyncTask<String, Void, Boolean>{
 
         private static final String TAG = "pollNewDataTask";

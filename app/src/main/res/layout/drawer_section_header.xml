@@ -4,9 +4,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="45dp"
                 android:background="@drawable/section_header_background"
-                android:paddingLeft="-10dp"
-    >
-
+                android:paddingLeft="-10dp">
 
     <ImageView
         android:id="@+id/drawer_section_icon"
@@ -30,6 +28,5 @@
         android:layout_toRightOf="@id/drawer_section_icon"
 
         />
-
 
 </RelativeLayout>

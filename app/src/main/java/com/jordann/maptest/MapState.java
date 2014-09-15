@@ -21,12 +21,13 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-/*
-  Created by jordan_n on 8/22/2014.
+/**
+ * Created by jordan_n on 8/22/2014.
+ *
+ * ClASS - MapState
+ * Maintains most persistent data, such as shuttles, stops, and drawer items, to be used between classes and the lifecycle of the app.
  */
 public class MapState {
-
-
 
     private static final String TAG = "MapState";
     private static final String TAG_DB = "SpecialTag";
@@ -56,45 +57,6 @@ public class MapState {
 
     private boolean stopsTaskStatus;
 
-    private DrawerLayout mDrawerLayout;
-    private ExpandableDrawerAdapter mAdapter;
-    private ExpandableListView mDrawerList;
-
-    private boolean reInitDrawerItems = false;
-
-    public boolean isReInitDrawerItems() {
-        return reInitDrawerItems;
-    }
-
-    public void setReInitDrawerItems(boolean reInitDrawerItems, ExpandableDrawerAdapter adapter) {
-        this.reInitDrawerItems = reInitDrawerItems;
-        mAdapter = adapter;
-    }
-
-    public DrawerLayout getDrawerLayout() {
-        return mDrawerLayout;
-    }
-
-    public void setDrawerLayout(DrawerLayout drawerLayout) {
-        mDrawerLayout = drawerLayout;
-    }
-
-    public ExpandableDrawerAdapter getAdapter() {
-        return mAdapter;
-    }
-
-
-    public void setAdapter(ExpandableDrawerAdapter adapter) {
-        mAdapter = adapter;
-    }
-
-    public ExpandableListView getDrawerList() {
-        return mDrawerList;
-    }
-
-    public void setDrawerList(ExpandableListView drawerList) {
-        mDrawerList = drawerList;
-    }
 
     public boolean isStopsTaskStatus() {
         return stopsTaskStatus;
@@ -103,9 +65,6 @@ public class MapState {
     public void setStopsTaskStatus(boolean stopsTaskStatus) {
         this.stopsTaskStatus = stopsTaskStatus;
     }
-
-
-
 
     private MapState(){
         mDrawerItems = new ArrayList<DrawerItem>();
@@ -137,28 +96,27 @@ public class MapState {
         Shuttle newShuttle = new Shuttle("North", false);
         newShuttle.setMarker(mMap.addMarker(new MarkerOptions().position(initLatLng).title("Init Shuttle").icon(BitmapDescriptorFactory.fromResource(R.drawable.shuttle_green)).flat(true).anchor(0.5f, 0.5f).infoWindowAnchor(.5f, .5f)));
         newShuttle.setColorID(R.color.shuttle_green);
-        Log.d(TAG, "Shuttle color: " + newShuttle.getColorID());
+        //Log.d(TAG, "Shuttle color: " + newShuttle.getColorID());
         mShuttles.add(newShuttle);
 
         newShuttle = new Shuttle("West 1", false);
         newShuttle.setMarker(mMap.addMarker(new MarkerOptions().position(initLatLng).title("Init Shuttle").icon(BitmapDescriptorFactory.fromResource(R.drawable.shuttle_purple)).flat(true).anchor(0.5f, 0.5f).infoWindowAnchor(.5f, .5f)));
         newShuttle.setColorID(R.color.shuttle_purple);
-        Log.d(TAG, "Shuttle color: " + newShuttle.getColorID());
+        //Log.d(TAG, "Shuttle color: " + newShuttle.getColorID());
         mShuttles.add(newShuttle);
 
         newShuttle = new Shuttle("West 2", false);
         newShuttle.setMarker(mMap.addMarker(new MarkerOptions().position(initLatLng).title("Init Shuttle").icon(BitmapDescriptorFactory.fromResource(R.drawable.shuttle_purple)).flat(true).anchor(0.5f, 0.5f).infoWindowAnchor(.5f, .5f)));
         newShuttle.setColorID(R.color.shuttle_purple);
-        Log.d(TAG, "Shuttle color: " + newShuttle.getColorID());
+        //Log.d(TAG, "Shuttle color: " + newShuttle.getColorID());
         mShuttles.add(newShuttle);
 
         newShuttle = new Shuttle("East", false);
         newShuttle.setMarker(mMap.addMarker(new MarkerOptions().position(initLatLng).title("Init Shuttle").icon(BitmapDescriptorFactory.fromResource(R.drawable.shuttle_orange)).flat(true).anchor(.5f, .5f).infoWindowAnchor(.5f, .5f)));
         newShuttle.setColorID(R.color.shuttle_orange);
-        Log.d(TAG, "Shuttle color: " + newShuttle.getColorID());
+        //Log.d(TAG, "Shuttle color: " + newShuttle.getColorID());
         mShuttles.add(newShuttle);
 
-        Log.d(TAG, "---------------------------------");
         if(mDrawerItems != null && mDrawerItems.size() != 0){
             //mDrawerItems[1] through mDrawerItems[4] are shuttles. Update new markers
             for(int i = 1; i < 5; i++){

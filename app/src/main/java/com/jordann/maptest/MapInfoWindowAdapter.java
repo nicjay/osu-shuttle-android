@@ -1,31 +1,20 @@
 package com.jordann.maptest;
 
-import android.app.ActionBar;
 import android.content.Context;
 import android.graphics.Typeface;
-import android.hardware.Camera;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.GridLayout;
-import android.widget.GridLayout;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.TableLayout;
 import android.widget.TextView;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Marker;
 
-import org.w3c.dom.Text;
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.ResourceBundle;
 
 /*
   Created by sellersk on 8/26/2014.
@@ -70,7 +59,7 @@ public class MapInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
         mMapState = MapState.get();
         mContext = context;
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        shuttleView = inflater.inflate(R.layout.info_shuttle_new, null);
+        shuttleView = inflater.inflate(R.layout.info_shuttle, null);
        // stopView = inflater.inflate(R.layout.info_stop, null);
         //gridLayout = (GridLayout)stopView.findViewById(R.id.eta_container);
 

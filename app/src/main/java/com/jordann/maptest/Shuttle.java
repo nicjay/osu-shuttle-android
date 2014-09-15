@@ -96,29 +96,25 @@ public class Shuttle {
         mMarker = marker;
     }
 
+    //Controls the animation, repositioning and rotation of shuttle marker
     public void updateMarker(){
-
-
-        final LatLng target = getLatLng();
+        final LatLng startLatLng = mMarker.getPosition();
+        final LatLng endLatLng = getLatLng();
 
         final long duration = 1000;
-        final Handler handler = new Handler();
         final long start = SystemClock.uptimeMillis();
-        //Projection proj = map.getProjection();
 
-        //Point startPoint = proj.toScreenLocation(marker.getPosition());
-        //final LatLng startLatLng = proj.fromScreenLocation(startPoint);
-
-        final LatLng startLatLng = mMarker.getPosition();
-
+        final Handler handler = new Handler();
         final Interpolator interpolator = new LinearInterpolator();
+
+        //Place the marker at interval points every X milliseconds, for smooth movement effect
         handler.post(new Runnable() {
             @Override
             public void run() {
                 long elapsed = SystemClock.uptimeMillis() - start;
                 float t = interpolator.getInterpolation((float) elapsed / duration);
-                double lng = t * target.longitude + (1 - t) * startLatLng.longitude;
-                double lat = t * target.latitude + (1 - t) * startLatLng.latitude;
+                double lng = t * endLatLng.longitude + (1 - t) * startLatLng.longitude;
+                double lat = t * endLatLng.latitude + (1 - t) * startLatLng.latitude;
                 mMarker.setPosition(new LatLng(lat, lng));
                 if (t < 1.0) {
                     // Post again 10ms later.
@@ -129,11 +125,9 @@ public class Shuttle {
             }
         });
 
-
        // mMarker.setPosition(getLatLng());
         mMarker.setRotation(getHeading());
     }
-
 
     public int getRouteID() {
         return RouteID;
