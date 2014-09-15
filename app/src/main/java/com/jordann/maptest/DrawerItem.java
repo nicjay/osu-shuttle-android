@@ -15,6 +15,8 @@ public class DrawerItem {
     private Shuttle mShuttle;
     private ArrayList<Integer> mStopsIndex;
 
+    private boolean mRowEnabled;
+
     //Section constructor
     public DrawerItem(int typeId, String title) {
         mTypeId = typeId;
@@ -22,10 +24,11 @@ public class DrawerItem {
     }
 
     //Shuttle Row constructor
-    public DrawerItem(int typeId, String title, Shuttle shuttle) {
+    public DrawerItem(int typeId, String title, Shuttle shuttle, boolean rowEnabled) {
         mTypeId = typeId;
         mTitle = title;
         mShuttle = shuttle;
+        mRowEnabled = rowEnabled;
     }
 
     //Route Row constructor
@@ -33,6 +36,10 @@ public class DrawerItem {
         mTypeId = typeId;
         mTitle = title;
         mStopsIndex = stopsIndex;
+    }
+
+    public void setShuttle(Shuttle shuttle) {
+        mShuttle = shuttle;
     }
 
     public int getTypeId() {
@@ -51,4 +58,11 @@ public class DrawerItem {
         return mStopsIndex;
     }
 
+    public boolean isRowEnabled() {
+        return mRowEnabled;
+    }
+
+    public void setRowEnabled(boolean rowEnabled) {
+        mRowEnabled = rowEnabled;
+    }
 }

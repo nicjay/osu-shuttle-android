@@ -1,5 +1,6 @@
 package com.jordann.maptest;
 
+import android.graphics.drawable.Drawable;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.View;
@@ -25,7 +26,9 @@ public class DrawerItemClickListener implements ExpandableListView.OnGroupClickL
 
     @Override
     public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
+
         selectItemGroup(groupPosition);
+        Log.d(TAG, "DrawableStates: " + v.getDrawableState().length);
         return false;
     }
 
@@ -35,6 +38,7 @@ public class DrawerItemClickListener implements ExpandableListView.OnGroupClickL
         return false;
     }
 
+
     private void selectItemGroup(int groupPosition) {
         Log.d(TAG, "selectItemGroup");
         ArrayList<DrawerItem> drawerItems = sMapState.getDrawerItems();
@@ -43,8 +47,10 @@ public class DrawerItemClickListener implements ExpandableListView.OnGroupClickL
             sMapState.animateMap(drawerItems.get(groupPosition).getShuttle().getLatLng());
             Log.d(TAG, "The marker is: " + drawerItems.get(groupPosition).getShuttle().getMarker());
             drawerItems.get(groupPosition).getShuttle().getMarker().showInfoWindow();
+            sMapState.setSelectedStopMarker(drawerItems.get(groupPosition).getShuttle().getMarker());
             mDrawerLayout.closeDrawer(mDrawerList);
         }
+
     }
 
     private void selectItemChild(int groupPosition, int childPosition){
@@ -54,7 +60,15 @@ public class DrawerItemClickListener implements ExpandableListView.OnGroupClickL
 
         int index = drawerItems.get(groupPosition).getStopsIndex().get(childPosition);
         sMapState.animateMap(stops.get(index).getLatLng());
+
+        if (sMapState.getSelectedStopMarker() != null && !sMapState.isStopsVisible()){
+            sMapState.setSelectedStopMarkerVisibility(false);
+        }
+        sMapState.setSelectedStopMarker(stops.get(index).getMarker());
+
+        stops.get(index).getMarker().setVisible(true);
         stops.get(index).getMarker().showInfoWindow();
+
         mDrawerLayout.closeDrawer(mDrawerList);
     }
 }

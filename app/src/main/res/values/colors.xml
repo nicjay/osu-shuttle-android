@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="OSU_black">#373737</color>
+    <color name="transparent_OSU_black">#d9373737</color>
+    <color name="OSU_white">#f5f2ed</color>
+    <color name="OSU_orange">#c34500</color>
+    <color name="transparent_OSU_white">#E7f5f2ed</color>
+    <color name="infowindow_font">#373737</color>
+
+    <color name="Navigation_Drawer_Background">#191b1b</color>
+
+    <color name="Navigation_Drawer_Item_Bg">#282828</color>
+    <color name="Navigation_Drawer_Item_Bg_Selected">#424242</color>
+
+    <color name="Navigation_Drawer_Item_Child_Bg">#383838</color>
+    <color name="Navigation_Drawer_Item_Child_Bg_Selected">#525252</color>
+
+    <color name="transparent_load">#B3000000</color>
+    <color name="transparent_error">#B3FF0000</color>
+
+
+    <color name="shuttle_green">#70a800</color>
+    <color name="shuttle_purple">#aa66cd</color>
+    <color name="shuttle_orange">#e0aa0f</color>
+</resources>

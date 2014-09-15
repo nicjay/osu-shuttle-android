@@ -1,0 +1,15 @@
+ <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_alignParentRight="true"
+              android:id="@+id/drawer_list_item_title"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:textAppearance="?android:attr/textAppearanceListItemSmall"
+              android:gravity="center_vertical"
+              android:paddingLeft="32dp"
+              android:paddingRight="16dp"
+              android:textColor="@color/OSU_white"
+              android:background="@drawable/navigation_item_child_selector"
+              android:textSize="16dp"
+              android:minHeight="?android:attr/listPreferredItemHeightSmall"/>
+
+

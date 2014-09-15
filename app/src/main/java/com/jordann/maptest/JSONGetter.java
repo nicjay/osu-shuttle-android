@@ -65,6 +65,7 @@ public class JSONGetter {
             mJSON = new JSONArray(builder.toString());
         }catch (JSONException e){
             Log.e(TAG, "JSONException");
+
         }
 
         return mJSON;
