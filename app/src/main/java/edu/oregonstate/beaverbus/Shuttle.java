@@ -1,8 +1,15 @@
 package edu.oregonstate.beaverbus;
 
+import android.content.Context;
 import android.os.SystemClock;
+import android.view.Display;
+import android.view.Surface;
+import android.view.WindowManager;
 import android.view.animation.LinearInterpolator;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import android.view.animation.Interpolator;
@@ -34,12 +41,14 @@ public class Shuttle {
 
     private Marker mMarker;
     private boolean isOnline;
+    private static MapState sMapState;
 
     private LinkedList<ShuttleEta> upcomingStops;
 
     public Shuttle(String name, boolean isOnline) {
         this.isOnline = isOnline;
         this.Name = name;
+        sMapState = MapState.get();
     }
 
     public void updateAll(Shuttle shuttle){
@@ -89,6 +98,8 @@ public class Shuttle {
 
     //Controls the animation, repositioning and rotation of shuttle marker
     public void updateMarker(){
+        final GoogleMap map = sMapState.getMap();
+
         final LatLng startLatLng = mMarker.getPosition();
         final LatLng endLatLng = getLatLng();
 
@@ -107,6 +118,23 @@ public class Shuttle {
                 double lng = t * endLatLng.longitude + (1 - t) * startLatLng.longitude;
                 double lat = t * endLatLng.latitude + (1 - t) * startLatLng.latitude;
                 mMarker.setPosition(new LatLng(lat, lng));
+
+                //Make the camera follow along if shuttle is selected, with correct offset
+                if (mMarker.isInfoWindowShown()){
+                    Display display = ((WindowManager) sMapState.getCurrentContext().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+                    int rotation = display.getRotation();
+                    double[] orientationOffset = sMapState.getInfoWindowOffset(map.getCameraPosition().zoom);
+
+                    LatLng newPosition = new LatLng(mMarker.getPosition().latitude + orientationOffset[0], mMarker.getPosition().longitude);
+
+                    if (rotation == Surface.ROTATION_90 || rotation == Surface.ROTATION_270) {
+                        newPosition = new LatLng(mMarker.getPosition().latitude + orientationOffset[1], mMarker.getPosition().longitude);
+                    }
+
+                    CameraPosition cameraPosition = new CameraPosition(newPosition, map.getCameraPosition().zoom, map.getCameraPosition().tilt, map.getCameraPosition().bearing);
+
+                    map.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                }
                 if (t < 1.0) {
                     // Post again 10ms later.
                     handler.postDelayed(this, 10);

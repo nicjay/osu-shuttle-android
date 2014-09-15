@@ -201,7 +201,7 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
                 public void onCameraChange(CameraPosition cameraPosition) {
                     if (cameraPosition.zoom < 13){
                         //TODO: put this back
-                        // mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mMap.getCameraPosition().target, 13));
+                         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mMap.getCameraPosition().target, 13));
                     }
                 }
             });

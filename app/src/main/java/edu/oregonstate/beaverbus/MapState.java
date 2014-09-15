@@ -45,7 +45,7 @@ public class MapState {
 
     private static Context sCurrentContext;
 
-    private static final int CAMERA_ANIMATION_SPEED = 600;
+    private static final int CAMERA_ANIMATION_SPEED = 700;
 
     private static final float CAMERA_TILT = 0;
     private static final float CAMERA_BEARING = 0;
@@ -139,7 +139,8 @@ public class MapState {
            newPosition = new LatLng(latLng.latitude + orientationOffset[1], latLng.longitude);
         }
 
-        CameraPosition cameraPosition = new CameraPosition(newPosition, mMap.getCameraPosition().zoom, CAMERA_TILT, CAMERA_BEARING);
+        //CameraPosition cameraPosition = new CameraPosition(newPosition, mMap.getCameraPosition().zoom, CAMERA_TILT, CAMERA_BEARING);
+        CameraPosition cameraPosition = new CameraPosition(newPosition, mMap.getCameraPosition().zoom, mMap.getCameraPosition().tilt, mMap.getCameraPosition().bearing);
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), CAMERA_ANIMATION_SPEED, null);
     }
 
