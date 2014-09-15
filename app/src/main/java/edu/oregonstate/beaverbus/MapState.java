@@ -1,25 +1,20 @@
-package com.jordann.maptest;
+package edu.oregonstate.beaverbus;
 
 import android.content.Context;
-import android.content.res.Configuration;
-import android.nfc.Tag;
-import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Display;
 import android.view.Surface;
 import android.view.WindowManager;
-import android.widget.ExpandableListView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
 import java.util.ArrayList;
-import java.util.LinkedList;
 
 /**
  * Created by jordan_n on 8/22/2014.

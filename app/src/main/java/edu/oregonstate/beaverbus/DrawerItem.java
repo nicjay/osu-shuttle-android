@@ -1,6 +1,5 @@
-package com.jordann.maptest;
+package edu.oregonstate.beaverbus;
 
-import android.media.Image;
 import java.util.ArrayList;
 
 /*

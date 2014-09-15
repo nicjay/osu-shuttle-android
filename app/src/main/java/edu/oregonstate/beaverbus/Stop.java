@@ -1,4 +1,4 @@
-package com.jordann.maptest;
+package edu.oregonstate.beaverbus;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;

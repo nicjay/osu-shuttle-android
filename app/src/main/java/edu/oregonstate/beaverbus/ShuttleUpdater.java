@@ -1,12 +1,8 @@
-package com.jordann.maptest;
+package edu.oregonstate.beaverbus;
 
-import android.app.ProgressDialog;
-import android.nfc.Tag;
 import android.os.AsyncTask;
 import android.os.Handler;
-import android.util.Log;
 
-import com.google.android.gms.internal.ge;
 import com.google.android.gms.maps.model.Marker;
 import com.google.gson.Gson;
 import org.json.JSONArray;

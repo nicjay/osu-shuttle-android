@@ -1,17 +1,8 @@
-package com.jordann.maptest;
+package edu.oregonstate.beaverbus;
 
-import android.animation.ObjectAnimator;
-import android.animation.TypeEvaluator;
-import android.graphics.Color;
-import android.graphics.Point;
 import android.os.SystemClock;
-import android.util.Log;
-import android.util.Property;
-import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.LinearInterpolator;
 
-import com.google.android.gms.maps.Projection;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import android.view.animation.Interpolator;
@@ -126,6 +117,11 @@ public class Shuttle {
         });
 
        // mMarker.setPosition(getLatLng());
+        mMarker.setRotation(getHeading());
+    }
+
+    public void updateMarkerWithoutAnim(){
+        mMarker.setPosition(getLatLng());
         mMarker.setRotation(getHeading());
     }
 

@@ -1,4 +1,4 @@
-package com.jordann.maptest;
+package edu.oregonstate.beaverbus;
 
 import android.util.Log;
 

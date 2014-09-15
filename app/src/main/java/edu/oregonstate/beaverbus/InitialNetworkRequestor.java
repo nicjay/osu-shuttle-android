@@ -1,4 +1,4 @@
-package com.jordann.maptest;
+package edu.oregonstate.beaverbus;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
@@ -12,12 +12,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.Random;
 
 /**

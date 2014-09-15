@@ -1,18 +1,15 @@
-package com.jordann.maptest;
+package edu.oregonstate.beaverbus;
 
-import android.app.ActionBar;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.net.ConnectivityManager;
-import android.nfc.Tag;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
-import android.text.Spannable;
-import android.text.SpannableString;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -22,7 +19,6 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ExpandableListView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -32,7 +28,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
-import java.util.ArrayList;
 
 /*
     CLASS- MapsActivty
@@ -54,6 +49,8 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
 
     private InitialNetworkRequestor initialNetworkRequestor;
     private ShuttleUpdater shuttleUpdater;
+
+    private static Dialog busInfoDialog;
 
     private static ProgressDialog sProgressDialog;
     private static AlertDialog networkFailureDialog;
@@ -315,7 +312,11 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
                 shuttle.getMarker().setVisible(false);
             } else {
                 if (shuttle.getLatLng() != shuttle.getMarker().getPosition()) {
-                    shuttle.updateMarker();
+                    if (shuttle.getLatLng() != new LatLng(0,0))
+                        shuttle.updateMarker();
+                    else{
+                        shuttle.updateMarkerWithoutAnim();
+                    }
                 }
                 shuttle.getMarker().setVisible(true);
             }
@@ -369,6 +370,10 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
                 toggleStopsVisibility(item);
                 return true;
             //TODO: create information window
+            case R.id.view_info:
+
+                showBusInfoDialog(item);
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -384,6 +389,7 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         Log.d(TAG, "onPrepareOptionsMenu");
+        createBusInfoDialog();
         if (mMapState != null){
             if (mMapState.isStopsVisible()) menu.findItem(R.id.toggle_stops).setTitle("Hide Stops");
             else menu.findItem(R.id.toggle_stops).setTitle("Show Stops");
@@ -401,6 +407,23 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
             stop.getMarker().setVisible(!stopsVisible);
         }
         mMapState.setStopsVisible(!stopsVisible);
+    }
+
+    public void showBusInfoDialog(MenuItem item){
+        if (busInfoDialog != null) {
+            busInfoDialog.show();
+        }
+    }
+
+    public void createBusInfoDialog(){
+        AlertDialog.Builder busInfoDialogBuilder = new AlertDialog.Builder(this);
+        busInfoDialogBuilder.setMessage("Hours of Operation:\n7:00 AM to 7:00 PM\n\nEstimated loop times:\n5 to 14 minutes")
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                }).setTitle("Beaver Bus");
+        busInfoDialog = busInfoDialogBuilder.create();
     }
 
     public void setUpRouteLines() {

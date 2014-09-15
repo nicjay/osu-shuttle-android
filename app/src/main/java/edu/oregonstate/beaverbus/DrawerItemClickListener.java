@@ -1,6 +1,5 @@
-package com.jordann.maptest;
+package edu.oregonstate.beaverbus;
 
-import android.graphics.drawable.Drawable;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.View;
