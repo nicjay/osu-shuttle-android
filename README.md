@@ -1,4 +1,6 @@
-shuttleAndroid
+Beaver Bus Tracker
 ==============
 
-Native Android version of the Campus Shuttle Tracker
+Native Android app to display campus shuttle locations, stops, and time estimates, making use of Google Maps API v2.
+
+Developed by Nick Jordan and Kevin Sellers at OSU Administrative Services.
