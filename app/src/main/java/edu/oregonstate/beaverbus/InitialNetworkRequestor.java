@@ -93,14 +93,15 @@ public class InitialNetworkRequestor extends AsyncTask<Void, Void, Boolean> {
             JSONObject route;
             try {
                 route = jStopsArray.getJSONObject(i);
-                JSONArray landmarks = route.getJSONArray("Landmarks");
+                JSONArray landmarks = route.getJSONArray("Stops");
 
                 for (int j = 0; j < landmarks.length(); j++){
                     JSONObject landmark = landmarks.getJSONObject(j);
-
-                    if (!stopNames.contains(landmark.getString("Label"))){
-                        stopNames.add(landmark.getString("Label"));
-                        Stop stop = new Stop(landmark.getDouble("Latitude"), landmark.getDouble("Longitude"), landmark.getString("Label"), new int[]{-1,-1,-1,-1});
+                    Log.d(TAG, "landmark is: "+landmark);
+                    Log.d(TAG, "line1 is: "+landmark.getString("Line1"));
+                    if (!stopNames.contains(landmark.getString("Line1"))){
+                        stopNames.add(landmark.getString("Line1"));
+                        Stop stop = new Stop(landmark.getDouble("Latitude"), landmark.getDouble("Longitude"), landmark.getString("Line1"), new int[]{-1,-1,-1,-1});
                         stops.add(stop);
                     }
                 }
