@@ -15,6 +15,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by jordan_n on 8/22/2014.
@@ -35,6 +36,7 @@ public class MapState {
     private boolean mStopsVisible;
 
     private Marker mSelectedStopMarker;
+    public boolean showSelectedInfoWindow = false;
     private int[] mSelectedStopMarkerTimes;
 
     private static ArrayList<Integer> mNorthStopIndex;
@@ -52,6 +54,14 @@ public class MapState {
 
     private boolean stopsTaskStatus;
 
+    public boolean noAnimate = false;
+
+    //Allows fast lookup of stopObjects for Estimate parsing
+    private HashMap<Integer, Stop> mStopsMap;
+
+    public HashMap<Integer, Stop> northMap = new HashMap<Integer, Stop>();
+    public HashMap<Integer, Stop> westMap = new HashMap<Integer, Stop>();
+    public HashMap<Integer, Stop> eastMap = new HashMap<Integer, Stop>();
 
     public boolean isStopsTaskStatus() {
         return stopsTaskStatus;
@@ -82,6 +92,14 @@ public class MapState {
         return sCurrentContext;
     }
 
+    public HashMap<Integer, Stop> getStopsMap() {
+        return mStopsMap;
+    }
+
+    public void setStopsMap(HashMap<Integer, Stop> stopsMap) {
+        mStopsMap = stopsMap;
+    }
+
     //Creates shuttle objects and their markers, initializing them to (0,0) on the map.
     public void initShuttles(){
         Log.d(TAG_DB, "initShuttles");
@@ -89,27 +107,23 @@ public class MapState {
         LatLng initLatLng = new LatLng(0,0);
 
         Shuttle newShuttle = new Shuttle("North", false);
-        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().position(initLatLng).title("Init Shuttle").icon(BitmapDescriptorFactory.fromResource(R.drawable.shuttle_green)).flat(true).anchor(0.5f, 0.5f).infoWindowAnchor(.5f, .5f)));
+        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().position(initLatLng).title("Init Shuttle").icon(BitmapDescriptorFactory.fromResource(R.drawable.shut_green)).flat(true).anchor(0.5f, 0.5f).infoWindowAnchor(.5f, .5f)));
         newShuttle.setColorID(R.color.shuttle_green);
-        //Log.d(TAG, "Shuttle color: " + newShuttle.getColorID());
         mShuttles.add(newShuttle);
 
         newShuttle = new Shuttle("West 1", false);
-        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().position(initLatLng).title("Init Shuttle").icon(BitmapDescriptorFactory.fromResource(R.drawable.shuttle_purple)).flat(true).anchor(0.5f, 0.5f).infoWindowAnchor(.5f, .5f)));
-        newShuttle.setColorID(R.color.shuttle_purple);
-        //Log.d(TAG, "Shuttle color: " + newShuttle.getColorID());
+        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().position(initLatLng).title("Init Shuttle").icon(BitmapDescriptorFactory.fromResource(R.drawable.shut_orange)).flat(true).anchor(0.5f, 0.5f).infoWindowAnchor(.5f, .5f)));
+        newShuttle.setColorID(R.color.shuttle_orange);
         mShuttles.add(newShuttle);
 
         newShuttle = new Shuttle("West 2", false);
-        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().position(initLatLng).title("Init Shuttle").icon(BitmapDescriptorFactory.fromResource(R.drawable.shuttle_purple)).flat(true).anchor(0.5f, 0.5f).infoWindowAnchor(.5f, .5f)));
-        newShuttle.setColorID(R.color.shuttle_purple);
-        //Log.d(TAG, "Shuttle color: " + newShuttle.getColorID());
+        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().position(initLatLng).title("West 2").icon(BitmapDescriptorFactory.fromResource(R.drawable.shut_orange)).flat(true).anchor(0.5f, 0.5f).infoWindowAnchor(.5f, .5f)));
+        newShuttle.setColorID(R.color.shuttle_orange);
         mShuttles.add(newShuttle);
 
         newShuttle = new Shuttle("East", false);
-        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().position(initLatLng).title("Init Shuttle").icon(BitmapDescriptorFactory.fromResource(R.drawable.shuttle_orange)).flat(true).anchor(.5f, .5f).infoWindowAnchor(.5f, .5f)));
-        newShuttle.setColorID(R.color.shuttle_orange);
-        //Log.d(TAG, "Shuttle color: " + newShuttle.getColorID());
+        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().position(initLatLng).title("Init Shuttle").icon(BitmapDescriptorFactory.fromResource(R.drawable.shut_purple)).flat(true).anchor(.5f, .5f).infoWindowAnchor(.5f, .5f)));
+        newShuttle.setColorID(R.color.shuttle_purple);
         mShuttles.add(newShuttle);
 
         if(mDrawerItems != null && mDrawerItems.size() != 0){
@@ -127,48 +141,9 @@ public class MapState {
 
     //Called on marker selection. Moves camera, accounting for infoWindow height and display orientation.
     public void animateMap(LatLng latLng){
-        Display display = ((WindowManager) sCurrentContext.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-        int rotation = display.getRotation();
-
-        //[0] = portraitOffset  ,   [1] = landscapeOffset
-        double[] orientationOffset = getInfoWindowOffset(mMap.getCameraPosition().zoom);
-
-        LatLng newPosition = new LatLng(latLng.latitude + orientationOffset[0], latLng.longitude);
-
-        if (rotation == Surface.ROTATION_90 || rotation == Surface.ROTATION_270) {
-           newPosition = new LatLng(latLng.latitude + orientationOffset[1], latLng.longitude);
-        }
-
         //CameraPosition cameraPosition = new CameraPosition(newPosition, mMap.getCameraPosition().zoom, CAMERA_TILT, CAMERA_BEARING);
-        CameraPosition cameraPosition = new CameraPosition(newPosition, mMap.getCameraPosition().zoom, mMap.getCameraPosition().tilt, mMap.getCameraPosition().bearing);
+        CameraPosition cameraPosition = new CameraPosition(latLng, mMap.getCameraPosition().zoom, mMap.getCameraPosition().tilt, mMap.getCameraPosition().bearing);
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), CAMERA_ANIMATION_SPEED, null);
-    }
-
-    public double[] getInfoWindowOffset(float zoom){
-        double[] offset = new double[2];
-        double portraitOffset = 0;
-        double landscapeOffset = 0;
-
-        if (zoom >= 13 && zoom < 14){
-            portraitOffset = .002;
-            landscapeOffset = .0059;
-        }
-        else if (zoom >= 14 && zoom < 16){
-            portraitOffset = .002;
-            landscapeOffset = .0029;
-        }
-        else if (zoom >= 16 && zoom < 17){
-            portraitOffset = .0008;
-            landscapeOffset = .00105;
-        }
-        else if (zoom >= 17 && zoom < 18){
-            portraitOffset = .0006;
-            landscapeOffset = .00060;
-        }
-
-        offset[0] = portraitOffset;
-        offset[1] = landscapeOffset;
-        return offset;
     }
 
     public GoogleMap getMap() {
@@ -199,7 +174,8 @@ public class MapState {
     public void setStopsMarkers(){
         Log.d(TAG_DB, "setStopMarkers");
         for (Stop stop : mStops) {
-            stop.setMarker(mMap.addMarker(new MarkerOptions().position(stop.getLatLng()).title(stop.getName()).visible(mStopsVisible)));
+            //TODO: fix stop.getName() in this next line. Only uses first stored stopName
+            stop.setMarker(mMap.addMarker(new MarkerOptions().position(stop.getLatLng()).infoWindowAnchor(.5f, .25f).title(stop.getName().get(0)).visible(mStopsVisible).alpha(0.7f).anchor(.5f, .5f).icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_dot_large))));
         }
     }
 
@@ -217,7 +193,7 @@ public class MapState {
                 int index = mStops.indexOf(stop);
                 //TODO: input shuttleETAs
                 for (int i = 0; i < 4; i++) {
-                    if (true/*shuttleETAs[i] != -1*/) {
+                    if (shuttleETAs[i] != -1) {
                         switch (i) {
                             case 0:
                                 mNorthStopIndex.add(index);
@@ -264,6 +240,9 @@ public class MapState {
         return false;
     }
 
+    public void setDrawerShuttleStatus(Shuttle shuttle, boolean newStatus){
+//!@
+    }
 
     public boolean isStopsVisible() {
         return mStopsVisible;
@@ -278,6 +257,10 @@ public class MapState {
         mSelectedStopMarker.setVisible(isVisible);
     }
 
+    public void refreshSelectedStopMarker(){
+        if(mSelectedStopMarker != null && showSelectedInfoWindow) mSelectedStopMarker.showInfoWindow();
+    }
+
     public boolean getSelectedStopMarkerVisibility() {
         return mSelectedStopMarker.isVisible();
     }
@@ -287,7 +270,8 @@ public class MapState {
     }
 
 
-    public void setSelectedStopMarker(Marker selectedStopMarker) {
+    public void setSelectedStopMarker(Marker selectedStopMarker, boolean showInfoWindow) {
+        showSelectedInfoWindow = showInfoWindow;
         if (selectedStopMarker != null) {
             for(Stop stop: mStops){
                 if(stop.getMarker().equals(selectedStopMarker)){
@@ -306,5 +290,27 @@ public class MapState {
         return mSelectedStopMarkerTimes;
     }
 
+    public HashMap<Integer, Stop> getNorthMap() {
+        return northMap;
+    }
 
+    public void setNorthMap(HashMap<Integer, Stop> northMap) {
+        this.northMap = northMap;
+    }
+
+    public HashMap<Integer, Stop> getEastMap() {
+        return eastMap;
+    }
+
+    public void setEastMap(HashMap<Integer, Stop> eastMap) {
+        this.eastMap = eastMap;
+    }
+
+    public HashMap<Integer, Stop> getWestMap() {
+        return westMap;
+    }
+
+    public void setWestMap(HashMap<Integer, Stop> westMap) {
+        this.westMap = westMap;
+    }
 }

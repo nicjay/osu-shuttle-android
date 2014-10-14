@@ -1,6 +1,7 @@
 package edu.oregonstate.beaverbus;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -85,13 +86,13 @@ public class ExpandableDrawerAdapter extends BaseExpandableListAdapter {
                         square.setBackgroundColor(0xFF70A800);
                         break;
                     case 2:
-                        square.setBackgroundColor(0xFF9540C0);      //AA66CD
+                        square.setBackgroundColor(0xFFE0AA0F);      //AA66CD
                         break;
                     case 3:
-                        square.setBackgroundColor(0xFFBF8CDA);
+                        square.setBackgroundColor(0xFFE0AA0F);
                         break;
                     case 4:
-                        square.setBackgroundColor(0xFFE0AA0F);
+                        square.setBackgroundColor(0xFFAA66CD);
                 }
 
 
@@ -144,17 +145,16 @@ public class ExpandableDrawerAdapter extends BaseExpandableListAdapter {
             convertView = inflater.inflate(R.layout.drawer_child_item, parent, false);
         }
         TextView childTitle = (TextView)convertView.findViewById(R.id.drawer_list_item_title);
-        int stopsIndex = mDrawerItems.get(groupPosition).getStopsIndex().get(childPosition);
-        String title = sMapState.getStops().get(stopsIndex).getName();
         switch (groupPosition){
             case NORTH:
-                childTitle.setText(title);
+
+                childTitle.setText("N-stop " + (childPosition+1));
                 break;
             case WEST:
-                childTitle.setText(title);
+                childTitle.setText("W-stop " + (childPosition+1));
                 break;
             case EAST:
-                childTitle.setText(title);
+                childTitle.setText("E-stop " + (childPosition+1));
                 break;
             default:
                 childTitle.setText("DEFAULT");
@@ -171,11 +171,11 @@ public class ExpandableDrawerAdapter extends BaseExpandableListAdapter {
     public int getChildrenCount(int groupPosition) {
         switch (groupPosition){
             case NORTH:
-                return mDrawerItems.get(groupPosition).getStopsIndex().size();
+                return sMapState.getNorthMap().size();// mDrawerItems.get(groupPosition).getStopsIndex().size();
             case WEST:
-                return mDrawerItems.get(groupPosition).getStopsIndex().size();
+                return sMapState.getWestMap().size();// mDrawerItems.get(groupPosition).getStopsIndex().size();
             case EAST:
-                return mDrawerItems.get(groupPosition).getStopsIndex().size();
+                return sMapState.getEastMap().size();// mDrawerItems.get(groupPosition).getStopsIndex().size();
             default:
                 return 0;
         }

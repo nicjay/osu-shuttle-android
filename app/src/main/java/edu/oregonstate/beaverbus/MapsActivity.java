@@ -98,6 +98,7 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
 
         if(!firstTime){
             shuttleUpdater.startShuttleUpdater();
+            mMapState.noAnimate = true;
         }
     }
 
@@ -146,7 +147,7 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
         mMap = mMapState.getMap();
         if (mMap == null) {
             Log.d(TAG, "setUpMapIfNeeded - map was null, creating...");
-            MapFragment mapFragment = ((MapFragment) getFragmentManager().findFragmentById(R.id.map));
+            final MapFragment mapFragment = ((MapFragment) getFragmentManager().findFragmentById(R.id.map));
             mapFragment.setRetainInstance(true);
             mMap = mapFragment.getMap();
             mMap.clear();
@@ -161,20 +162,21 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
             mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                 @Override
                 public boolean onMarkerClick(Marker marker) {
-                    if (mMapState.getSelectedStopMarker() != null && !mMapState.isStopsVisible()){
+                    if (mMapState.getSelectedStopMarker() != null && !mMapState.isStopsVisible() && mMapState.showSelectedInfoWindow){
                         mMapState.setSelectedStopMarkerVisibility(false);
                     }
 
-                    mMapState.animateMap(marker.getPosition());
+                    //mMapState.animateMap(marker.getPosition());
                     marker.setVisible(true);
-                    marker.showInfoWindow();
 
-                    mMapState.setSelectedStopMarker(marker);
+
                     //TODO: are we really using flat for shuttle-stop differentiation?
                     if (!marker.isFlat()) {
-                        mMapState.setSelectedStopMarker(marker);
+                        marker.showInfoWindow();
+                        mMapState.setSelectedStopMarker(marker, true);
                     } else {
-                        mMapState.setSelectedStopMarker(null);
+                        mMapState.animateMap(marker.getPosition());
+                        mMapState.setSelectedStopMarker(marker, false);
                     }
 
                     return true;
@@ -186,10 +188,11 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
                 @Override
                 public void onMapClick(LatLng latLng) {
                     if (mMapState.getSelectedStopMarker() != null){
-                        if (!mMapState.isStopsVisible()) {
+                        if (!mMapState.isStopsVisible() && mMapState.showSelectedInfoWindow) {
+                            Log.d(TAG, "!!@ showSelectedInfoWindow : " + mMapState.showSelectedInfoWindow);
                             mMapState.setSelectedStopMarkerVisibility(false);
                         }
-                        mMapState.setSelectedStopMarker(null);
+                        mMapState.setSelectedStopMarker(null, false);
                     }
                 }
             });
@@ -312,16 +315,22 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
                 shuttle.getMarker().setVisible(false);
             } else {
                 if (shuttle.getLatLng() != shuttle.getMarker().getPosition()) {
-                    if (shuttle.getLatLng() != new LatLng(0,0))
-                        shuttle.updateMarker();
+                    if (shuttle.getLatLng() != new LatLng(0,0)) {
+                        Log.d(TAG, "Starting position. WITHOUT AIM");
+                        shuttle.updateMarker(!mMapState.noAnimate);
+                    }
                     else{
+
+
                         shuttle.updateMarkerWithoutAnim();
                     }
                 }
                 shuttle.getMarker().setVisible(true);
             }
         }
-
+        if(mMapState.noAnimate){
+            mMapState.noAnimate = false;
+        }
         //Only executes if any StopIndex array is null (first run)
         mMapState.initStopsArrays();
 
@@ -455,7 +464,7 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
                 .add(new LatLng(44.559873, -123.273996)).add(new LatLng(44.561578, -123.274318))
                 .add(new LatLng(44.562113, -123.274114)).add(new LatLng(44.564507, -123.274058));
         Polyline polylineEast = mMap.addPolyline(rectOptionsEast);
-        polylineEast.setColor(0xBDE0AA0F);
+        polylineEast.setColor(0xBDAA66CD);
 
         //EAST ROUTE
         PolylineOptions rectOptionsWest = new PolylineOptions()
@@ -469,7 +478,7 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
                 .add(new LatLng(44.558254, -123.281967)).add(new LatLng(44.558305, -123.280559))
                 .add(new LatLng(44.558993, -123.279550));
         Polyline polylineWest = mMap.addPolyline(rectOptionsWest);
-        polylineWest.setColor(0xBDAA66CD);
+        polylineWest.setColor(0xBDE0AA0F);
     }
 
 

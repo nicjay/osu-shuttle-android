@@ -32,7 +32,7 @@ public class JSONGetter {
     public JSONArray getJSONFromUrl(String url){
         HttpClient client = new DefaultHttpClient();
         HttpGet httpGet = new HttpGet(url);
-
+        Log.d(TAG, "Getting from url : " + url);
         try{
             HttpResponse response = client.execute(httpGet);
             StatusLine statusLine = response.getStatusLine();

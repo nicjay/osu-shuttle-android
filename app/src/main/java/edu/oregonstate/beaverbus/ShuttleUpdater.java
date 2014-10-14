@@ -2,6 +2,7 @@ package edu.oregonstate.beaverbus;
 
 import android.os.AsyncTask;
 import android.os.Handler;
+import android.util.Log;
 
 import com.google.android.gms.maps.model.Marker;
 import com.google.gson.Gson;
@@ -9,6 +10,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Random;
 
@@ -27,21 +29,18 @@ public class ShuttleUpdater {
     private pollNewDataTask currentTask;
 
     private Handler mHandler;
-    private boolean isBusy = false;
-    private boolean stop = true;
     private Runnable r;
     private static final long ASYNC_DELAY = 5000;
-    private String shuttleUrl = "http://portal.campusops.oregonstate.edu/files/shuttle/GetMapVehiclePoints.txt";
+    private boolean isBusy = false, stop = true;
 
-    private static final int NORTH_ROUTE_ID = 3;
-    private static final int WEST_ROUTE_ID = 2;
-    private static final int EAST_ROUTE_ID = 1;
+    private String shuttleUrl = "http://www.osushuttles.com/Services/JSONPRelay.svc/GetMapVehiclePoints";//"http://portal.campusops.oregonstate.edu/files/shuttle/GetMapVehiclePoints.txt";
+    private String estimatesUrl = "http://www.osushuttles.com/Services/JSONPRelay.svc/GetRouteStopArrivals";
 
+    private static final int NORTH_ROUTE_ID = 7, EAST_ROUTE_ID = 8, WEST_ROUTE_ID = 9;
 
     public interface OnMapStateUpdate{
         void onPostShuttleRequest(boolean success);
     }
-
 
     private ShuttleUpdater(OnMapStateUpdate listener) {
         super();
@@ -55,7 +54,6 @@ public class ShuttleUpdater {
             sShuttleUpdater = new ShuttleUpdater(listener);
         }
         return sShuttleUpdater;
-
     }
 
     private void startHandler(){
@@ -87,7 +85,6 @@ public class ShuttleUpdater {
             stop = false;
             currentTask = new pollNewDataTask(shuttleUrl);
             currentTask.execute();
-
             startHandler();
         }
     }
@@ -96,26 +93,28 @@ public class ShuttleUpdater {
      * CLASS - pollNewDataTask
      * Pulls the shuttle JSON URL a single time.
      * Determines online states of shuttles.
-     * Determines next three stops of shuttles.
      */
     private class pollNewDataTask extends AsyncTask<String, Void, Boolean>{
-
         private static final String TAG = "pollNewDataTask";
 
         private String url;
         private JSONArray JSONShuttles;
+        private JSONArray JSONEstimates;
 
         public pollNewDataTask(String url) {
             super();
             this.url = url;
         }
 
-
         @Override
         protected Boolean doInBackground(String... params) {
             JSONGetter getter = new JSONGetter();
+            JSONGetter estGetter = new JSONGetter();
+            //TODO: url is passed in, estimatesUrl is not, perhaps both should just be global
             JSONShuttles = getter.getJSONFromUrl(url);
-            if(JSONShuttles != null){
+            JSONEstimates = estGetter.getJSONFromUrl(estimatesUrl);
+
+            if(JSONShuttles != null && JSONEstimates != null){
                 return true;
             }
             return false;
@@ -125,167 +124,124 @@ public class ShuttleUpdater {
         @Override
         protected void onPostExecute(Boolean success) {
             super.onPostExecute(success);
-
             parseJSON();
+            sMapState.refreshSelectedStopMarker();
             if(!stop) listener.onPostShuttleRequest(success);
         }
 
         //TODO: reduce number of string conversions here and JSONGetter
-       private void parseJSON(){
-            Gson gson = new Gson();
-            boolean[] onlineStates = {false,false,false,false};
-            if(JSONShuttles != null) {
-                for (int i = 0; i < JSONShuttles.length(); i++) {
+       private void parseJSON() {
+           Gson gson = new Gson();
+           boolean[] onlineStates = {false, false, false, false};
+           if (JSONShuttles != null) {
+               for (int i = 0; i < JSONShuttles.length(); i++) {
 
-                    String json = null;
-                    try {
-                        JSONObject rawJson = JSONShuttles.getJSONObject(i);
-                        json = rawJson.toString();
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    Shuttle shuttle = gson.fromJson(json, Shuttle.class);
-                    shuttle.setOnline(true);
-
-                    switch (shuttle.getRouteID()) {
-                        case NORTH_ROUTE_ID:
-                            sMapState.setShuttle(0, shuttle);
-                            onlineStates[0] = true;
-                            break;
-                        case WEST_ROUTE_ID:  //Double route
-                            if (sMapState.getShuttles().get(1).getVehicleId() == shuttle.getVehicleId()) {
-                                sMapState.setShuttle(1, shuttle);
-                                onlineStates[1] = true;
-                            } else if (sMapState.getShuttles().get(2).getVehicleId() == shuttle.getVehicleId()) {
-                                sMapState.setShuttle(2, shuttle);
-                                onlineStates[2] = true;
-                            } else if (!sMapState.getShuttles().get(1).isOnline()) {
-                                sMapState.setShuttle(1, shuttle);
-                                onlineStates[1] = true;
-                            } else if (!sMapState.getShuttles().get(2).isOnline()) {
-                                sMapState.setShuttle(2, shuttle);
-                                onlineStates[2] = true;
-                            }
-                            break;
-                        case EAST_ROUTE_ID:
-                            sMapState.setShuttle(3, shuttle);
-                            onlineStates[3] = true;
-                            break;
-                    }
-                }
-            }
-            ArrayList<Shuttle> shuttles = sMapState.getShuttles();
-            for (int i = 0; i < 4; i++) {
-                Shuttle shuttle = shuttles.get(i);
-                //Log.d(TAG, "SET SHUTTLE OFFLINE " + shuttle.isOnline());
-                if (!onlineStates[i]){
-                   shuttle.setOnline(false);
-
-                }
-                else shuttle.setOnline(true);
-            }
-
-
-            //Test Times
-           ArrayList<Stop> stops = sMapState.getStops();
-           if (stops != null) {
-               Random random = new Random();
-               int maxNum = 16;
-               Marker marker = sMapState.getSelectedStopMarker();
-               for (int i = 0, len = stops.size(); i < len; i++) {
-                   Stop stop = stops.get(i);
-                   int[] oldTimes = null;
-                   boolean checkOld = false;
-
-                   if(marker != null) {
-                       if (sMapState.getSelectedStopMarker().equals(stop.getMarker())) {
-                           oldTimes = stop.getShuttleETAs();
-                           checkOld = true;
-                       }
+                   String json = null;
+                   try {
+                       JSONObject rawJson = JSONShuttles.getJSONObject(i);
+                       json = rawJson.toString();
+                   } catch (JSONException e) {
+                       e.printStackTrace();
                    }
-
-                   int num0 = random.nextInt(maxNum/2);
-                   int num1 = random.nextInt((maxNum-num0)/2)+num0;
-                   int num2 = random.nextInt(maxNum-num1-2)+num1;
-                   int num3 = random.nextInt(maxNum-num2)+num2;
-
-                   stop.setShuttleETAs(new int[]{num0, num1, num2, num3});
-
-                   if(checkOld && stop.getShuttleETAs() != oldTimes){
-                       sMapState.getSelectedStopMarker().showInfoWindow();
+                   Shuttle shuttle = gson.fromJson(json, Shuttle.class);
+                   if(shuttle.getGroundSpeed() == 0){
+                       Log.d(TAG, "OH! Here is heading: " + shuttle.getHeading());
                    }
+                   Log.d(TAG, "OH!heading: " + shuttle.getHeading());
+                   shuttle.setOnline(true);
 
+                   switch (shuttle.getRouteID()) {
+                       case NORTH_ROUTE_ID:
+                           sMapState.setShuttle(0, shuttle);
+                           onlineStates[0] = true;
+                           break;
+                       case WEST_ROUTE_ID:  //Double route
+                           if (sMapState.getShuttles().get(1).getVehicleId() == shuttle.getVehicleId()) {
+                               sMapState.setShuttle(1, shuttle);
+                               onlineStates[1] = true;
+                           } else if (sMapState.getShuttles().get(2).getVehicleId() == shuttle.getVehicleId()) {
+                               sMapState.setShuttle(2, shuttle);
+                               onlineStates[2] = true;
+                           } else if (!sMapState.getShuttles().get(1).isOnline()) {
+                               sMapState.setShuttle(1, shuttle);
+                               onlineStates[1] = true;
+                           } else if (!sMapState.getShuttles().get(2).isOnline()) {
+                               sMapState.setShuttle(2, shuttle);
+                               onlineStates[2] = true;
+                           }
+                           break;
+                       case EAST_ROUTE_ID:
+                           sMapState.setShuttle(3, shuttle);
+                           onlineStates[3] = true;
+                           break;
+                   }
                }
            }
-
-           LinkedList<Shuttle.ShuttleEta> northLinkedList = new LinkedList<Shuttle.ShuttleEta>();
-           LinkedList<Shuttle.ShuttleEta> west1LinkedList = new LinkedList<Shuttle.ShuttleEta>();
-           LinkedList<Shuttle.ShuttleEta> west2LinkedList = new LinkedList<Shuttle.ShuttleEta>();
-           LinkedList<Shuttle.ShuttleEta> eastLinkedList = new LinkedList<Shuttle.ShuttleEta>();
-
-           for(int i = 0, len = stops.size(); i < len; i++) {
-               Stop stop = stops.get(i);
-               int[] ETAs = stop.getShuttleETAs();
-               Shuttle.ShuttleEta newNorthEta = new Shuttle.ShuttleEta();
-               newNorthEta.name = stop.getName();
-               newNorthEta.time = ETAs[0];
-               Shuttle.ShuttleEta newWest1Eta = new Shuttle.ShuttleEta();
-               newWest1Eta.name = stop.getName();
-               newWest1Eta.time = ETAs[1];
-               Shuttle.ShuttleEta newWest2Eta = new Shuttle.ShuttleEta();
-               newWest2Eta.name = stop.getName();
-               newWest2Eta.time = ETAs[2];
-               Shuttle.ShuttleEta newEastEta = new Shuttle.ShuttleEta();
-               newEastEta.name = stop.getName();
-               newEastEta.time = ETAs[3];
-
-               northLinkedList = addEtaIfNeeded(northLinkedList, i , newNorthEta);
-               west1LinkedList = addEtaIfNeeded(west1LinkedList, i , newWest1Eta);
-               west2LinkedList = addEtaIfNeeded(west2LinkedList, i , newWest2Eta);
-               eastLinkedList = addEtaIfNeeded(eastLinkedList, i , newEastEta);
+           ArrayList<Shuttle> shuttles = sMapState.getShuttles();
+           for (int i = 0; i < 4; i++) {
+               Shuttle shuttle = shuttles.get(i);
+               if (!onlineStates[i]) shuttle.setOnline(false);
+               else shuttle.setOnline(true);
            }
-           shuttles.get(0).setUpcomingStops(northLinkedList);
-           shuttles.get(1).setUpcomingStops(west1LinkedList);
-           shuttles.get(2).setUpcomingStops(west2LinkedList);
-           shuttles.get(3).setUpcomingStops(eastLinkedList);
 
+           if (JSONEstimates != null) {
+               try {
+                   for (int i = 0, len = JSONEstimates.length(); i < len; i++) {
+                       JSONObject jsonObj = JSONEstimates.getJSONObject(i);
+                       HashMap<Integer, Stop> stopsMap = sMapState.getStopsMap();
 
-          /* stops = sMapState.getStops();
-           for(int i = 0; i < stops.size(); i++) {
-               //Log.d(TAG, "1stopShuttleETAS: " + stops.get(i).getShuttleETAs()[0] + " , " + stops.get(i).getShuttleETAs()[1] + " , " + stops.get(i).getShuttleETAs()[2] + " , " + stops.get(i).getShuttleETAs()[3] + " , ");
-           }*/
+                       Integer stopId = jsonObj.getInt("RouteStopID");
+                       int routeId = jsonObj.getInt("RouteID");
+                       Stop stop = stopsMap.get(stopId);
+
+                       if (stop != null) {
+                           JSONArray estimates = jsonObj.getJSONArray("VehicleEstimates");
+                           int estimate0[] = {-1, -1};
+                           int estimate1[] = {-1, -1};
+                           JSONObject estObj0 = estimates.getJSONObject(0);
+                           if (estObj0 != null) {
+                               if(estObj0.getBoolean("OnRoute")) {
+                                   estimate0[0] = estObj0.getInt("VehicleID");
+                                   estimate0[1] = estObj0.getInt("SecondsToStop");
+                               }
+                           }
+                           if (estimates.length() > 1) {
+                               JSONObject estObj1 = estimates.getJSONObject(1);
+                               if (estObj1 != null) {
+                                   if(estObj1.getBoolean("OnRoute")) {
+                                       estimate1[0] = estObj1.getInt("VehicleID");
+                                       estimate1[1] = estObj1.getInt("SecondsToStop");
+                                   }
+                               }
+                           }
+
+                           switch (routeId) {
+                               case NORTH_ROUTE_ID: //North
+                                   stop.setShuttleETA(0, estimate0[1]);
+                                   break;
+                               case EAST_ROUTE_ID: //East
+                                   stop.setShuttleETA(3, estimate0[1]);
+                                   break;
+                               case WEST_ROUTE_ID:   //West
+                                   if (shuttles.get(1).getVehicleId() == estimate0[0]) {
+                                       stop.setShuttleETA(1, estimate0[1]);
+                                   } else if (shuttles.get(1).getVehicleId() == estimate1[0]) {
+                                       stop.setShuttleETA(1, estimate1[1]);
+                                   }
+                                   if (shuttles.get(2).getVehicleId() == estimate0[0]) {
+                                       stop.setShuttleETA(2, estimate0[1]);
+                                   } else if (shuttles.get(2).getVehicleId() == estimate1[0]) {
+                                       stop.setShuttleETA(2, estimate1[1]);
+                                   }
+                                   break;
+                               default:
+                           }
+                       }
+                   }
+               } catch (JSONException e) {
+                   e.printStackTrace();
+               }
+           }
        }
-        private LinkedList<Shuttle.ShuttleEta> addEtaIfNeeded(LinkedList<Shuttle.ShuttleEta> list, int index, Shuttle.ShuttleEta newEta){
-            if(newEta.time == -1) return list;
-            switch (index) {
-                case 0:
-                    list.add(newEta);
-                    break;
-                case 1:
-                    if (newEta.time < list.getFirst().time)
-                        list.addFirst(newEta);
-                    else list.add(newEta);
-                    break;
-                case 2:
-                    if (newEta.time < list.getFirst().time)
-                        list.addFirst(newEta);
-                    else if (newEta.time < list.get(1).time)
-                        list.add(1, newEta);
-                    else list.add(newEta);
-                    break;
-                default:
-                    if (newEta.time < list.getFirst().time) {
-                        list.addFirst(newEta);
-                        list.removeLast();
-                    } else if (newEta.time < list.get(1).time) {
-                        list.add(1, newEta);
-                        list.removeLast();
-                    } else if (newEta.time < list.get(2).time) {
-                        list.add(2, newEta);
-                        list.removeLast();
-                    }
-            }
-            return list;
-        }
     }
 }
