@@ -8,6 +8,7 @@ import android.view.WindowManager;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
@@ -55,6 +56,7 @@ public class MapState {
     private boolean stopsTaskStatus;
 
     public boolean noAnimate = false;
+    private boolean stopMarkersBordered = true;
 
     //Allows fast lookup of stopObjects for Estimate parsing
     private HashMap<Integer, Stop> mStopsMap;
@@ -107,22 +109,22 @@ public class MapState {
         LatLng initLatLng = new LatLng(0,0);
 
         Shuttle newShuttle = new Shuttle("North", false);
-        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().position(initLatLng).title("Init Shuttle").icon(BitmapDescriptorFactory.fromResource(R.drawable.shut_green)).flat(true).anchor(0.5f, 0.5f).infoWindowAnchor(.5f, .5f)));
+        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().alpha(.85f).position(initLatLng).title("Init Shuttle").icon(BitmapDescriptorFactory.fromResource(R.drawable.shut_green_marker_m)).flat(true).anchor(0.5f, 0.5f).infoWindowAnchor(.5f, .5f)));
         newShuttle.setColorID(R.color.shuttle_green);
         mShuttles.add(newShuttle);
 
         newShuttle = new Shuttle("West 1", false);
-        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().position(initLatLng).title("Init Shuttle").icon(BitmapDescriptorFactory.fromResource(R.drawable.shut_orange)).flat(true).anchor(0.5f, 0.5f).infoWindowAnchor(.5f, .5f)));
+        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().alpha(.85f).position(initLatLng).title("Init Shuttle").icon(BitmapDescriptorFactory.fromResource(R.drawable.shut_orange_marker_m)).flat(true).anchor(0.5f, 0.5f).infoWindowAnchor(.5f, .5f)));
         newShuttle.setColorID(R.color.shuttle_orange);
         mShuttles.add(newShuttle);
 
         newShuttle = new Shuttle("West 2", false);
-        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().position(initLatLng).title("West 2").icon(BitmapDescriptorFactory.fromResource(R.drawable.shut_orange)).flat(true).anchor(0.5f, 0.5f).infoWindowAnchor(.5f, .5f)));
+        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().alpha(.85f).position(initLatLng).title("Init Shuttle").icon(BitmapDescriptorFactory.fromResource(R.drawable.shut_orange_marker_m)).flat(true).anchor(0.5f, 0.5f).infoWindowAnchor(.5f, .5f)));
         newShuttle.setColorID(R.color.shuttle_orange);
         mShuttles.add(newShuttle);
 
         newShuttle = new Shuttle("East", false);
-        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().position(initLatLng).title("Init Shuttle").icon(BitmapDescriptorFactory.fromResource(R.drawable.shut_purple)).flat(true).anchor(.5f, .5f).infoWindowAnchor(.5f, .5f)));
+        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().alpha(.85f).position(initLatLng).title("Init Shuttle").icon(BitmapDescriptorFactory.fromResource(R.drawable.shut_purple_marker_m)).flat(true).anchor(.5f, .5f).infoWindowAnchor(.5f, .5f)));
         newShuttle.setColorID(R.color.shuttle_purple);
         mShuttles.add(newShuttle);
 
@@ -175,7 +177,18 @@ public class MapState {
         Log.d(TAG_DB, "setStopMarkers");
         for (Stop stop : mStops) {
             //TODO: fix stop.getName() in this next line. Only uses first stored stopName
-            stop.setMarker(mMap.addMarker(new MarkerOptions().position(stop.getLatLng()).infoWindowAnchor(.5f, .25f).title(stop.getName().get(0)).visible(mStopsVisible).alpha(0.7f).anchor(.5f, .5f).icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_dot_large))));
+            stop.setMarker(mMap.addMarker(new MarkerOptions().position(stop.getLatLng()).infoWindowAnchor(.5f, .25f).title(stop.getName().get(0)).visible(mStopsVisible).alpha(0.7f).anchor(.5f, .5f).icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_dot_large_border))));
+        }
+    }
+
+    public void toggleStopMarkerBorders(){
+        BitmapDescriptor newIcon;
+        if(stopMarkersBordered) newIcon = BitmapDescriptorFactory.fromResource(R.drawable.marker_dot_large);
+        else newIcon = BitmapDescriptorFactory.fromResource(R.drawable.marker_dot_large_border);
+        stopMarkersBordered = !stopMarkersBordered;
+
+        for(Stop stop : mStops){
+            stop.getMarker().setIcon(newIcon);
         }
     }
 

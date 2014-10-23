@@ -5,7 +5,9 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.net.ConnectivityManager;
+import android.net.Uri;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
@@ -57,6 +59,8 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
     private static LinearLayout errorLayout;
 
     private boolean firstTime = true;
+
+    private Polyline polylineNorth;
 
 
     @Override
@@ -159,6 +163,12 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
             }
 
             mMap.setInfoWindowAdapter(new MapInfoWindowAdapter(this));
+            mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+                @Override
+                public void onInfoWindowClick(Marker marker) {
+                    mMapState.animateMap(marker.getPosition());
+                }
+            });
             mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                 @Override
                 public boolean onMarkerClick(Marker marker) {
@@ -261,6 +271,7 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
         Callback, handles the success or failure result of the initial stop+shuttle request.
      */
     public void onPostInitialRequest(boolean success){
+        Log.d(TAG, "..! ON POST INITIAL requEST");
         if (success){
             Log.d(TAG, "onPostInitialRequest success");
             sProgressDialog.dismiss();
@@ -280,6 +291,7 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
         Error views and loading dialogs are added or removed accordingly.
      */
     public void onPostShuttleRequest(boolean success){
+        Log.d(TAG, "..! ON POST SHUTTLE requEST");
         if(success){
             Log.d(TAG, "onPostShuttleRequest success");
             updateMap();
@@ -383,6 +395,14 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
 
                 showBusInfoDialog(item);
                 return true;
+            case R.id.rate_app:
+                final String myappPackageName = getPackageName(); // getPackageName() from Context or Activity object
+                try {
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + myappPackageName)));
+                } catch (android.content.ActivityNotFoundException anfe) {
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://play.google.com/store/apps/details?id=" + myappPackageName)));
+                }
+                    return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -433,6 +453,7 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
                     }
                 }).setTitle("Beaver Bus");
         busInfoDialog = busInfoDialogBuilder.create();
+
     }
 
     public void setUpRouteLines() {
@@ -447,8 +468,9 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
                 .add(new LatLng(44.564643, -123.275300)).add(new LatLng(44.564635, -123.279935))
                 .add(new LatLng(44.564650, -123.284575)).add(new LatLng(44.564590, -123.289720))
                 .add(new LatLng(44.566792, -123.289718));
-        Polyline polylineNorth = mMap.addPolyline(rectOptionsNorth);
+        polylineNorth = mMap.addPolyline(rectOptionsNorth);
         polylineNorth.setColor(0xBD70A800);
+        polylineNorth.setWidth(10);
 
         //SOUTH ROUTE
         PolylineOptions rectOptionsEast = new PolylineOptions()
@@ -465,6 +487,7 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
                 .add(new LatLng(44.562113, -123.274114)).add(new LatLng(44.564507, -123.274058));
         Polyline polylineEast = mMap.addPolyline(rectOptionsEast);
         polylineEast.setColor(0xBDAA66CD);
+        polylineEast.setWidth(10);
 
         //EAST ROUTE
         PolylineOptions rectOptionsWest = new PolylineOptions()
@@ -479,6 +502,7 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
                 .add(new LatLng(44.558993, -123.279550));
         Polyline polylineWest = mMap.addPolyline(rectOptionsWest);
         polylineWest.setColor(0xBDE0AA0F);
+        polylineWest.setWidth(10);
     }
 
 

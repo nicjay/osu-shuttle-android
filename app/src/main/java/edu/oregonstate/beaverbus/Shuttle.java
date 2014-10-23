@@ -10,6 +10,7 @@ import android.view.animation.LinearInterpolator;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -128,6 +129,20 @@ public class Shuttle {
         final Handler handler = new Handler();
         final Interpolator interpolator = new LinearInterpolator();
 
+        if(GroundSpeed != 0){
+            switch (RouteID){
+                case 7:
+                    mMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.shut_green_marker_m));
+                    break;
+                case 9:
+                    mMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.shut_orange_marker_m));
+                    break;
+                case 8:
+                    mMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.shut_purple_marker_m));
+                    break;
+            }
+        }
+
         //Place the marker at interval points every X milliseconds, for smooth movement effect
         if(!startLatLng.equals(new LatLng(0, 0)) && animate){
             handler.post(new Runnable() {
@@ -157,7 +172,23 @@ public class Shuttle {
                         // Post again 10ms later.
                         handler.postDelayed(this, 10);
                     } else {
-                        // animation ended
+                        if(GroundSpeed == 0){
+                            switch (RouteID){
+                                case 7:
+                                    mMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.shut_green_square_m));
+                                    break;
+                                case 9:
+                                    mMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.shut_orange_square_m));
+                                    break;
+                                case 8:
+                                    mMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.shut_purple_square_m));
+                                    break;
+                            }
+                            double oldHeading = Heading;
+                            Heading = 0;
+                            mMarker.setRotation(Heading);
+                            Log.d(TAG, "~ Setting rotation  to 0! " + oldHeading + " --> " + Heading);
+                        }// animation ended
                     }
                 }
             });
@@ -165,7 +196,12 @@ public class Shuttle {
             mMarker.setPosition(endLatLng);
         }
        // mMarker.setPosition(getLatLng());
-        mMarker.setRotation(getHeading());
+        if(Heading != 0 && GroundSpeed != 0) {
+            Log.d(TAG, "~ Setting rotation to actual heading! " + Heading);
+            mMarker.setRotation(Heading);
+        }else{
+            Log.d(TAG, "~ skipped " + Heading);
+        }
     }
 
     public void updateMarkerWithoutAnim(){

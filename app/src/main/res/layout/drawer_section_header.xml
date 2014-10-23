@@ -8,11 +8,14 @@
 
     <ImageView
         android:id="@+id/drawer_section_icon"
-        android:layout_width="45dp"
+        android:layout_width="35dp"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:scaleType="centerInside"
-        android:paddingLeft="0dp"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
         />
 
     <TextView

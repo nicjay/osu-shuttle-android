@@ -6,6 +6,6 @@
     <item android:id="@+id/view_info"
           android:title="Bus Information" />
 
-    <item
-        android:title="A third option" />
+    <item android:id="@+id/rate_app"
+        android:title="Rate the App" />
 </menu>

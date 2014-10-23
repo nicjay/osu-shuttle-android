@@ -84,6 +84,7 @@ public class MapInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
                         }
                         etaText.setText(""+eta);
                         container.addView(stopSection);
+                        Log.d(TAG, "~! This is the width: " + container.getWidth());
                     }
                 }
                 if(!shuttleShown){
@@ -91,6 +92,11 @@ public class MapInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
                     textView.setText("Offline");
                     container.addView(textView);
                 }
+
+                ImageView imageView = new ImageView(mContext);
+                imageView.setImageResource(R.drawable.infowindow_bottom);
+
+
 
                 return stopView;
 

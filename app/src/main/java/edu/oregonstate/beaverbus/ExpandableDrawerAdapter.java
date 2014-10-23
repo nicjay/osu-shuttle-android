@@ -53,7 +53,8 @@ public class ExpandableDrawerAdapter extends BaseExpandableListAdapter {
                 sectionIcon.setImageResource(R.drawable.shuttle_grey);
             }else{
                 sectionIcon.setImageResource(R.drawable.map_marker_icon);
-                sectionIcon.setPadding(3, 3, 3, 3);
+                sectionIcon.getLayoutParams().height = 25;
+                //sectionIcon.setPadding(3, 3, 3, 3);
             }
 
             return sectionView;

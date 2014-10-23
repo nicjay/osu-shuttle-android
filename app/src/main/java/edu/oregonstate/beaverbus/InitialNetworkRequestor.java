@@ -194,15 +194,19 @@ public class InitialNetworkRequestor extends AsyncTask<Void, Void, Boolean> {
                         break;
                     case WEST_ROUTE_ID:  //Double route
                         if (shuttles.get(1).getVehicleId() == shuttle.getVehicleId()) {
+                            Log.d(TAG, "onlineSta  1");
                             sMapState.setShuttle(1, shuttle);
                             onlineStates[1] = true;
                         } else if (shuttles.get(2).getVehicleId() == shuttle.getVehicleId()) {
+                            Log.d(TAG, "onlineSta  2");
                             sMapState.setShuttle(2, shuttle);
                             onlineStates[2] = true;
                         } else if (!shuttles.get(1).isOnline()) {
+                            Log.d(TAG, "onlineSta  3");
                             sMapState.setShuttle(1, shuttle);
                             onlineStates[1] = true;
                         } else if (!shuttles.get(2).isOnline()) {
+                            Log.d(TAG, "onlineSta  4");
                             sMapState.setShuttle(2, shuttle);
                             onlineStates[2] = true;
                         }
@@ -215,12 +219,14 @@ public class InitialNetworkRequestor extends AsyncTask<Void, Void, Boolean> {
             }
         }
         for (int i = 0; i < 4; i++) {
+            Log.d(TAG, "onlinestates : " + onlineStates[i]);
             Shuttle shuttle = shuttles.get(i);
             if (!onlineStates[i]){
                 shuttle.setOnline(false);
             }
             else shuttle.setOnline(true);
         }
+
 
 //        //Test Times
 //        Random random = new Random();
