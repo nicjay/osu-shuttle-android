@@ -40,6 +40,7 @@ public class MapState {
     public boolean showSelectedInfoWindow = false;
     private int[] mSelectedStopMarkerTimes;
 
+
     private static ArrayList<Integer> mNorthStopIndex;
     private static ArrayList<Integer> mWestStopIndex;
     private static ArrayList<Integer> mEastStopIndex;
@@ -64,6 +65,7 @@ public class MapState {
     public HashMap<Integer, Stop> northMap = new HashMap<Integer, Stop>();
     public HashMap<Integer, Stop> westMap = new HashMap<Integer, Stop>();
     public HashMap<Integer, Stop> eastMap = new HashMap<Integer, Stop>();
+
 
     public boolean isStopsTaskStatus() {
         return stopsTaskStatus;
@@ -109,22 +111,22 @@ public class MapState {
         LatLng initLatLng = new LatLng(0,0);
 
         Shuttle newShuttle = new Shuttle("North", false);
-        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().alpha(.85f).position(initLatLng).title("Init Shuttle").icon(BitmapDescriptorFactory.fromResource(R.drawable.shut_green_marker_m)).flat(true).anchor(0.5f, 0.5f).infoWindowAnchor(.5f, .5f)));
+        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().alpha(.85f).position(initLatLng).title("North").icon(BitmapDescriptorFactory.fromResource(R.drawable.shut_green_marker_m)).flat(true).anchor(0.5f, 0.5f).infoWindowAnchor(.5f, .5f)));
         newShuttle.setColorID(R.color.shuttle_green);
         mShuttles.add(newShuttle);
 
         newShuttle = new Shuttle("West 1", false);
-        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().alpha(.85f).position(initLatLng).title("Init Shuttle").icon(BitmapDescriptorFactory.fromResource(R.drawable.shut_orange_marker_m)).flat(true).anchor(0.5f, 0.5f).infoWindowAnchor(.5f, .5f)));
+        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().alpha(.85f).position(initLatLng).title("West 1").icon(BitmapDescriptorFactory.fromResource(R.drawable.shut_orange_marker_m)).flat(true).anchor(0.5f, 0.5f).infoWindowAnchor(.5f, .5f)));
         newShuttle.setColorID(R.color.shuttle_orange);
         mShuttles.add(newShuttle);
 
         newShuttle = new Shuttle("West 2", false);
-        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().alpha(.85f).position(initLatLng).title("Init Shuttle").icon(BitmapDescriptorFactory.fromResource(R.drawable.shut_orange_marker_m)).flat(true).anchor(0.5f, 0.5f).infoWindowAnchor(.5f, .5f)));
+        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().alpha(.85f).position(initLatLng).title("West 2").icon(BitmapDescriptorFactory.fromResource(R.drawable.shut_orange_marker_m)).flat(true).anchor(0.5f, 0.5f).infoWindowAnchor(.5f, .5f)));
         newShuttle.setColorID(R.color.shuttle_orange);
         mShuttles.add(newShuttle);
 
         newShuttle = new Shuttle("East", false);
-        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().alpha(.85f).position(initLatLng).title("Init Shuttle").icon(BitmapDescriptorFactory.fromResource(R.drawable.shut_purple_marker_m)).flat(true).anchor(.5f, .5f).infoWindowAnchor(.5f, .5f)));
+        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().alpha(.85f).position(initLatLng).title("East").icon(BitmapDescriptorFactory.fromResource(R.drawable.shut_purple_marker_m)).flat(true).anchor(.5f, .5f).infoWindowAnchor(.5f, .5f)));
         newShuttle.setColorID(R.color.shuttle_purple);
         mShuttles.add(newShuttle);
 
@@ -135,9 +137,16 @@ public class MapState {
             }
 
         }
+
+        Shuttle shut1 = sMapState.getShuttles().get(1);
+        Shuttle shut2 = sMapState.getShuttles().get(2);
+        Log.d(TAG, "~~~! shut1" + shut1.getName() + shut1.isOnline() + " shut2" + shut2.getName() + shut2.isOnline());
     }
 
     public void setShuttle(int index, Shuttle shuttle){
+        //Log.d(TAG, "~~~! setShuttle index: " + index);
+        if(shuttle.isOnline()) Log.d(TAG, "~~~! " + index + " --> SET TO ONLINE");
+        else Log.d(TAG, "~~~! " + index + " --> SET TO OFFLINE");
         mShuttles.get(index).updateAll(shuttle);
     }
 
@@ -177,7 +186,7 @@ public class MapState {
         Log.d(TAG_DB, "setStopMarkers");
         for (Stop stop : mStops) {
             //TODO: fix stop.getName() in this next line. Only uses first stored stopName
-            stop.setMarker(mMap.addMarker(new MarkerOptions().position(stop.getLatLng()).infoWindowAnchor(.5f, .25f).title(stop.getName().get(0)).visible(mStopsVisible).alpha(0.7f).anchor(.5f, .5f).icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_dot_large_border))));
+            stop.setMarker(mMap.addMarker(new MarkerOptions().position(stop.getLatLng()).infoWindowAnchor(.5f, .25f).title(stop.getName()).visible(mStopsVisible).alpha(0.7f).anchor(.5f, .5f).icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_dot_large_border))));
         }
     }
 

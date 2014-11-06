@@ -9,8 +9,8 @@
                 >
    <View
        android:id="@+id/info_stop_square"
-       android:layout_width="11dp"
-       android:layout_height="11dp"
+       android:layout_width="13dp"
+       android:layout_height="13dp"
        android:background="@color/OSU_orange"
        android:layout_marginBottom="8dp"/>
 
@@ -19,7 +19,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="8"
-        android:textSize="28sp"/>
+        android:textSize="28dp"/>
 
     <TextView
         android:layout_width="wrap_content"

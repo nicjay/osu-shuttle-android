@@ -12,11 +12,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Random;
 
 /**
  * Created by sellersk on 9/11/2014.
@@ -66,14 +66,16 @@ public class InitialNetworkRequestor extends AsyncTask<Void, Void, Boolean> {
             return false;
         }
 
-        JSONGetter getter = new JSONGetter();
+        JSONGetter stopGetter = new JSONGetter();
 
-        JSONArray jStopsArray = getter.getJSONFromUrl(stopUrl);
+        JSONArray jStopsArray = stopGetter.getJSONFromUrl(stopUrl);
         if (jStopsArray == null){
             return false;
         }
 
-        JSONArray jShuttlesArray = getter.getJSONFromUrl(shuttleUrl);
+        JSONGetter shuttleGetter = new JSONGetter();
+
+        JSONArray jShuttlesArray = shuttleGetter.getJSONFromUrl(shuttleUrl);
         if (jShuttlesArray == null){
             return false;
         }
@@ -153,7 +155,6 @@ public class InitialNetworkRequestor extends AsyncTask<Void, Void, Boolean> {
                         if(existingStop.areLatLngEqual(latLng)){
                             existingStop.addServicedRoute(routeId);
                             existingStop.addStopId(stopId);
-                            existingStop.addStopName(stopName);
                             stopsMap.put(stopId, existingStop);
                             addStopToRouteMap((Integer)stopNum, routeId, existingStop);
                             break;
@@ -167,6 +168,9 @@ public class InitialNetworkRequestor extends AsyncTask<Void, Void, Boolean> {
             return false;
         }
 
+
+
+
         sMapState.setStopsMap(stopsMap);
 
         ArrayList<Shuttle> shuttles = sMapState.getShuttles();
@@ -176,14 +180,21 @@ public class InitialNetworkRequestor extends AsyncTask<Void, Void, Boolean> {
             for (int i = 0; i < jShuttlesArray.length(); i++) {
 
                 String json = null;
+                JSONObject rawJson = null;
                 try {
-                    JSONObject rawJson = jShuttlesArray.getJSONObject(i);
+                    rawJson = jShuttlesArray.getJSONObject(i);
                     json = rawJson.toString();
+
+                    Log.d(TAG, "~!~!" + rawJson.getInt("VehicleID"));
+                    //rawJson.
                 } catch (JSONException e) {
                     e.printStackTrace();
                     return false;
                 }
                 Shuttle shuttle = gson.fromJson(json, Shuttle.class);
+
+
+
                 Log.d(TAG, "!@ " + shuttle.getName() + " / " + shuttle.getLatLng());
                 shuttle.setOnline(true);
 
@@ -193,8 +204,9 @@ public class InitialNetworkRequestor extends AsyncTask<Void, Void, Boolean> {
                         onlineStates[0] = true;
                         break;
                     case WEST_ROUTE_ID:  //Double route
+                        Log.d(TAG, "onlineSta " + shuttle.getVehicleId());
                         if (shuttles.get(1).getVehicleId() == shuttle.getVehicleId()) {
-                            Log.d(TAG, "onlineSta  1");
+                            Log.d(TAG, "onlineSta  1 ");
                             sMapState.setShuttle(1, shuttle);
                             onlineStates[1] = true;
                         } else if (shuttles.get(2).getVehicleId() == shuttle.getVehicleId()) {
@@ -242,7 +254,43 @@ public class InitialNetworkRequestor extends AsyncTask<Void, Void, Boolean> {
         sMapState.setWestMap(westMap);
         Log.d(TAG, "!@ sizes... " + northMap.size() + " , " + eastMap.size() + " , " + westMap.size() + "::" + sMapState.getNorthMap().get(3));
 
+        Log.d(TAG, "~! setStopNames:");
+        setStopNames();
+
         return true;
+    }
+
+    private void setStopNames(){
+        try {
+            FileInputStream fileInputStream = (sMapState.getCurrentContext().getResources().openRawResourceFd(R.raw.stop_names)).createInputStream();
+            InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream);
+            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+            StringBuilder sb = new StringBuilder();
+            String line;
+            ArrayList<Stop> stops = sMapState.getStops();
+            while ((line = bufferedReader.readLine()) != null){
+                String[] words = line.split("_");
+
+                for (int i = 0; i < stops.size(); i++) {
+                    Stop stop = stops.get(i);
+
+                    if(stop.getLatLng().latitude == Double.parseDouble(words[0]) && stop.getLatLng().longitude == Double.parseDouble(words[1])){
+                        Log.d(TAG, "~! NEW NAME for " + stop.getName() + ". Goes to --> " + words[2]);
+                        stop.setName(words[2]);
+
+                        break;
+                    }
+                }
+            }
+            String finalString = sb.toString();
+            Log.d(TAG, "~! finalString : " + finalString);
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.d(TAG, "~! finalString error");
+        }
+
     }
 
     private void addStopToRouteMap(Integer stopNum, int routeId, Stop stop){

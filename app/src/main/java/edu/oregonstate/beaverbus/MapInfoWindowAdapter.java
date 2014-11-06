@@ -62,8 +62,8 @@ public class MapInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
                     int eta = shuttleEtas[i];
                     if(eta != -1){
                         shuttleShown = true;
-                        eta = eta / 60;
-                        if(eta == 0) eta = 1;
+                        //eta = eta / 60;
+                        //if(eta == 0) eta = 1;
                         View stopSection = inflater.inflate(R.layout.info_stop_section, null);
                         View square = stopSection.findViewById(R.id.info_stop_square);
                         TextView etaText = (TextView)stopSection.findViewById(R.id.info_stop_eta);
@@ -84,7 +84,6 @@ public class MapInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
                         }
                         etaText.setText(""+eta);
                         container.addView(stopSection);
-                        Log.d(TAG, "~! This is the width: " + container.getWidth());
                     }
                 }
                 if(!shuttleShown){

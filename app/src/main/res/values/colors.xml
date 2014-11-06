@@ -2,9 +2,12 @@
 <resources>
     <color name="OSU_black">#373737</color>
     <color name="transparent_OSU_black">#d9373737</color>
+    <color name="very_transparent_OSU_black">#80373737</color>
     <color name="OSU_white">#f5f2ed</color>
     <color name="OSU_orange">#c34500</color>
-    <color name="transparent_OSU_white">#E7f5f2ed</color>
+    <color name="transparent_OSU_orange">#BDF37321</color>
+    <color name="transparent_OSU_white">#CCf5f2ed</color><!-- E7f5f2ed -->
+    <color name="very_transparent_OSU_white">#A6f5f2ed</color>
     <color name="infowindow_font">#373737</color>
 
     <color name="Navigation_Drawer_Background">#191b1b</color>
@@ -22,4 +25,11 @@
     <color name="shuttle_green">#70a800</color>
     <color name="shuttle_purple">#aa66cd</color>
     <color name="shuttle_orange">#e0aa0f</color>
+
+    <color name="transparent_shuttle_green">#8070a800</color>
+    <color name="transparent_shuttle_purple">#80aa66cd</color>
+    <color name="transparent_shuttle_orange">#80e0aa0f</color>
+
+    <color name="favorite_stop_name_background">#D9B6BCC4</color>
+    <color name="favorite_stop_white">#BFf5f2ed</color>
 </resources>

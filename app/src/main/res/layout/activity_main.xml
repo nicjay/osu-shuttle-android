@@ -27,6 +27,44 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 />
+
+            <TextView
+                android:id="@+id/selected_stop"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:textSize="20dp"
+                android:layout_centerInParent="true"
+                android:textStyle="bold"
+                android:layout_marginRight="55dp"
+                android:layout_marginTop="15dp"
+                android:background="@drawable/stop_title_border"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+
+                />
+
+
+
+            <LinearLayout
+                android:id="@+id/favorites_view"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="58dp"
+                android:layout_marginBottom="8dp"
+                >
+
+
+
+
+            </LinearLayout>
+
+
             <LinearLayout
                 android:id="@+id/error_view"
                 android:layout_width="match_parent"
@@ -54,6 +92,17 @@
                     />
 
             </LinearLayout>
+
+            <Button
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="+"
+                android:id="@+id/favorite_button"
+                android:layout_above="@+id/favorites_view"
+                android:layout_alignLeft="@+id/favorites_view"
+                android:layout_alignStart="@+id/favorites_view"
+                android:layout_marginBottom="94dp"/>
         </RelativeLayout>
 
         <!-- android:layout_gravity="start" tells DrawerLayout to treat

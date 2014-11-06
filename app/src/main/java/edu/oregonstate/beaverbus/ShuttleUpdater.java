@@ -133,6 +133,11 @@ public class ShuttleUpdater {
        private void parseJSON() {
            Gson gson = new Gson();
            boolean[] onlineStates = {false, false, false, false};
+
+           Shuttle shut1 = sMapState.getShuttles().get(1);
+           Shuttle shut2 = sMapState.getShuttles().get(2);
+
+            Log.d(TAG, "~~~! shuttles set");
            if (JSONShuttles != null) {
                for (int i = 0; i < JSONShuttles.length(); i++) {
 
@@ -159,15 +164,21 @@ public class ShuttleUpdater {
                            if (sMapState.getShuttles().get(1).getVehicleId() == shuttle.getVehicleId()) {
                                sMapState.setShuttle(1, shuttle);
                                onlineStates[1] = true;
-                           } else if (sMapState.getShuttles().get(2).getVehicleId() == shuttle.getVehicleId()) {
+                               Log.d(TAG, "~~! 1");
+                           } if (sMapState.getShuttles().get(2).getVehicleId() == shuttle.getVehicleId()) {
                                sMapState.setShuttle(2, shuttle);
                                onlineStates[2] = true;
+                           Log.d(TAG, "~~! 2");
                            } else if (!sMapState.getShuttles().get(1).isOnline()) {
                                sMapState.setShuttle(1, shuttle);
                                onlineStates[1] = true;
+                           Log.d(TAG, "~~! 3");
                            } else if (!sMapState.getShuttles().get(2).isOnline()) {
-                               sMapState.setShuttle(2, shuttle);
+                           Log.d(TAG, "~~!4   3: " + sMapState.getShuttles().get(1).isOnline() + " , 4 : " + sMapState.getShuttles().get(2).isOnline());
+                           Log.d(TAG, "~~!   " + sMapState.getShuttles().get(1).getName());
+                           sMapState.setShuttle(2, shuttle);
                                onlineStates[2] = true;
+
                            }
                            break;
                        case EAST_ROUTE_ID:
@@ -202,7 +213,8 @@ public class ShuttleUpdater {
                            if (estObj0 != null) {
                                if(estObj0.getBoolean("OnRoute")) {
                                    estimate0[0] = estObj0.getInt("VehicleID");
-                                   estimate0[1] = estObj0.getInt("SecondsToStop");
+                                   estimate0[1] = estObj0.getInt("SecondsToStop")/60;
+                                   if(estimate0[1] == 0) estimate0[1] = 1;
                                }
                            }
                            if (estimates.length() > 1) {
@@ -210,7 +222,8 @@ public class ShuttleUpdater {
                                if (estObj1 != null) {
                                    if(estObj1.getBoolean("OnRoute")) {
                                        estimate1[0] = estObj1.getInt("VehicleID");
-                                       estimate1[1] = estObj1.getInt("SecondsToStop");
+                                       estimate1[1] = estObj1.getInt("SecondsToStop")/60;
+                                       if(estimate1[1] == 0) estimate1[1] = 1;
                                    }
                                }
                            }
@@ -223,14 +236,20 @@ public class ShuttleUpdater {
                                    stop.setShuttleETA(3, estimate0[1]);
                                    break;
                                case WEST_ROUTE_ID:   //West
+                                   Log.d(TAG, "~! estimate0[1]: " + estimate0[1] + ", estimate1[1] : " + estimate1[1]);
+                                   Log.d(TAG, "~! shut 1 vehid: " + shuttles.get(1).getVehicleId());
                                    if (shuttles.get(1).getVehicleId() == estimate0[0]) {
+                                       Log.d(TAG, "~! 1");
                                        stop.setShuttleETA(1, estimate0[1]);
                                    } else if (shuttles.get(1).getVehicleId() == estimate1[0]) {
+                                       Log.d(TAG, "~! 2");
                                        stop.setShuttleETA(1, estimate1[1]);
                                    }
                                    if (shuttles.get(2).getVehicleId() == estimate0[0]) {
+                                       Log.d(TAG, "~! 3");
                                        stop.setShuttleETA(2, estimate0[1]);
                                    } else if (shuttles.get(2).getVehicleId() == estimate1[0]) {
+                                       Log.d(TAG, "~! 4");
                                        stop.setShuttleETA(2, estimate1[1]);
                                    }
                                    break;

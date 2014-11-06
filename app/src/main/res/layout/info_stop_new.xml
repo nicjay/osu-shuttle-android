@@ -13,4 +13,9 @@
                   android:padding="8dp">
 
     </LinearLayout>
+    <ImageView
+        android:layout_width="20dp"
+        android:layout_height="17dp"
+        android:layout_gravity="center_horizontal"
+        android:src="@drawable/infowindow_bottom_light"/>
  </LinearLayout>

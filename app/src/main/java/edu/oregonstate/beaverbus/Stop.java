@@ -17,7 +17,7 @@ public class Stop {
     private double mLatitude;
     private double mLongitude;
     private LatLng mLatLng;
-    private ArrayList<String> mName;
+    private String mName;
     private int[] mShuttleETAs = new int[4];
     private ArrayList<Integer> mServicedRoutes;
     private ArrayList<Integer> mStopIds;
@@ -27,8 +27,6 @@ public class Stop {
 
     public Stop(LatLng latLng, String name, int routeId, int stopId, int[] shuttleETAs){
         mLatLng = latLng;
-        mName = new ArrayList<String>();
-        mName.add(name);
         mShuttleETAs = shuttleETAs;
         mServicedRoutes = new ArrayList<Integer>();
         mServicedRoutes.add(routeId);
@@ -66,8 +64,12 @@ public class Stop {
         return mLatLng;
     }
 
-    public ArrayList<String> getName() {
+    public String getName() {
         return mName;
+    }
+
+    public void setName(String name) {
+        mName = name;
     }
 
     public void setLatLng(LatLng latLng) {
@@ -80,10 +82,6 @@ public class Stop {
 
     public void addStopId(int stopId){
         mStopIds.add(stopId);
-    }
-
-    public void addStopName(String name){
-        mName.add(name);
     }
 
     public boolean areLatLngEqual(LatLng latLng){
