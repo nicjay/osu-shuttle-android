@@ -93,16 +93,16 @@
 
             </LinearLayout>
 
-            <Button
+          <!--  <Button
                 style="?android:attr/buttonStyleSmall"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="+"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
                 android:id="@+id/favorite_button"
-                android:layout_above="@+id/favorites_view"
-                android:layout_alignLeft="@+id/favorites_view"
-                android:layout_alignStart="@+id/favorites_view"
-                android:layout_marginBottom="94dp"/>
+                android:layout_alignParentLeft="true"
+                android:background="#CCFFFFFF"
+                android:layout_alignParentTop="true"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="8dp"/> -->
         </RelativeLayout>
 
         <!-- android:layout_gravity="start" tells DrawerLayout to treat

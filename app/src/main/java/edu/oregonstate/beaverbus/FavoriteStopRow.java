@@ -1,5 +1,6 @@
 package edu.oregonstate.beaverbus;
 
+import android.view.View;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -9,11 +10,19 @@ import java.util.ArrayList;
  */
 public class FavoriteStopRow {
 
+    private View favRow;
     private TextView favStopName;
-
     private TextView[] favStopETAs = new TextView[4];
 
     public Stop favStopObj;
+
+    public View getFavRow() {
+        return favRow;
+    }
+
+    public void setFavRow(View favRow) {
+        this.favRow = favRow;
+    }
 
     public TextView getFavStopName() {
         return favStopName;

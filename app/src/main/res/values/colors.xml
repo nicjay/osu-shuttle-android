@@ -32,4 +32,6 @@
 
     <color name="favorite_stop_name_background">#D9B6BCC4</color>
     <color name="favorite_stop_white">#BFf5f2ed</color>
+
+    <color name="favorite_row_selected">#d9373737</color>
 </resources>

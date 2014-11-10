@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:id="@+id/add_favorite"
+          android:icon="@drawable/favorite_star_disabled"
+          android:title="Favorite"
+          android:showAsAction="ifRoom" />
+
     <item android:id="@+id/toggle_stops"
           android:title="Hide Stops"/>
 
