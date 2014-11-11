@@ -701,9 +701,9 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
                 favoriteStopRows.clear();
                 favoritesView.removeAllViews();
                 saveFavoriteStopRows();
+                if (mMapState.getSelectedStopMarker() != null) setFavIcon(FAV_ICON_EMPTY);
                 return true;
             case R.id.view_info:
-
                 showBusInfoDialog(item);
                 return true;
             case R.id.rate_app:
