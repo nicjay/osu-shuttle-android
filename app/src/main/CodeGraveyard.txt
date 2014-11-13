@@ -131,3 +131,29 @@ private LinkedList<Shuttle.ShuttleEta> addEtaIfNeeded(LinkedList<Shuttle.Shuttle
        }
    }
     */
+
+ =====================================================================
+ ---------------------------------------------------------------------
+ =====================================================================
+/* TO REMOVE //Extract
+int nameLength = stopName.length();
+Integer firstDigit;
+if(stopName.charAt(nameLength-1) != ' ') {
+    firstDigit = Character.getNumericValue(stopName.charAt(nameLength - 1));
+}else{
+    firstDigit = Character.getNumericValue(stopName.charAt(nameLength - 2));
+}
+
+int stopNum;
+if (firstDigit == 0) {
+    stopNum = 10;
+} else {
+    stopNum = firstDigit;
+}
+
+if (stopId == 77){  //Special edge case. Bad JSON
+    stopNum = 8;
+}*/
+ =====================================================================
+ ---------------------------------------------------------------------
+ =====================================================================

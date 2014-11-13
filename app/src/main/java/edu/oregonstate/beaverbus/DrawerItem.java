@@ -8,13 +8,13 @@ import java.util.ArrayList;
 public class DrawerItem {
     private static final String TAG = "DrawerItem";
 
-    private int mTypeId;
+    private int mTypeId;    //Differentiates between: list header, child, expandable
     private String mTitle;
 
-    private Shuttle mShuttle;
-    private ArrayList<Integer> mStopsIndex;
+    private Shuttle mShuttle;   //List items 1-4 represent the 4 shuttle objects
+    private ArrayList<Integer> mStopsIndex; //Stop objects for each route. Indices 6-8
 
-    private boolean mRowEnabled;
+    private boolean mRowEnabled;    //Currently unused. TODO: disabled when shuttle offline
 
     //Section constructor
     public DrawerItem(int typeId, String title) {

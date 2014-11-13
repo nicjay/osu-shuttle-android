@@ -6,8 +6,12 @@
     <color name="OSU_white">#f5f2ed</color>
     <color name="OSU_orange">#c34500</color>
     <color name="transparent_OSU_orange">#BDF37321</color>
+    <color name="slightly_transparent_OSU_orange">#80F37321</color>
+    <color name="very_transparent_OSU_orange">#4DF37321</color>
+    <color name="super_transparent_OSU_orange">#1AF37321</color>
     <color name="transparent_OSU_white">#CCf5f2ed</color><!-- E7f5f2ed -->
     <color name="very_transparent_OSU_white">#A6f5f2ed</color>
+    <color name="super_transparent_OSU_white">#16f5f2ed</color>
     <color name="infowindow_font">#373737</color>
 
     <color name="Navigation_Drawer_Background">#191b1b</color>

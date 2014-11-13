@@ -19,26 +19,31 @@ import java.io.InputStreamReader;
 
 /*
   Created by jordan_n on 8/22/2014.
- */
-public class JSONGetter {
 
+  Gets JSON from specified URL. Building and returning JSONArray
+*/
+
+public class JSONGetter {
     public final String TAG = "JSONGetter";
+
     private StringBuilder builder = new StringBuilder();
     private JSONArray mJSON;
 
     public JSONGetter(){
+        //Constructor
     }
 
     public JSONArray getJSONFromUrl(String url){
+        //Get
         HttpClient client = new DefaultHttpClient();
         HttpGet httpGet = new HttpGet(url);
-        Log.d(TAG, "Getting from url : " + url);
+
+        //Parse
         try{
             HttpResponse response = client.execute(httpGet);
-            StatusLine statusLine = response.getStatusLine();
-            int statusCode = statusLine.getStatusCode();
 
-            if(statusCode == 200){
+            int statusCode = response.getStatusLine().getStatusCode();
+            if (statusCode == 200){ //If OKAY
                 HttpEntity entity = response.getEntity();
                 InputStream content = entity.getContent();
                 BufferedReader reader = new BufferedReader(new InputStreamReader(content));
@@ -47,9 +52,8 @@ public class JSONGetter {
                 while((line = reader.readLine()) != null){
                     builder.append(line);
                 }
-
             } else {
-                Log.d(TAG, "statusCode: " + statusCode);
+                Log.e(TAG, "ERROR statusCode: " + statusCode);
             }
         }catch (ClientProtocolException e){
             e.printStackTrace();
@@ -61,13 +65,13 @@ public class JSONGetter {
             //TODO: cleanup http
         }
 
+        //Get JSON from built string
         try{
             mJSON = new JSONArray(builder.toString());
         }catch (JSONException e){
             Log.e(TAG, "JSONException");
 
         }
-
         return mJSON;
     }
 }

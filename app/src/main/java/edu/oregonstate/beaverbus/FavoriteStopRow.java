@@ -3,14 +3,15 @@ package edu.oregonstate.beaverbus;
 import android.view.View;
 import android.widget.TextView;
 
-import java.util.ArrayList;
+/*
+  Created by sellersk on 10/30/2014.
 
-/**
- * Created by sellersk on 10/30/2014.
- */
+  Holds stopObject and view for added favorite.
+  Allows updating of referenced textViews (ETA times for stop)
+*/
+
 public class FavoriteStopRow {
-
-    private View favRow;
+    private View favRow;    //Row view for favorite
     private TextView favStopName;
     private TextView[] favStopETAs = new TextView[4];
 
@@ -36,9 +37,6 @@ public class FavoriteStopRow {
         return favStopETAs;
     }
 
-    public void setFavStopETAs(TextView[] favStopETAs) {
-        this.favStopETAs = favStopETAs;
-    }
     public void setFavStopETA(TextView favStopETA, int index) {
         favStopETAs[index] = favStopETA;
     }

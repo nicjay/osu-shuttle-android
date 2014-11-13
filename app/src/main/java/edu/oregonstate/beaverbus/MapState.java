@@ -32,25 +32,27 @@ public class MapState {
     private static MapState sMapState;
     private static GoogleMap mMap;
 
+    //Stops and Shuttles
     private static ArrayList<Shuttle> mShuttles;
     private static ArrayList<Stop> mStops;
     private boolean mStopsVisible;
 
+    //Currently selected Stop
     private Marker mSelectedStopMarker;
     public boolean showSelectedInfoWindow = false;
     private int[] mSelectedStopMarkerTimes;
 
-
+    //Stop indices of mStops for Stops of each route
     private static ArrayList<Integer> mNorthStopIndex;
     private static ArrayList<Integer> mWestStopIndex;
     private static ArrayList<Integer> mEastStopIndex;
 
+    //Navigation Drawer items
     private static ArrayList<DrawerItem> mDrawerItems;
 
     private static Context sCurrentContext;
 
     private static final int CAMERA_ANIMATION_SPEED = 700;
-
     private static final float CAMERA_TILT = 0;
     private static final float CAMERA_BEARING = 0;
 
@@ -263,7 +265,6 @@ public class MapState {
     }
 
     public void setDrawerShuttleStatus(Shuttle shuttle, boolean newStatus){
-//!@
     }
 
     public boolean isStopsVisible() {

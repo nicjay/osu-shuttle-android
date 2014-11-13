@@ -20,7 +20,7 @@
 android:textColor="#494949"
         android:gravity="center"
 android:background="@drawable/favorite_name_border"
-android:layout_marginTop="3dp"
+android:layout_marginTop="0dp"
         />
 
     <LinearLayout
@@ -32,7 +32,7 @@ android:layout_marginTop="3dp"
         android:orientation="horizontal"
         android:gravity="center"
         android:background="@drawable/favorite_times_border"
-        android:layout_marginTop="3dp">
+        android:layout_marginTop="0dp">
 
     </LinearLayout>
 

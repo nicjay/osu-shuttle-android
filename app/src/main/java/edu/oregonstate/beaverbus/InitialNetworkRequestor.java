@@ -18,141 +18,97 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-/**
- * Created by sellersk on 9/11/2014.
- *
- * CLASS - InitialNetworkRequestor
- * Pulls stop, shuttle, and ETA JSON URLS a single time, to determine if initial JSON or network errors.
- * Determines online states of shuttles.
- * Determines next three stops of shuttles.
+/*
+  Created by sellersk on 9/11/2014.
+  TODO: unneeded. merge with ShuttleUpdater to handle firstTime
+
+  CLASS - InitialNetworkRequestor
+  Pulls stop, shuttle, and ETA JSON URLS a single time to determine if error in JSON or network.
+  Determines online states of shuttles.
  */
 public class InitialNetworkRequestor extends AsyncTask<Void, Void, Boolean> {
     private static final String TAG = "InitialNetworkRequestor";
 
     private static MapState sMapState;
-    private static final String stopUrl = "http://www.osushuttles.com/Services/JSONPRelay.svc/GetStops"; //"http://www.osushuttles.com/Services/JSONPRelay.svc/GetRoutesForMapWithSchedule";
-    private static final String shuttleUrl = "http://www.osushuttles.com/Services/JSONPRelay.svc/GetMapVehiclePoints"; //"http://portal.campusops.oregonstate.edu/files/shuttle/GetMapVehiclePoints.txt";
-    private static final String etaUrl = "";
+    private static final String stopUrl = "http://www.osushuttles.com/Services/JSONPRelay.svc/GetStops";
+    private static final String shuttleUrl = "http://www.osushuttles.com/Services/JSONPRelay.svc/GetMapVehiclePoints";
 
     private static final int NORTH_ROUTE_ID = 7;
     private static final int WEST_ROUTE_ID = 9;
     private static final int EAST_ROUTE_ID = 8;
 
 
-    private HashMap<Integer, Stop> northMap;
+    private HashMap<Integer, Stop> northMap = new HashMap<Integer, Stop>();
     private HashMap<Integer, Stop> westMap = new HashMap<Integer, Stop>();
     private HashMap<Integer, Stop> eastMap = new HashMap<Integer, Stop>();
 
-
-
+    //Interface to handle callback of 'network request' in MapsActivity
     private OnInitialRequestComplete listener;
-
-
     public interface OnInitialRequestComplete{
         void onPostInitialRequest(boolean success);
     }
 
     public InitialNetworkRequestor(){
         sMapState = MapState.get();
-        northMap = new HashMap<Integer, Stop>();
-
         listener = (OnInitialRequestComplete)sMapState.getCurrentContext();
     }
 
     @Override
     protected Boolean doInBackground(Void... params) {
         //False return at any point indicates a network or JSON error
-        if(!isNetworkAvailable()){
-            return false;
-        }
+        if(!isNetworkAvailable()) return false;
 
+        //Get stops information
         JSONGetter stopGetter = new JSONGetter();
-
         JSONArray jStopsArray = stopGetter.getJSONFromUrl(stopUrl);
-        if (jStopsArray == null){
-            return false;
-        }
+        if (jStopsArray == null) return false;
 
+        //Get shuttle locations
         JSONGetter shuttleGetter = new JSONGetter();
-
         JSONArray jShuttlesArray = shuttleGetter.getJSONFromUrl(shuttleUrl);
-        if (jShuttlesArray == null){
-            return false;
-        }
+        if (jShuttlesArray == null) return false;
 
-        /*
-        JSONArray jEtaArray = getter.getJSONFromUrl(etaUrl);
-
-        if (jEtaArray == null){
-            return false;
-        }
-        */
-
-        boolean jsonSuccess = parseJSON(jStopsArray, jShuttlesArray);
-
-        return jsonSuccess;
+        return parseJSON(jStopsArray, jShuttlesArray);
     }
 
     @Override
     protected void onPostExecute(Boolean success) {
-        Log.d(TAG, "Finished request!");
+        //Callback in MapsActivity
         listener.onPostInitialRequest(success);
     }
 
-
     //TODO: reduce number of string conversions here and JSONGetter
-    private boolean parseJSON(JSONArray jStopsArray, JSONArray jShuttlesArray/*, JSONArray jEtaArray*/){
+    private boolean parseJSON(JSONArray jStopsArray, JSONArray jShuttlesArray){
         ArrayList<Stop> stops = new ArrayList<Stop>();
-        ArrayList<String> stopNames = new ArrayList<String>();
         ArrayList<LatLng> seenLatLngs = new ArrayList<LatLng>();
 
         HashMap<Integer, Stop> stopsMap = new HashMap<Integer, Stop>();
 
-
-
         try {
             for (int i = 0, len = jStopsArray.length(); i < len; i++){
-                JSONObject stopJson;
+                //Get JSONObject
+                JSONObject stopJson = jStopsArray.getJSONObject(i);
 
-                stopJson = jStopsArray.getJSONObject(i);
+                //Get stop info
                 LatLng latLng = new LatLng(stopJson.getDouble("Latitude"), stopJson.getDouble("Longitude"));
                 int routeId = stopJson.getInt("RouteID");
                 int stopId = stopJson.getInt("RouteStopID");
                 String stopName = stopJson.getString("Description");
-                int nameLength = stopName.length();
-                int stopNum;
-                Integer firstDigit;
 
-                if(stopName.charAt(nameLength-1) != ' ') {
-                    firstDigit = Character.getNumericValue(stopName.charAt(nameLength - 1));
-                }else{
-                    firstDigit = Character.getNumericValue(stopName.charAt(nameLength - 2));
-                }
+                int stopNum = 0;
+                // JSON returns duplicate stop LatLngs for each Route they are on.
+                if (!seenLatLngs.contains(latLng)){ //New stop object must be made.
 
-                if (firstDigit == 0) {
-                    stopNum = 10;
-                } else {
-                    stopNum = firstDigit;
-                }
-
-                if (stopId == 77){  //Special edge case. Bad JSON
-                    stopNum = 8;
-                }
-
-                if(!seenLatLngs.contains(latLng)){
-                    //New stop object must be made.
                     Stop stop = new Stop(latLng, stopName, routeId, stopId, new int[]{-1, -1, -1, -1});
-
                     addStopToRouteMap((Integer)stopNum, routeId, stop);
                     stopsMap.put(stopId, stop);
                     seenLatLngs.add(latLng);
                     stops.add(stop);
-                }else{
-                    //Find existing stop object and add (routeId, stopId) to it
 
-                    for(int j = 0; j < stops.size(); j++){
-                        Stop existingStop = stops.get(j);
-                        if(existingStop.areLatLngEqual(latLng)){
+                }else{ //Find existing stop object and add (routeId, stopId) to it
+                    for(Stop existingStop : stops){
+                        if(existingStop.areLatLngEqual(latLng)){ //Found matching existing stop
+
                             existingStop.addServicedRoute(routeId);
                             existingStop.addStopId(stopId);
                             stopsMap.put(stopId, existingStop);
@@ -168,34 +124,25 @@ public class InitialNetworkRequestor extends AsyncTask<Void, Void, Boolean> {
             return false;
         }
 
-
-
-
         sMapState.setStopsMap(stopsMap);
 
+        //Parse shuttle JSON
         ArrayList<Shuttle> shuttles = sMapState.getShuttles();
         Gson gson = new Gson();
         boolean[] onlineStates = {false,false,false,false};
         if(jShuttlesArray != null) {
             for (int i = 0; i < jShuttlesArray.length(); i++) {
-
                 String json = null;
-                JSONObject rawJson = null;
-                try {
-                    rawJson = jShuttlesArray.getJSONObject(i);
-                    json = rawJson.toString();
 
-                    Log.d(TAG, "~!~!" + rawJson.getInt("VehicleID"));
-                    //rawJson.
+                try {
+                    json = jShuttlesArray.getJSONObject(i).toString();
                 } catch (JSONException e) {
                     e.printStackTrace();
                     return false;
                 }
-                Shuttle shuttle = gson.fromJson(json, Shuttle.class);
 
+                Shuttle shuttle = gson.fromJson(json, Shuttle.class); //Extract shuttleObject from JSON
 
-
-                Log.d(TAG, "!@ " + shuttle.getName() + " / " + shuttle.getLatLng());
                 shuttle.setOnline(true);
 
                 switch (shuttle.getRouteID()) {
@@ -203,22 +150,24 @@ public class InitialNetworkRequestor extends AsyncTask<Void, Void, Boolean> {
                         sMapState.setShuttle(0, shuttle);
                         onlineStates[0] = true;
                         break;
-                    case WEST_ROUTE_ID:  //Double route
-                        Log.d(TAG, "onlineSta " + shuttle.getVehicleId());
+                    case WEST_ROUTE_ID:  //Double WEST route
+                        //If index 1 has vehicleId
                         if (shuttles.get(1).getVehicleId() == shuttle.getVehicleId()) {
-                            Log.d(TAG, "onlineSta  1 ");
                             sMapState.setShuttle(1, shuttle);
                             onlineStates[1] = true;
-                        } else if (shuttles.get(2).getVehicleId() == shuttle.getVehicleId()) {
-                            Log.d(TAG, "onlineSta  2");
+                        }
+                        //If index 2 has vehicleId
+                        else if (shuttles.get(2).getVehicleId() == shuttle.getVehicleId()) {
                             sMapState.setShuttle(2, shuttle);
                             onlineStates[2] = true;
-                        } else if (!shuttles.get(1).isOnline()) {
-                            Log.d(TAG, "onlineSta  3");
+                        }
+                        //If index 1 is offline, set anew
+                        else if (!shuttles.get(1).isOnline()) {
                             sMapState.setShuttle(1, shuttle);
                             onlineStates[1] = true;
-                        } else if (!shuttles.get(2).isOnline()) {
-                            Log.d(TAG, "onlineSta  4");
+                        }
+                        //If index 2 is offline, set anew
+                        else if (!shuttles.get(2).isOnline()) {
                             sMapState.setShuttle(2, shuttle);
                             onlineStates[2] = true;
                         }
@@ -230,77 +179,53 @@ public class InitialNetworkRequestor extends AsyncTask<Void, Void, Boolean> {
                 }
             }
         }
-        for (int i = 0; i < 4; i++) {
-            Log.d(TAG, "onlinestates : " + onlineStates[i]);
-            Shuttle shuttle = shuttles.get(i);
-            if (!onlineStates[i]){
-                shuttle.setOnline(false);
-            }
+        //Sets online/offline status for each shuttleObj, based on whether it was just set anew
+        for (Shuttle shuttle : shuttles) {
+            int i = shuttles.indexOf(shuttle);
+            if (!onlineStates[i]) shuttle.setOnline(false);
             else shuttle.setOnline(true);
         }
 
-
-//        //Test Times
-//        Random random = new Random();
-//        int maxNum = 2;
-//
-//        for (int i = 0, len = stops.size(); i < len; i++) {
-//            Stop stop = stops.get(i);
-//            stop.setShuttleETAs(new int[]{random.nextInt(maxNum), random.nextInt(maxNum), random.nextInt(maxNum), random.nextInt(maxNum)});
-//        }
         sMapState.setStops(stops);
         sMapState.setNorthMap(northMap);
         sMapState.setEastMap(eastMap);
         sMapState.setWestMap(westMap);
-        Log.d(TAG, "!@ sizes... " + northMap.size() + " , " + eastMap.size() + " , " + westMap.size() + "::" + sMapState.getNorthMap().get(3));
 
-        Log.d(TAG, "~! setStopNames:");
+        //Now that stopObjs are set. Initiate function to set their names based on res>>raw>>stop_names.jpg
         setStopNames();
-
         return true;
     }
 
     private void setStopNames(){
         try {
+            //File I/O variables
             FileInputStream fileInputStream = (sMapState.getCurrentContext().getResources().openRawResourceFd(R.raw.stop_names)).createInputStream();
             InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream);
             BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-            StringBuilder sb = new StringBuilder();
+
             String line;
             ArrayList<Stop> stops = sMapState.getStops();
+
             while ((line = bufferedReader.readLine()) != null){
-                String[] words = line.split("_");
+                String[] words = line.split("_"); //File lines are: Lat, Lng, StopName. Separated by '_'
 
-                for (int i = 0; i < stops.size(); i++) {
-                    Stop stop = stops.get(i);
-
+                for (Stop stop : stops) {   //Find stopObj that matches LatLng
                     if(stop.getLatLng().latitude == Double.parseDouble(words[0]) && stop.getLatLng().longitude == Double.parseDouble(words[1])){
-                        Log.d(TAG, "~! NEW NAME for " + stop.getName() + ". Goes to --> " + words[2]);
                         stop.setName(words[2]);
-
                         break;
                     }
                 }
             }
-            String finalString = sb.toString();
-            Log.d(TAG, "~! finalString : " + finalString);
-
-
         } catch (Exception e) {
             e.printStackTrace();
-            Log.d(TAG, "~! finalString error");
+            Log.e(TAG, "File input parse error");
         }
-
     }
 
+    //Adds new stopNum to previously made stopObj
     private void addStopToRouteMap(Integer stopNum, int routeId, Stop stop){
-        if(stopNum == 1){
-            Log.d(TAG, "!@ YAH " + stop.getName());
-        }
-
         switch (routeId){
             case NORTH_ROUTE_ID:
-                Log.d(TAG, "Stopnum add to north: " + stopNum);
                 northMap.put(stopNum, stop);
                 break;
             case WEST_ROUTE_ID:
@@ -310,9 +235,8 @@ public class InitialNetworkRequestor extends AsyncTask<Void, Void, Boolean> {
                 eastMap.put(stopNum, stop);
                 break;
         }
-
-        Log.d(TAG, "!@ sizes... " + northMap.size() + " , " + eastMap.size() + " , " + westMap.size());
     }
+
     public boolean isNetworkAvailable(){
         ConnectivityManager cm = (ConnectivityManager)sMapState.getCurrentContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         return(cm.getActiveNetworkInfo() != null);
