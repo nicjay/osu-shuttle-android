@@ -34,8 +34,15 @@
     <color name="transparent_shuttle_purple">#80aa66cd</color>
     <color name="transparent_shuttle_orange">#80e0aa0f</color>
 
-    <color name="favorite_stop_name_background">#D9B6BCC4</color>
+    <color name="favorite_stop_name_background">#D9FF8441</color> <!-- 8Cff6612 -->
     <color name="favorite_stop_white">#BFf5f2ed</color>
 
     <color name="favorite_row_selected">#d9373737</color>
+
+    <color name="favorite_name_gradient0">#F2D78B5F</color>
+    <color name="favorite_name_gradient1">#F2DC9C77</color>
+    <color name="favorite_name_gradient2">#F2D58253</color>
+
+
+
 </resources>

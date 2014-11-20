@@ -27,6 +27,7 @@ public class Stop {
 
     public Stop(LatLng latLng, String name, int routeId, int stopId, int[] shuttleETAs){
         mLatLng = latLng;
+        mName = name;
         mShuttleETAs = shuttleETAs;
         mServicedRoutes = new ArrayList<Integer>();
         mServicedRoutes.add(routeId);

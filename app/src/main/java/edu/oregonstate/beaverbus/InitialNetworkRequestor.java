@@ -95,15 +95,17 @@ public class InitialNetworkRequestor extends AsyncTask<Void, Void, Boolean> {
                 int stopId = stopJson.getInt("RouteStopID");
                 String stopName = stopJson.getString("Description");
 
-                int stopNum = 0;
                 // JSON returns duplicate stop LatLngs for each Route they are on.
                 if (!seenLatLngs.contains(latLng)){ //New stop object must be made.
 
                     Stop stop = new Stop(latLng, stopName, routeId, stopId, new int[]{-1, -1, -1, -1});
-                    addStopToRouteMap((Integer)stopNum, routeId, stop);
+
                     stopsMap.put(stopId, stop);
                     seenLatLngs.add(latLng);
                     stops.add(stop);
+
+                    int stopNum = stops.indexOf(stop);
+                    addStopToRouteMap(stopNum, routeId, stop);
 
                 }else{ //Find existing stop object and add (routeId, stopId) to it
                     for(Stop existingStop : stops){
@@ -112,7 +114,10 @@ public class InitialNetworkRequestor extends AsyncTask<Void, Void, Boolean> {
                             existingStop.addServicedRoute(routeId);
                             existingStop.addStopId(stopId);
                             stopsMap.put(stopId, existingStop);
-                            addStopToRouteMap((Integer)stopNum, routeId, existingStop);
+
+
+                            int stopNum = stops.indexOf(existingStop);
+                            addStopToRouteMap(stopNum, routeId, existingStop);
                             break;
                         }
                     }
@@ -191,6 +196,8 @@ public class InitialNetworkRequestor extends AsyncTask<Void, Void, Boolean> {
         sMapState.setEastMap(eastMap);
         sMapState.setWestMap(westMap);
 
+        Log.d(TAG, "!@# sizeN: " + northMap.size() + " sizeE" + eastMap.size() + " size W: " + westMap.size());
+
         //Now that stopObjs are set. Initiate function to set their names based on res>>raw>>stop_names.jpg
         setStopNames();
         return true;
@@ -206,16 +213,31 @@ public class InitialNetworkRequestor extends AsyncTask<Void, Void, Boolean> {
             String line;
             ArrayList<Stop> stops = sMapState.getStops();
 
+            int[] setStopNameBoolean = new int[stops.size()];
+            for (int i = 0; i < setStopNameBoolean.length; i++) {
+                setStopNameBoolean[i] = 0;
+            }
+
             while ((line = bufferedReader.readLine()) != null){
                 String[] words = line.split("_"); //File lines are: Lat, Lng, StopName. Separated by '_'
+
 
                 for (Stop stop : stops) {   //Find stopObj that matches LatLng
                     if(stop.getLatLng().latitude == Double.parseDouble(words[0]) && stop.getLatLng().longitude == Double.parseDouble(words[1])){
                         stop.setName(words[2]);
+                        setStopNameBoolean[stops.indexOf(stop)] = 1;
                         break;
                     }
                 }
             }
+            int count = 0;
+            for (int i = 0; i < setStopNameBoolean.length; i++) {
+                if(setStopNameBoolean[i] == 0){
+                    count++;
+                }
+            }
+            if(count > 0) Log.d(TAG, "ERROR: " + count + " stops not set");
+
         } catch (Exception e) {
             e.printStackTrace();
             Log.e(TAG, "File input parse error");
@@ -226,13 +248,14 @@ public class InitialNetworkRequestor extends AsyncTask<Void, Void, Boolean> {
     private void addStopToRouteMap(Integer stopNum, int routeId, Stop stop){
         switch (routeId){
             case NORTH_ROUTE_ID:
-                northMap.put(stopNum, stop);
+
+                northMap.put(northMap.size(), stop);
                 break;
             case WEST_ROUTE_ID:
-                westMap.put(stopNum, stop);
+                westMap.put(westMap.size(), stop);
                 break;
             case EAST_ROUTE_ID:
-                eastMap.put(stopNum, stop);
+                eastMap.put(eastMap.size(), stop);
                 break;
         }
     }

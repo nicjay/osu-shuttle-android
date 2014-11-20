@@ -1,5 +1,6 @@
 package edu.oregonstate.beaverbus;
 
+import android.app.Activity;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.View;
@@ -19,10 +20,13 @@ public class DrawerItemClickListener implements ExpandableListView.OnGroupClickL
     private DrawerLayout mDrawerLayout;
     private ExpandableListView mDrawerList;
 
+    private MapsActivity activity;
+
     private static final int NORTH = 6, WEST = 7, EAST = 8; //Indices for expandable list headers
 
-    public DrawerItemClickListener(DrawerLayout layout, ExpandableListView listView) {
+    public DrawerItemClickListener(MapsActivity activity, DrawerLayout layout, ExpandableListView listView) {
         super();
+        this.activity = activity;
         sMapState = MapState.get();
         mDrawerLayout = layout;
         mDrawerList = listView;
@@ -48,6 +52,8 @@ public class DrawerItemClickListener implements ExpandableListView.OnGroupClickL
             //Jump to shuttle location, hide Nav drawer
             sMapState.animateMap(drawerItems.get(groupPosition).getShuttle().getLatLng());
 
+            activity.animateSelectedStopTitle(drawerItems.get(groupPosition).getShuttle().getName(), true, false, null);
+
             if (sMapState.getSelectedStopMarker() != null) { //If a stop is currently selected
                 if (!sMapState.isStopsVisible()){
                     sMapState.getSelectedStopMarker().setVisible(false);
@@ -55,6 +61,9 @@ public class DrawerItemClickListener implements ExpandableListView.OnGroupClickL
                 sMapState.getSelectedStopMarker().hideInfoWindow();
                 sMapState.setSelectedStopMarker(null, false);
             }
+
+
+
             mDrawerLayout.closeDrawer(mDrawerList);
         }
 
@@ -68,13 +77,13 @@ public class DrawerItemClickListener implements ExpandableListView.OnGroupClickL
         Marker marker;
         switch (groupPosition) {    //Switch to find which stopsIndex map to search in for childPosition
             case NORTH:
-                marker = sMapState.getNorthMap().get(childPosition+1).getMarker();
+                marker = sMapState.getNorthMap().get(childPosition).getMarker();
                 break;
             case WEST:
-                marker = sMapState.getWestMap().get(childPosition+1).getMarker();
+                marker = sMapState.getWestMap().get(childPosition).getMarker();
                 break;
             case EAST:
-                marker = sMapState.getEastMap().get(childPosition+1).getMarker();
+                marker = sMapState.getEastMap().get(childPosition).getMarker();
                 break;
             default:
                 marker = null;
@@ -82,6 +91,7 @@ public class DrawerItemClickListener implements ExpandableListView.OnGroupClickL
         if(marker != null) {
             sMapState.animateMap(marker.getPosition());
             sMapState.setSelectedStopMarker(marker, true);
+            activity.animateSelectedStopTitle(marker.getTitle(), true, false, null);
             marker.setVisible(true);
             marker.showInfoWindow();
         }

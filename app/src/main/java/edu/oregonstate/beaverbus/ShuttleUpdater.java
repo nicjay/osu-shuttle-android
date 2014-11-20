@@ -205,6 +205,9 @@ public class ShuttleUpdater {
                        int routeId = jsonObj.getInt("RouteID");
                        Stop stop = stopsMap.get(stopId);
 
+
+
+
                        if (stop != null) {
                            JSONArray estimates = jsonObj.getJSONArray("VehicleEstimates");
                            int estimate0[] = {-1, -1};
@@ -260,6 +263,7 @@ public class ShuttleUpdater {
                } catch (JSONException e) {
                    e.printStackTrace();
                }
+
            }
        }
     }

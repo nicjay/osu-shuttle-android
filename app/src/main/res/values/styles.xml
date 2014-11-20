@@ -6,4 +6,14 @@
         <!-- Customize your theme here. -->
     </style>
 
+    <style name="CustomDialog" parent="@android:style/Theme.Dialog">
+        <item name="android:background">@color/OSU_black</item>
+        <item name="android:textColor">@color/OSU_white</item>
+        <item name="android:progressBarStyle">@android:style/Widget.DeviceDefault.ProgressBar.Large</item>
+    </style>
+
+    <style name="BusInfoDialogTheme" parent="@android:style/Theme.Dialog">
+        <item name="android:textColor">@color/OSU_orange</item>
+    </style>
+
 </resources>

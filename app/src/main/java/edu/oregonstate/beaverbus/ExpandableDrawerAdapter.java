@@ -129,13 +129,14 @@ public class ExpandableDrawerAdapter extends BaseExpandableListAdapter {
         TextView childTitle = (TextView)convertView.findViewById(R.id.drawer_list_item_title); //Title
         switch (groupPosition){ //TODO: add in new stopNames once finalized
             case NORTH:
-                childTitle.setText("N-stop " + (childPosition+1));
+                //childTitle.setText("N-stop " + (childPosition+1));
+                childTitle.setText(sMapState.getNorthMap().get(childPosition).getName());
                 break;
             case WEST:
-                childTitle.setText("W-stop " + (childPosition+1));
+                childTitle.setText(sMapState.getWestMap().get(childPosition).getName());
                 break;
             case EAST:
-                childTitle.setText("E-stop " + (childPosition+1));
+                childTitle.setText(sMapState.getEastMap().get(childPosition).getName());
                 break;
             default:
                 childTitle.setText("DEFAULT");

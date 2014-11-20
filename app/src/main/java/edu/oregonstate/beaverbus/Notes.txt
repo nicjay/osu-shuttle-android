@@ -3,3 +3,5 @@ Preferred ImageSizes
           M           48x48
           XH          96x96
           XXH         144x144
+
+

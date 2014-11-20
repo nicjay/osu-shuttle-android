@@ -188,14 +188,14 @@ public class MapState {
         Log.d(TAG_DB, "setStopMarkers");
         for (Stop stop : mStops) {
             //TODO: fix stop.getName() in this next line. Only uses first stored stopName
-            stop.setMarker(mMap.addMarker(new MarkerOptions().position(stop.getLatLng()).infoWindowAnchor(.5f, .25f).title(stop.getName()).visible(mStopsVisible).alpha(0.7f).anchor(.5f, .5f).icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_dot_large_border))));
+            stop.setMarker(mMap.addMarker(new MarkerOptions().position(stop.getLatLng()).infoWindowAnchor(.5f, .25f).title(stop.getName()).visible(mStopsVisible).alpha(0.7f).anchor(.5f, .5f).icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_dot_plus))));
         }
     }
 
     public void toggleStopMarkerBorders(){
         BitmapDescriptor newIcon;
-        if(stopMarkersBordered) newIcon = BitmapDescriptorFactory.fromResource(R.drawable.marker_dot_large);
-        else newIcon = BitmapDescriptorFactory.fromResource(R.drawable.marker_dot_large_border);
+        if(stopMarkersBordered) newIcon = BitmapDescriptorFactory.fromResource(R.drawable.marker_dot_empty);
+        else newIcon = BitmapDescriptorFactory.fromResource(R.drawable.marker_dot_plus);
         stopMarkersBordered = !stopMarkersBordered;
 
         for(Stop stop : mStops){
@@ -294,8 +294,12 @@ public class MapState {
 
 
     public void setSelectedStopMarker(Marker selectedStopMarker, boolean showInfoWindow) {
+        if(mSelectedStopMarker != null && !mSelectedStopMarker.isFlat()) mSelectedStopMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.marker_dot_plus));
+        if(selectedStopMarker!= null && showInfoWindow)selectedStopMarker.setIcon((BitmapDescriptorFactory.fromResource(R.drawable.marker_dot_empty)));
+
         showSelectedInfoWindow = showInfoWindow;
         if (selectedStopMarker != null) {
+
             for(Stop stop: mStops){
                 if(stop.getMarker().equals(selectedStopMarker)){
                     mSelectedStopMarkerTimes = stop.getShuttleETAs();

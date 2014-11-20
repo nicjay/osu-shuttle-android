@@ -51,13 +51,7 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
     private final LatLng MAP_CENTER = new LatLng(44.563731, -123.279534);
     private final float MAP_ZOOM_LEVEL = 14.5f;
 
-    //Favorites view variables
-    private static ArrayList<FavoriteStopRow> favoriteStopRows;
-    private static LinearLayout favoritesView;
-    private final int FAV_ICON_DISABLED = 0;
-    private final int FAV_ICON_EMPTY = 1;
-    private final int FAV_ICON_FILLED = 2;
-    private int favIconState = FAV_ICON_DISABLED;
+
 
     //Navigation Drawer variables
     private DrawerLayout mDrawerLayout;
@@ -79,8 +73,9 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
     private static TextView selectedStopTitle;
 
     //Options Menu
-    private static Menu menuGlobal;
+    public static Menu menuGlobal;
 
+    private FavoriteManager favoriteManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,7 +88,9 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
         errorLayout = (LinearLayout) findViewById(R.id.error_view);
         selectedStopTitle = ((TextView)findViewById(R.id.selected_stop));
         selectedStopTitle.setVisibility(View.INVISIBLE);
-        favoritesView = (LinearLayout)findViewById(R.id.favorites_view);
+
+        favoriteManager = new FavoriteManager(this, getApplicationContext());
+
 
         //Get singleton, set context
         mMapState = MapState.get();
@@ -101,10 +98,13 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
 
         //Initialization
         setUpMapIfNeeded();
-        favoriteStopRows = new ArrayList<FavoriteStopRow>();
 
         //Show Loading Dialog
-        sProgressDialog = ProgressDialog.show(this, "", "Loading...", true, false);
+        sProgressDialog = new ProgressDialog(this, R.style.CustomDialog);
+        sProgressDialog.setMessage("Loading...");
+        sProgressDialog.show();
+        //sProgressDialog = ProgressDialog.show(this, "", "Loading...", true, false);
+        //sProgressDialog.setProgressStyle(R.style.CustomDialog);
 
         //Start initial HTTP request
         initialNetworkRequestor = new InitialNetworkRequestor();
@@ -168,137 +168,6 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
         mMapState.setMap(null);
     }
 
-    public void addFavorite(){
-        if (mMapState.getSelectedStopMarker() != null){ //Stop must be selected
-            ArrayList<Stop> mStops = mMapState.getStops();
-            LatLng newFavCoords = mMapState.getSelectedStopMarker().getPosition();
-
-            outerloop:
-            for (Stop stop : mStops) {
-                if (stop.getLatLng().equals(newFavCoords)) { //Found stopObj
-                    for (int j = 0; j < favoriteStopRows.size(); j++){
-                        if (favoriteStopRows.get(j).getFavStopObj().equals(stop)){ //If stopObj is already in favorites, remove
-                            favoritesView.removeView(favoriteStopRows.get(j).getFavRow());
-                            favoriteStopRows.remove(j);
-                            setFavIcon(FAV_ICON_EMPTY);
-                            saveFavoriteStopRows();
-                            break outerloop;
-                        }
-                    }
-                    if (favoriteStopRows.size() >= 3){
-                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.max_favorites), Toast.LENGTH_SHORT).show();
-                    } else {
-                        setFavIcon(FAV_ICON_FILLED);
-                        addFavoriteRow(stop, true);
-                    }
-                    break;
-                }
-            }
-        }
-    }
-
-    //Adds new favorite row view for given stopObj. Called on add new favorite, and to load saved favorites.
-    private void addFavoriteRow(Stop newFavoriteStop, boolean save){
-        final Stop newStop = newFavoriteStop;
-
-        FavoriteStopRow newFavoriteStopRow = new FavoriteStopRow();
-        View newFavRow = getLayoutInflater().inflate(R.layout.favorite_row, null, false);
-        LinearLayout timesView = (LinearLayout)newFavRow.findViewById(R.id.favorite_times_layout);
-
-        TextView favStopName = (TextView)newFavRow.findViewById(R.id.favorite_stop_name);
-        favStopName.setText(newStop.getName());
-
-        newFavRow.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onMapMarkerClick(newStop.getMarker());
-                //newFavoriteStop.getMarker().showInfoWindow();
-            }
-        });
-        newFavoriteStopRow.setFavRow(newFavRow);
-        newFavoriteStopRow.setFavStopName(favStopName);
-        newFavoriteStopRow.setFavStopObj(newStop);
-
-        if (favoriteStopRows.size() == 0) { //If first row, set no margin on bottom. Default bottom-margin in xml of rowView
-            LinearLayout.LayoutParams nameParams = (LinearLayout.LayoutParams) favStopName.getLayoutParams();
-            nameParams.setMargins(0, 0, 0, 0);
-            favStopName.setLayoutParams(nameParams);
-
-            LinearLayout.LayoutParams timeParams = (LinearLayout.LayoutParams) timesView.getLayoutParams();
-            timeParams.setMargins(0, 0, 0, 0);
-            timesView.setLayoutParams(timeParams);
-        }
-
-        for (int i = 0; i < 4; i++){ //For each ETA in shuttleETAs
-            if (newStop.getShuttleETA(i) == -1) continue;
-
-            View newTime = getLayoutInflater().inflate(R.layout.favorite_row_eta, null, false);
-            View stopSquare = (View)newTime.findViewById(R.id.favorite_info_stop_square);
-            TextView stopETA = (TextView)newTime.findViewById(R.id.favorite_info_stop_eta);
-
-            stopETA.setText(Integer.toString(newStop.getShuttleETA(i)));
-
-            int etaColor;
-            switch (i){
-                case 0:
-                    etaColor = getResources().getColor(R.color.shuttle_green);
-                    break;
-                case 1:
-                    etaColor = getResources().getColor(R.color.shuttle_orange);
-                    break;
-                case 2:
-                    etaColor = getResources().getColor(R.color.shuttle_orange);
-                    break;
-                case 3:
-                    etaColor = getResources().getColor(R.color.shuttle_purple);
-                    break;
-                default:
-                    etaColor = getResources().getColor(R.color.OSU_black);
-
-            }
-            stopSquare.setBackgroundColor(etaColor);
-            timesView.addView(newTime);
-
-            //Set textView of ETA in favObj for updating
-            newFavoriteStopRow.setFavStopETA(stopETA, i);
-        }
-        favoritesView.addView(newFavRow);
-        favoriteStopRows.add(newFavoriteStopRow);
-
-        if(save) saveFavoriteStopRows(); //Save on newFavorite click. However, when loading initially, save after all have been loaded
-    }
-
-    private void saveFavoriteStopRows(){
-        SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
-        SharedPreferences.Editor prefsEditor = sharedPreferences.edit();
-
-        String savedString = "";
-        for(int i = 0; i < favoriteStopRows.size(); i++){
-            if(i != 0) savedString = savedString.concat("_");
-            FavoriteStopRow favoriteStopRow = favoriteStopRows.get(i);
-            savedString = savedString.concat(favoriteStopRow.getFavStopObj().getName());
-        }
-        prefsEditor.putString("BeaverBusFavorites", savedString);
-        prefsEditor.commit();
-    }
-
-    private void loadFavoriteStopRows(){
-        SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
-        String favorites = sharedPreferences.getString("BeaverBusFavorites", "");
-        String[] favoriteStopNames = favorites.split("_");
-
-        ArrayList<Stop> stops = mMapState.getStops();
-        for (int i = 0; i < favoriteStopNames.length; i++){ //For each favorite
-            for (int j = 0; j < stops.size(); j++){
-                if (favoriteStopNames[i].equals(stops.get(j).getName())){ //Find stopObj
-                    addFavoriteRow(stops.get(j), false);    //Add saved favorite
-                    break;
-                }
-            }
-        }
-        if(favoriteStopNames.length > 0) saveFavoriteStopRows();
-    }
-
     /*
     METHOD - setUpMapIfNeeded()
        If map does not already exist in mapState...
@@ -340,15 +209,15 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
             mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
                 @Override
                 public void onMapClick(LatLng latLng) {
+                    animateSelectedStopTitle(null, false, false, false);
                     if (mMapState.getSelectedStopMarker() != null){
-                        selectedStopTitle.setVisibility(View.INVISIBLE);
-                        animateSelectedStopTitle(null, false, false);
+
                         if (!mMapState.isStopsVisible() && mMapState.showSelectedInfoWindow) {
                             mMapState.setSelectedStopMarkerVisibility(false);
                         }
                         mMapState.setSelectedStopMarker(null, false);
                     }
-                    setFavIcon(FAV_ICON_DISABLED);
+                    favoriteManager.setFavIcon(favoriteManager.FAV_ICON_DISABLED);
                 }
             });
 
@@ -369,7 +238,9 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
         }
     }
 
-    private boolean onMapMarkerClick(Marker marker){
+    public boolean onMapMarkerClick(Marker marker){
+        Log.d(TAG, "!@# latlong  : " + marker.getPosition());
+
         if (mMapState.getSelectedStopMarker() != null && !mMapState.isStopsVisible() && mMapState.showSelectedInfoWindow){
             mMapState.setSelectedStopMarkerVisibility(false);
         }
@@ -377,28 +248,19 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
         marker.setVisible(true);
 
         if (mMapState.getSelectedStopMarker() == null) {
-            animateSelectedStopTitle(marker.getTitle(), true, true);
+            animateSelectedStopTitle(marker.getTitle(), true, true, marker.isFlat());
         } else {
-            animateSelectedStopTitle(marker.getTitle(), true, false);
+            animateSelectedStopTitle(marker.getTitle(), true, false, marker.isFlat());
         }
 
-        boolean favorite = false;
+        favoriteManager.onMapClick(marker);
 
         //If stop
         if (!marker.isFlat()) {
-            for (int i = 0; i < favoriteStopRows.size(); i++){
-                if(favoriteStopRows.get(i).getFavStopObj().getMarker().equals(marker)){
-                    favorite = true;
-                    break;
-                }
-            }
-            if(favorite) setFavIcon(FAV_ICON_FILLED);
-            else setFavIcon(FAV_ICON_EMPTY);
 
-            marker.showInfoWindow();
             mMapState.setSelectedStopMarker(marker, true);
+            marker.showInfoWindow();
         } else {
-            setFavIcon(FAV_ICON_DISABLED);
             mMapState.animateMap(marker.getPosition());
             mMapState.setSelectedStopMarker(marker, false);
         }
@@ -406,11 +268,11 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
         return true;
     }
 
-    private void animateSelectedStopTitle(final String markerTitle, final Boolean slideNewTitle, Boolean fromHidden){
+    public void animateSelectedStopTitle(final String markerTitle, final Boolean slideNewTitle, Boolean fromHidden, Boolean isShuttle){
         final Animation fadeInAnim = AnimationUtils.makeInAnimation(getApplicationContext(), true);
         fadeInAnim.setDuration(400);
 
-        if (fromHidden){
+        if (selectedStopTitle.getVisibility() == View.INVISIBLE){
             selectedStopTitle.setVisibility(View.VISIBLE);
             selectedStopTitle.setText(markerTitle);
             selectedStopTitle.startAnimation(fadeInAnim);
@@ -428,6 +290,8 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
                         selectedStopTitle.setVisibility(View.VISIBLE);
                         selectedStopTitle.setText(markerTitle);
                         selectedStopTitle.startAnimation(fadeInAnim);
+                    }else{
+                        selectedStopTitle.setVisibility(View.INVISIBLE);
                     }
                 }
 
@@ -454,8 +318,8 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
             mDrawerList = (ExpandableListView) this.findViewById(R.id.left_drawer);
 
             //Set onClickListeners
-            mDrawerList.setOnGroupClickListener(new DrawerItemClickListener(mDrawerLayout, mDrawerList));
-            mDrawerList.setOnChildClickListener(new DrawerItemClickListener(mDrawerLayout, mDrawerList));
+            mDrawerList.setOnGroupClickListener(new DrawerItemClickListener(this, mDrawerLayout, mDrawerList));
+            mDrawerList.setOnChildClickListener(new DrawerItemClickListener(this, mDrawerLayout, mDrawerList));
 
             //NavDrawer Initialization
             mAdapter = new ExpandableDrawerAdapter(this, mMapState.getDrawerItems());
@@ -487,7 +351,6 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
         Log.d(TAG, "..! ON POST INITIAL requEST");
         if (success){
             Log.d(TAG, "onPostInitialRequest success");
-            sProgressDialog.dismiss();
             mMapState.setStopsMarkers();
 
             shuttleUpdater.startShuttleUpdater();
@@ -508,7 +371,7 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
         Log.d(TAG, "..! ON POST SHUTTLE requEST");
         if(success){
             Log.d(TAG, "onPostShuttleRequest success");
-            if(favoritesView.getChildCount() == 0) loadFavoriteStopRows();
+            favoriteManager.initSavedFavorites();
             updateMap();
             if(errorLayout.getVisibility() == View.VISIBLE) {
                 Animation animation = AnimationUtils.makeOutAnimation(this, true);
@@ -537,7 +400,7 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
     */
     public void updateMap(){
         Log.d(TAG, "updateMap");
-        updateFavorites();
+        favoriteManager.updateFavorites();
         for (Shuttle shuttle : mMapState.getShuttles()) {
             if (!shuttle.isOnline()) {
                 shuttle.getMarker().setVisible(false);
@@ -570,23 +433,7 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
         sProgressDialog.dismiss();
     }
 
-    public void updateFavorites(){
-        for (int i = 0; i < favoriteStopRows.size(); i++){
-            FavoriteStopRow row = favoriteStopRows.get(i);
-            int[] shuttleETAs = row.getFavStopObj().getShuttleETAs();
 
-            TextView[] textViews = row.getFavStopETAs();
-
-            //TODO: fails sometimes. shuttleETAs[j] is null
-            for (int j = 0; j < shuttleETAs.length; j++){
-                if(shuttleETAs[j] == -1) continue;
-
-
-                Log.d(TAG, "shuttleETAs : " + j + " = " + shuttleETAs[j]);
-                textViews[j].setText(String.valueOf(shuttleETAs[j]));
-            }
-        }
-    }
 
 
     public void initNetworkFailureDialog(){
@@ -626,10 +473,7 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
                 return true;
             //TODO: create information window
             case R.id.clear_favorites:
-                favoriteStopRows.clear();
-                favoritesView.removeAllViews();
-                saveFavoriteStopRows();
-                if (mMapState.getSelectedStopMarker() != null) setFavIcon(FAV_ICON_EMPTY);
+                favoriteManager.clearFavorites();
                 return true;
             case R.id.view_info:
                 showBusInfoDialog(item);
@@ -643,29 +487,14 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
                 }
                     return true;
             case R.id.add_favorite:
-                if (favIconState == FAV_ICON_DISABLED) Toast.makeText(getApplicationContext(), getResources().getString(R.string.disabled_favorites), Toast.LENGTH_SHORT).show();
-                addFavorite();
+                favoriteManager.addFavorite();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    public void setFavIcon(int newState){
-        MenuItem item = menuGlobal.getItem(0);
-        favIconState = newState;
-        switch (newState){
-            case FAV_ICON_DISABLED:
-                item.setIcon(R.drawable.favorite_star_disabled);
-                break;
-            case FAV_ICON_EMPTY:
-                item.setIcon(R.drawable.favorite_star_empty_3);
-                break;
-            case FAV_ICON_FILLED:
-                item.setIcon(R.drawable.favorite_star_filled);
-                break;
-        }
-    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -705,7 +534,8 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
     }
 
     public void createBusInfoDialog(){
-        AlertDialog.Builder busInfoDialogBuilder = new AlertDialog.Builder(this);
+        AlertDialog.Builder busInfoDialogBuilder = new AlertDialog.Builder(this, R.style.BusInfoDialogTheme);
+
         busInfoDialogBuilder.setMessage("Hours of Operation:\n7:00 AM to 7:00 PM\n\nEstimated loop times:\n5 to 14 minutes")
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
