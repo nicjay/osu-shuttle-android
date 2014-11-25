@@ -2,6 +2,7 @@ package edu.oregonstate.beaverbus;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -31,11 +32,13 @@ public class FavoriteManager {
     private static MapState mMapState;
     private MapsActivity mActivity;
 
+    private static SelectedMarkerManager mSelectedMarkerManager;
+
     public void clearFavorites(){
         favoriteStopRows.clear();
         favoritesView.removeAllViews();
         saveFavoriteStopRows();
-        if (mMapState.getSelectedStopMarker() != null) setFavIcon(FAV_ICON_EMPTY);
+        if (mSelectedMarkerManager.getSelectedMarker() != null) setFavIcon(FAV_ICON_EMPTY);
     }
 
     public void initSavedFavorites(){
@@ -58,8 +61,9 @@ public class FavoriteManager {
         }
     }
 
-    public FavoriteManager(MapsActivity activity, Context context) {
+    public FavoriteManager(MapsActivity activity, Context context, SelectedMarkerManager selectedMarkerManager) {
         mContext = context;
+        mSelectedMarkerManager = selectedMarkerManager;
         favoritesView = (LinearLayout)activity.findViewById(R.id.favorites_view);
         favoriteStopRows = new ArrayList<FavoriteStopRow>();
         mMapState = mMapState.get();
@@ -83,9 +87,9 @@ public class FavoriteManager {
 
     public void addFavorite(){
         if (favIconState == FAV_ICON_DISABLED) Toast.makeText(mContext, mContext.getResources().getString(R.string.disabled_favorites), Toast.LENGTH_SHORT).show();
-        if (mMapState.getSelectedStopMarker() != null){ //Stop must be selected
+        if (mSelectedMarkerManager.getSelectedMarker() != null){ //Stop must be selected
             ArrayList<Stop> mStops = mMapState.getStops();
-            LatLng newFavCoords = mMapState.getSelectedStopMarker().getPosition();
+            LatLng newFavCoords = mSelectedMarkerManager.getSelectedMarker().getPosition();
 
             outerloop:
             for (Stop stop : mStops) {
@@ -115,15 +119,19 @@ public class FavoriteManager {
         final Stop newStop = newFavoriteStop;
 
         FavoriteStopRow newFavoriteStopRow = new FavoriteStopRow();
-        View newFavRow = mActivity.getLayoutInflater().inflate(R.layout.favorite_row, null, false);
+
+        LinearLayout parent = (LinearLayout)mActivity.findViewById(R.id.favorites_view);
+        View newFavRow = mActivity.getLayoutInflater().inflate(R.layout.favorite_row, parent, false);
         LinearLayout timesView = (LinearLayout)newFavRow.findViewById(R.id.favorite_times_layout);
 
         TextView favStopName = (TextView)newFavRow.findViewById(R.id.favorite_stop_name);
+        favStopName.setTypeface(Typeface.create("sans-serif-condensed", Typeface.BOLD));
         favStopName.setText(newStop.getName());
 
         newFavRow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.d(TAG, "newFavRow Click Listner called");
                 mActivity.onMapMarkerClick(newStop.getMarker());
                 //newFavoriteStop.getMarker().showInfoWindow();
             }
@@ -157,6 +165,9 @@ public class FavoriteManager {
             TextView stopETA = (TextView)newTime.findViewById(R.id.favorite_info_stop_eta);
 
             stopETA.setText(Integer.toString(newStop.getShuttleETA(i)));
+            stopETA.setTypeface(Typeface.create("sans-serif-condensed", Typeface.NORMAL));
+
+
 
             int etaColor;
             switch (i){
@@ -213,7 +224,7 @@ public class FavoriteManager {
             savedString = savedString.concat(favoriteStopRow.getFavStopObj().getName());
         }
         prefsEditor.putString("BeaverBusFavorites", savedString);
-        prefsEditor.commit();
+        prefsEditor.apply();
     }
 
     public void loadFavoriteStopRows(){

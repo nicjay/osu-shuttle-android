@@ -15,6 +15,7 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -37,10 +38,10 @@ public class InitialNetworkRequestor extends AsyncTask<Void, Void, Boolean> {
     private static final int WEST_ROUTE_ID = 9;
     private static final int EAST_ROUTE_ID = 8;
 
+    private ArrayList<Stop> northStops = new ArrayList<Stop>();
+    private ArrayList<Stop> westStops = new ArrayList<Stop>();
+    private ArrayList<Stop> eastStops = new ArrayList<Stop>();
 
-    private HashMap<Integer, Stop> northMap = new HashMap<Integer, Stop>();
-    private HashMap<Integer, Stop> westMap = new HashMap<Integer, Stop>();
-    private HashMap<Integer, Stop> eastMap = new HashMap<Integer, Stop>();
 
     //Interface to handle callback of 'network request' in MapsActivity
     private OnInitialRequestComplete listener;
@@ -104,8 +105,7 @@ public class InitialNetworkRequestor extends AsyncTask<Void, Void, Boolean> {
                     seenLatLngs.add(latLng);
                     stops.add(stop);
 
-                    int stopNum = stops.indexOf(stop);
-                    addStopToRouteMap(stopNum, routeId, stop);
+                    addStopToRouteMap(routeId, stop);
 
                 }else{ //Find existing stop object and add (routeId, stopId) to it
                     for(Stop existingStop : stops){
@@ -115,9 +115,7 @@ public class InitialNetworkRequestor extends AsyncTask<Void, Void, Boolean> {
                             existingStop.addStopId(stopId);
                             stopsMap.put(stopId, existingStop);
 
-
-                            int stopNum = stops.indexOf(existingStop);
-                            addStopToRouteMap(stopNum, routeId, existingStop);
+                            addStopToRouteMap(routeId, existingStop);
                             break;
                         }
                     }
@@ -192,11 +190,9 @@ public class InitialNetworkRequestor extends AsyncTask<Void, Void, Boolean> {
         }
 
         sMapState.setStops(stops);
-        sMapState.setNorthMap(northMap);
-        sMapState.setEastMap(eastMap);
-        sMapState.setWestMap(westMap);
-
-        Log.d(TAG, "!@# sizeN: " + northMap.size() + " sizeE" + eastMap.size() + " size W: " + westMap.size());
+        sMapState.setNorthStops(northStops);
+        sMapState.setWestStops(westStops);
+        sMapState.setEastStops(eastStops);
 
         //Now that stopObjs are set. Initiate function to set their names based on res>>raw>>stop_names.jpg
         setStopNames();
@@ -245,17 +241,16 @@ public class InitialNetworkRequestor extends AsyncTask<Void, Void, Boolean> {
     }
 
     //Adds new stopNum to previously made stopObj
-    private void addStopToRouteMap(Integer stopNum, int routeId, Stop stop){
+    private void addStopToRouteMap(int routeId, Stop stop){
         switch (routeId){
             case NORTH_ROUTE_ID:
-
-                northMap.put(northMap.size(), stop);
+                northStops.add(stop);
                 break;
             case WEST_ROUTE_ID:
-                westMap.put(westMap.size(), stop);
+                westStops.add(stop);
                 break;
             case EAST_ROUTE_ID:
-                eastMap.put(eastMap.size(), stop);
+                eastStops.add(stop);
                 break;
         }
     }

@@ -10,9 +10,7 @@
         android:id="@+id/drawer_layout"
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:onClick="loadNoClick"
-        >
+        android:layout_height="match_parent">
 
         <!-- As the main content view, the view below consumes the entire
              space available using match_parent in both dimensions.-->
@@ -28,27 +26,6 @@
                 android:layout_height="match_parent"
                 />
 
-            <TextView
-                android:id="@+id/selected_stop"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:textSize="20dp"
-                android:layout_centerInParent="true"
-                android:textStyle="bold"
-                android:layout_marginRight="55dp"
-                android:layout_marginTop="15dp"
-                android:background="@drawable/selected_bg"
-                android:paddingLeft="16dp"
-                android:paddingRight="16dp"
-                android:paddingTop="4dp"
-                android:paddingBottom="4dp"
-                android:maxWidth="225dp"
-                android:gravity="center"
-
-                />
-
-
 
             <LinearLayout
                 android:id="@+id/favorites_view"
@@ -63,14 +40,13 @@
 
 
 
-
             </LinearLayout>
 
 
             <LinearLayout
                 android:id="@+id/error_view"
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
+                android:layout_height="wrap_content"
                 android:background="@color/transparent_error"
                 android:layout_alignParentTop="true"
                 android:orientation="horizontal"
@@ -79,9 +55,10 @@
 
                 <TextView
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:text="Server could not be reached. Retrying..."
+                    android:layout_height="wrap_content"
+                    android:text="@string/no_connection_message"
                     android:gravity="center_vertical"
+                    android:layout_gravity="center_vertical"
                     android:paddingLeft="16dp"
                     android:textSize="16dp"
                     android:textColor="#FFFFFF"/>
@@ -94,7 +71,25 @@
                     />
 
             </LinearLayout>
+            <TextView
+                android:id="@+id/selected_stop"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:textSize="22dp"
+                android:layout_centerInParent="true"
+                android:textStyle="bold"
+                android:layout_marginRight="55dp"
+                android:layout_marginTop="15dp"
+                android:background="@drawable/selected_stop_name_bg"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:maxWidth="225dp"
+                android:gravity="center_horizontal"
 
+                />
           <!--  <Button
                 style="?android:attr/buttonStyleSmall"
                 android:layout_width="45dp"

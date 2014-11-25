@@ -5,8 +5,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/navigation_item_selector">
-
-
     <TextView
         android:id="@+id/drawer_item_title"
         android:layout_width="wrap_content"
@@ -18,7 +16,6 @@
         android:textSize="20sp"
         android:textColor="#e7e0d4"
         />
-
     <ImageView
         android:id="@+id/drawer_item_carrot"
         android:layout_width="wrap_content"

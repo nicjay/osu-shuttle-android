@@ -1,17 +1,11 @@
 package edu.oregonstate.beaverbus;
 
-import android.content.Context;
 import android.os.SystemClock;
 import android.util.Log;
-import android.view.Display;
-import android.view.Surface;
-import android.view.WindowManager;
 import android.view.animation.LinearInterpolator;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import android.view.animation.Interpolator;
@@ -132,13 +126,13 @@ public class Shuttle {
         if(GroundSpeed != 0){
             switch (RouteID){
                 case 7:
-                    mMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.shut_green_marker_m));
+                    mMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.bus_green_marker));
                     break;
                 case 9:
-                    mMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.shut_orange_marker_m));
+                    mMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.bus_orange_marker));
                     break;
                 case 8:
-                    mMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.shut_purple_marker_m));
+                    mMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.bus_purple_marker));
                     break;
             }
         }
@@ -175,13 +169,13 @@ public class Shuttle {
                         if(GroundSpeed == 0){
                             switch (RouteID){
                                 case 7:
-                                    mMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.shut_green_square_m));
+                                    mMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.bus_green_square));
                                     break;
                                 case 9:
-                                    mMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.shut_orange_square_m));
+                                    mMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.bus_orange_square));
                                     break;
                                 case 8:
-                                    mMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.shut_purple_square_m));
+                                    mMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.bus_purple_square));
                                     break;
                             }
                             double oldHeading = Heading;

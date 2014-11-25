@@ -2,6 +2,7 @@ package edu.oregonstate.beaverbus;
 
 import android.content.Context;
 
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -9,7 +10,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Marker;
-import java.util.ArrayList;
 
 /*
   Created by sellersk on 8/26/2014.
@@ -52,6 +52,7 @@ public class MapInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
                         View stopSection = inflater.inflate(R.layout.info_stop_section, null);
                         View square = stopSection.findViewById(R.id.info_stop_square);
                         TextView etaText = (TextView)stopSection.findViewById(R.id.info_stop_eta);
+                        etaText.setTypeface(Typeface.create("sans-serif-condensed", Typeface.NORMAL));
 
                         //Set square color based on ETA index
                         switch (i){
@@ -80,7 +81,7 @@ public class MapInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
 
                 //Set custom image bottom pointer
                 ImageView imageView = new ImageView(mContext);
-                imageView.setImageResource(R.drawable.infowindow_bottom);
+                imageView.setImageResource(R.drawable.info_window_bottom_triangle);
 
                 return stopView;
             }

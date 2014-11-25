@@ -9,7 +9,7 @@
                   android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
                   android:id="@+id/eta_container"
-                  android:background="@drawable/stop_info_border"
+                  android:background="@drawable/info_window_border"
                   android:padding="8dp">
 
     </LinearLayout>
@@ -17,5 +17,5 @@
         android:layout_width="20dp"
         android:layout_height="17dp"
         android:layout_gravity="center_horizontal"
-        android:src="@drawable/infowindow_bottom"/>
+        android:src="@drawable/info_window_bottom_triangle"/>
  </LinearLayout>

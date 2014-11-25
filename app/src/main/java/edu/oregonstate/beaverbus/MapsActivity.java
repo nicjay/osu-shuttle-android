@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -18,10 +19,12 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ExpandableListView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -72,10 +75,17 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
     //TextView displayed at top of screen
     private static TextView selectedStopTitle;
 
+    //Route Lines
+    Polyline polylineWest;
+    Polyline polylineNorth;
+    Polyline polylineEast;
+
+
     //Options Menu
     public static Menu menuGlobal;
 
     private FavoriteManager favoriteManager;
+    private SelectedMarkerManager selectedMarkerManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,14 +97,20 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
         //View references within main screen
         errorLayout = (LinearLayout) findViewById(R.id.error_view);
         selectedStopTitle = ((TextView)findViewById(R.id.selected_stop));
+        selectedStopTitle.setTypeface(Typeface.create("sans-serif-condensed", Typeface.BOLD));
         selectedStopTitle.setVisibility(View.INVISIBLE);
 
-        favoriteManager = new FavoriteManager(this, getApplicationContext());
+
+        selectedMarkerManager = new SelectedMarkerManager(this);
+
+        favoriteManager = new FavoriteManager(this, getApplicationContext(), selectedMarkerManager);
+
 
 
         //Get singleton, set context
         mMapState = MapState.get();
         mMapState.setCurrentContext(this);
+        mMapState.setSelectedMarkerManager(selectedMarkerManager);
 
         //Initialization
         setUpMapIfNeeded();
@@ -102,6 +118,7 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
         //Show Loading Dialog
         sProgressDialog = new ProgressDialog(this, R.style.CustomDialog);
         sProgressDialog.setMessage("Loading...");
+        sProgressDialog.setCancelable(false);
         sProgressDialog.show();
         //sProgressDialog = ProgressDialog.show(this, "", "Loading...", true, false);
         //sProgressDialog.setProgressStyle(R.style.CustomDialog);
@@ -201,6 +218,7 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
             mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                 @Override
                 public boolean onMarkerClick(Marker marker) {
+                    Log.d(TAG, "!@# markerClick. Map : " + mMap);
                    return onMapMarkerClick(marker);
                 }
             });
@@ -209,14 +227,7 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
             mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
                 @Override
                 public void onMapClick(LatLng latLng) {
-                    animateSelectedStopTitle(null, false, false, false);
-                    if (mMapState.getSelectedStopMarker() != null){
-
-                        if (!mMapState.isStopsVisible() && mMapState.showSelectedInfoWindow) {
-                            mMapState.setSelectedStopMarkerVisibility(false);
-                        }
-                        mMapState.setSelectedStopMarker(null, false);
-                    }
+                    selectedMarkerManager.onMapClick();
                     favoriteManager.setFavIcon(favoriteManager.FAV_ICON_DISABLED);
                 }
             });
@@ -237,72 +248,6 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
             mMapState.initShuttles();
         }
     }
-
-    public boolean onMapMarkerClick(Marker marker){
-        Log.d(TAG, "!@# latlong  : " + marker.getPosition());
-
-        if (mMapState.getSelectedStopMarker() != null && !mMapState.isStopsVisible() && mMapState.showSelectedInfoWindow){
-            mMapState.setSelectedStopMarkerVisibility(false);
-        }
-        mMapState.animateMap(marker.getPosition());
-        marker.setVisible(true);
-
-        if (mMapState.getSelectedStopMarker() == null) {
-            animateSelectedStopTitle(marker.getTitle(), true, true, marker.isFlat());
-        } else {
-            animateSelectedStopTitle(marker.getTitle(), true, false, marker.isFlat());
-        }
-
-        favoriteManager.onMapClick(marker);
-
-        //If stop
-        if (!marker.isFlat()) {
-
-            mMapState.setSelectedStopMarker(marker, true);
-            marker.showInfoWindow();
-        } else {
-            mMapState.animateMap(marker.getPosition());
-            mMapState.setSelectedStopMarker(marker, false);
-        }
-
-        return true;
-    }
-
-    public void animateSelectedStopTitle(final String markerTitle, final Boolean slideNewTitle, Boolean fromHidden, Boolean isShuttle){
-        final Animation fadeInAnim = AnimationUtils.makeInAnimation(getApplicationContext(), true);
-        fadeInAnim.setDuration(400);
-
-        if (selectedStopTitle.getVisibility() == View.INVISIBLE){
-            selectedStopTitle.setVisibility(View.VISIBLE);
-            selectedStopTitle.setText(markerTitle);
-            selectedStopTitle.startAnimation(fadeInAnim);
-        } else {
-            Animation fadeOutAnim = AnimationUtils.makeOutAnimation(this, true);
-            fadeOutAnim.setDuration(300);
-            fadeOutAnim.setAnimationListener(new Animation.AnimationListener() {
-                @Override
-                public void onAnimationStart(Animation animation) {
-                }
-
-                @Override
-                public void onAnimationEnd(Animation animation) {
-                    if (slideNewTitle) {
-                        selectedStopTitle.setVisibility(View.VISIBLE);
-                        selectedStopTitle.setText(markerTitle);
-                        selectedStopTitle.startAnimation(fadeInAnim);
-                    }else{
-                        selectedStopTitle.setVisibility(View.INVISIBLE);
-                    }
-                }
-
-                @Override
-                public void onAnimationRepeat(Animation animation) {
-                }
-            });
-            selectedStopTitle.startAnimation(fadeOutAnim);
-        }
-    }
-
     /*
     METHOD - initNavigationDrawer()
        Creates all components needed for navDrawer.
@@ -327,11 +272,11 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
             mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close) {
                 public void onDrawerClosed(View view) {
                     super.onDrawerClosed(view);
-                    invalidateOptionsMenu();
+                    //invalidateOptionsMenu();
                 }
                 public void onDrawerOpened(View drawerView) {
                     super.onDrawerOpened(drawerView);
-                    invalidateOptionsMenu();
+                    //invalidateOptionsMenu();
                 }
             };
             mDrawerLayout.setDrawerListener(mDrawerToggle);
@@ -374,23 +319,52 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
             favoriteManager.initSavedFavorites();
             updateMap();
             if(errorLayout.getVisibility() == View.VISIBLE) {
+                //Remove the error view if it was there
                 Animation animation = AnimationUtils.makeOutAnimation(this, true);
                 animation.setDuration(1000);
                 errorLayout.startAnimation(animation);
                 errorLayout.setVisibility(View.INVISIBLE);
+
+                //Set the stop title back to normal
+                RelativeLayout.LayoutParams selectedStopTitleParams = (RelativeLayout.LayoutParams)selectedStopTitle.getLayoutParams();
+                selectedStopTitleParams.setMargins(0, 15, 55, 0);
+                selectedStopTitle.setLayoutParams(selectedStopTitleParams);
             }
         }else{
             Log.d(TAG, "onPostShuttleRequest fail");
             sProgressDialog.dismiss();
             if(errorLayout.getVisibility() == View.INVISIBLE && !networkFailureDialog.isShowing()) {
+                //Show the error view
                 Animation animationSlideLeft = AnimationUtils.makeInAnimation(this, true);
                 animationSlideLeft.setDuration(1000);
                 errorLayout.startAnimation(animationSlideLeft);
                 errorLayout.setVisibility(View.VISIBLE);
+
+                //Reposition stop title below error view
+                RelativeLayout.LayoutParams selectedStopTitleParams = (RelativeLayout.LayoutParams)selectedStopTitle.getLayoutParams();
+                selectedStopTitleParams.setMargins(0, 90, 55, 0);
+                selectedStopTitle.setLayoutParams(selectedStopTitleParams);
             }
+            //Clear last ETA data. Maybe not necessary.
+            /*
+            for (Stop stop : mMapState.getStops()){
+                stop.setShuttleETA(0, -1);
+                stop.setShuttleETA(1, -1);
+                stop.setShuttleETA(2, -1);
+                stop.setShuttleETA(3, -1);
+            }
+            */
         }
     }
+    public void animateSelectedStopTitle(final String markerTitle, final Boolean slideNewTitle, Boolean fromHidden, final Boolean isShuttle, Boolean mapClick) {
+        if(isShuttle == null) Log.d(TAG, "!@# NULL");
+        selectedMarkerManager.animateSelectedStopTitle(markerTitle, slideNewTitle, fromHidden, isShuttle, mapClick);
+    }
 
+    public boolean onMapMarkerClick(Marker marker){
+        favoriteManager.onMapClick(marker);
+        return selectedMarkerManager.onMarkerClick(marker);
+    }
 
     /*
     METHOD - updateMap()
@@ -547,6 +521,7 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
     }
 
     public void setUpRouteLines() {
+
         //NORTH ROUTE
         PolylineOptions rectOptionsNorth = new PolylineOptions()
                 .add(new LatLng(44.566792, -123.289718)).add(new LatLng(44.566783, -123.284842))
@@ -558,7 +533,7 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
                 .add(new LatLng(44.564643, -123.275300)).add(new LatLng(44.564635, -123.279935))
                 .add(new LatLng(44.564650, -123.284575)).add(new LatLng(44.564590, -123.289720))
                 .add(new LatLng(44.566792, -123.289718));
-        Polyline polylineNorth = mMap.addPolyline(rectOptionsNorth);
+        polylineNorth = mMap.addPolyline(rectOptionsNorth);
         polylineNorth.setColor(0xBD70A800);
         polylineNorth.setWidth(10);
 
@@ -575,7 +550,7 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
                 .add(new LatLng(44.557859, -123.279679)).add(new LatLng(44.559460, -123.276646))
                 .add(new LatLng(44.559873, -123.273996)).add(new LatLng(44.561578, -123.274318))
                 .add(new LatLng(44.562113, -123.274114)).add(new LatLng(44.564507, -123.274058));
-        Polyline polylineEast = mMap.addPolyline(rectOptionsEast);
+        polylineEast = mMap.addPolyline(rectOptionsEast);
         polylineEast.setColor(0xBDAA66CD);
         polylineEast.setWidth(10);
 
@@ -590,9 +565,10 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
                 .add(new LatLng(44.560012, -123.283142)).add(new LatLng(44.559246, -123.283160))
                 .add(new LatLng(44.558254, -123.281967)).add(new LatLng(44.558305, -123.280559))
                 .add(new LatLng(44.558993, -123.279550));
-        Polyline polylineWest = mMap.addPolyline(rectOptionsWest);
+        polylineWest = mMap.addPolyline(rectOptionsWest);
         polylineWest.setColor(0xBDE0AA0F);
         polylineWest.setWidth(10);
+        selectedMarkerManager.setPolylines(polylineNorth, polylineEast, polylineWest);
     }
 
 

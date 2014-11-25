@@ -2,17 +2,12 @@ package edu.oregonstate.beaverbus;
 
 import android.content.Context;
 import android.util.Log;
-import android.view.Display;
-import android.view.Surface;
-import android.view.WindowManager;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
@@ -37,11 +32,6 @@ public class MapState {
     private static ArrayList<Stop> mStops;
     private boolean mStopsVisible;
 
-    //Currently selected Stop
-    private Marker mSelectedStopMarker;
-    public boolean showSelectedInfoWindow = false;
-    private int[] mSelectedStopMarkerTimes;
-
     //Stop indices of mStops for Stops of each route
     private static ArrayList<Integer> mNorthStopIndex;
     private static ArrayList<Integer> mWestStopIndex;
@@ -59,15 +49,24 @@ public class MapState {
     private boolean stopsTaskStatus;
 
     public boolean noAnimate = false;
-    private boolean stopMarkersBordered = true;
+
+    private SelectedMarkerManager mSelectedMarkerManager;
 
     //Allows fast lookup of stopObjects for Estimate parsing
     private HashMap<Integer, Stop> mStopsMap;
 
-    public HashMap<Integer, Stop> northMap = new HashMap<Integer, Stop>();
-    public HashMap<Integer, Stop> westMap = new HashMap<Integer, Stop>();
-    public HashMap<Integer, Stop> eastMap = new HashMap<Integer, Stop>();
+    public ArrayList<Stop> northStops = new ArrayList<Stop>();
+    public ArrayList<Stop> westStops = new ArrayList<Stop>();
+    public ArrayList<Stop> eastStops = new ArrayList<Stop>();
 
+
+    public SelectedMarkerManager getSelectedMarkerManager() {
+        return mSelectedMarkerManager;
+    }
+
+    public void setSelectedMarkerManager(SelectedMarkerManager selectedMarkerManager) {
+        mSelectedMarkerManager = selectedMarkerManager;
+    }
 
     public boolean isStopsTaskStatus() {
         return stopsTaskStatus;
@@ -113,22 +112,22 @@ public class MapState {
         LatLng initLatLng = new LatLng(0,0);
 
         Shuttle newShuttle = new Shuttle("North", false);
-        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().alpha(.85f).position(initLatLng).title("North").icon(BitmapDescriptorFactory.fromResource(R.drawable.shut_green_marker_m)).flat(true).anchor(0.5f, 0.5f).infoWindowAnchor(.5f, .5f)));
+        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().alpha(.85f).position(initLatLng).title("North Bus").icon(BitmapDescriptorFactory.fromResource(R.drawable.bus_green_marker)).flat(true).anchor(0.5f, 0.5f).infoWindowAnchor(.5f, .5f)));
         newShuttle.setColorID(R.color.shuttle_green);
         mShuttles.add(newShuttle);
 
         newShuttle = new Shuttle("West 1", false);
-        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().alpha(.85f).position(initLatLng).title("West 1").icon(BitmapDescriptorFactory.fromResource(R.drawable.shut_orange_marker_m)).flat(true).anchor(0.5f, 0.5f).infoWindowAnchor(.5f, .5f)));
+        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().alpha(.85f).position(initLatLng).title("West 1 Bus").icon(BitmapDescriptorFactory.fromResource(R.drawable.bus_orange_marker)).flat(true).anchor(0.5f, 0.5f).infoWindowAnchor(.5f, .5f)));
         newShuttle.setColorID(R.color.shuttle_orange);
         mShuttles.add(newShuttle);
 
         newShuttle = new Shuttle("West 2", false);
-        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().alpha(.85f).position(initLatLng).title("West 2").icon(BitmapDescriptorFactory.fromResource(R.drawable.shut_orange_marker_m)).flat(true).anchor(0.5f, 0.5f).infoWindowAnchor(.5f, .5f)));
+        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().alpha(.85f).position(initLatLng).title("West 2 Bus").icon(BitmapDescriptorFactory.fromResource(R.drawable.bus_orange_marker)).flat(true).anchor(0.5f, 0.5f).infoWindowAnchor(.5f, .5f)));
         newShuttle.setColorID(R.color.shuttle_orange);
         mShuttles.add(newShuttle);
 
         newShuttle = new Shuttle("East", false);
-        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().alpha(.85f).position(initLatLng).title("East").icon(BitmapDescriptorFactory.fromResource(R.drawable.shut_purple_marker_m)).flat(true).anchor(.5f, .5f).infoWindowAnchor(.5f, .5f)));
+        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().alpha(.85f).position(initLatLng).title("East Bus").icon(BitmapDescriptorFactory.fromResource(R.drawable.bus_purple_marker)).flat(true).anchor(.5f, .5f).infoWindowAnchor(.5f, .5f)));
         newShuttle.setColorID(R.color.shuttle_purple);
         mShuttles.add(newShuttle);
 
@@ -189,17 +188,6 @@ public class MapState {
         for (Stop stop : mStops) {
             //TODO: fix stop.getName() in this next line. Only uses first stored stopName
             stop.setMarker(mMap.addMarker(new MarkerOptions().position(stop.getLatLng()).infoWindowAnchor(.5f, .25f).title(stop.getName()).visible(mStopsVisible).alpha(0.7f).anchor(.5f, .5f).icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_dot_plus))));
-        }
-    }
-
-    public void toggleStopMarkerBorders(){
-        BitmapDescriptor newIcon;
-        if(stopMarkersBordered) newIcon = BitmapDescriptorFactory.fromResource(R.drawable.marker_dot_empty);
-        else newIcon = BitmapDescriptorFactory.fromResource(R.drawable.marker_dot_plus);
-        stopMarkersBordered = !stopMarkersBordered;
-
-        for(Stop stop : mStops){
-            stop.getMarker().setIcon(newIcon);
         }
     }
 
@@ -275,69 +263,31 @@ public class MapState {
         mStopsVisible = stopsVisible;
     }
 
-
-    public void setSelectedStopMarkerVisibility(boolean isVisible) {
-        mSelectedStopMarker.setVisible(isVisible);
-    }
-
     public void refreshSelectedStopMarker(){
-        if(mSelectedStopMarker != null && showSelectedInfoWindow) mSelectedStopMarker.showInfoWindow();
+        mSelectedMarkerManager.refreshMarker();
     }
 
-    public boolean getSelectedStopMarkerVisibility() {
-        return mSelectedStopMarker.isVisible();
+    public ArrayList<Stop> getNorthStops() {
+        return northStops;
     }
 
-    public Marker getSelectedStopMarker(){
-        return mSelectedStopMarker;
+    public void setNorthStops(ArrayList<Stop> northStops) {
+        this.northStops = northStops;
     }
 
-
-    public void setSelectedStopMarker(Marker selectedStopMarker, boolean showInfoWindow) {
-        if(mSelectedStopMarker != null && !mSelectedStopMarker.isFlat()) mSelectedStopMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.marker_dot_plus));
-        if(selectedStopMarker!= null && showInfoWindow)selectedStopMarker.setIcon((BitmapDescriptorFactory.fromResource(R.drawable.marker_dot_empty)));
-
-        showSelectedInfoWindow = showInfoWindow;
-        if (selectedStopMarker != null) {
-
-            for(Stop stop: mStops){
-                if(stop.getMarker().equals(selectedStopMarker)){
-                    mSelectedStopMarkerTimes = stop.getShuttleETAs();
-                }
-            }
-            mSelectedStopMarker = selectedStopMarker;
-
-        } else {
-            mSelectedStopMarkerTimes = null;
-            mSelectedStopMarker = null;
-        }
+    public ArrayList<Stop> getWestStops() {
+        return westStops;
     }
 
-    public int[] getSelectedStopMarkerTimes() {
-        return mSelectedStopMarkerTimes;
+    public void setWestStops(ArrayList<Stop> westStops) {
+        this.westStops = westStops;
     }
 
-    public HashMap<Integer, Stop> getNorthMap() {
-        return northMap;
+    public ArrayList<Stop> getEastStops() {
+        return eastStops;
     }
 
-    public void setNorthMap(HashMap<Integer, Stop> northMap) {
-        this.northMap = northMap;
-    }
-
-    public HashMap<Integer, Stop> getEastMap() {
-        return eastMap;
-    }
-
-    public void setEastMap(HashMap<Integer, Stop> eastMap) {
-        this.eastMap = eastMap;
-    }
-
-    public HashMap<Integer, Stop> getWestMap() {
-        return westMap;
-    }
-
-    public void setWestMap(HashMap<Integer, Stop> westMap) {
-        this.westMap = westMap;
+    public void setEastStops(ArrayList<Stop> eastStops) {
+        this.eastStops = eastStops;
     }
 }

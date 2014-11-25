@@ -1,7 +1,6 @@
 package edu.oregonstate.beaverbus;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,9 +50,9 @@ public class ExpandableDrawerAdapter extends BaseExpandableListAdapter {
 
             //Two different icons: stop and shuttle, 0 and 5.
             if(groupPosition == 0) {
-                sectionIcon.setImageResource(R.drawable.shuttle_grey);
+                sectionIcon.setImageResource(R.drawable.nav_drawer_bus_icon);
             }else{
-                sectionIcon.setImageResource(R.drawable.map_marker_icon);
+                sectionIcon.setImageResource(R.drawable.nav_drawer_map_marker_icon);
                 sectionIcon.getLayoutParams().height = 25;
                 //sectionIcon.setPadding(3, 3, 3, 3);
             }
@@ -129,14 +128,14 @@ public class ExpandableDrawerAdapter extends BaseExpandableListAdapter {
         TextView childTitle = (TextView)convertView.findViewById(R.id.drawer_list_item_title); //Title
         switch (groupPosition){ //TODO: add in new stopNames once finalized
             case NORTH:
-                //childTitle.setText("N-stop " + (childPosition+1));
-                childTitle.setText(sMapState.getNorthMap().get(childPosition).getName());
+                //childTitle.setText(sMapState.getNorthMap().get(childPosition).getName());
+                childTitle.setText(sMapState.getNorthStops().get(childPosition).getName());
                 break;
             case WEST:
-                childTitle.setText(sMapState.getWestMap().get(childPosition).getName());
+                childTitle.setText(sMapState.getWestStops().get(childPosition).getName());
                 break;
             case EAST:
-                childTitle.setText(sMapState.getEastMap().get(childPosition).getName());
+                childTitle.setText(sMapState.getEastStops().get(childPosition).getName());
                 break;
             default:
                 childTitle.setText("DEFAULT");
@@ -153,11 +152,11 @@ public class ExpandableDrawerAdapter extends BaseExpandableListAdapter {
     public int getChildrenCount(int groupPosition) {
         switch (groupPosition){
             case NORTH:
-                return sMapState.getNorthMap().size();
+                return sMapState.getNorthStops().size();
             case WEST:
-                return sMapState.getWestMap().size();
+                return sMapState.getWestStops().size();
             case EAST:
-                return sMapState.getEastMap().size();
+                return sMapState.getEastStops().size();
             default:
                 return 0;
         }

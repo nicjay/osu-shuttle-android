@@ -52,48 +52,33 @@ public class DrawerItemClickListener implements ExpandableListView.OnGroupClickL
             //Jump to shuttle location, hide Nav drawer
             sMapState.animateMap(drawerItems.get(groupPosition).getShuttle().getLatLng());
 
-            activity.animateSelectedStopTitle(drawerItems.get(groupPosition).getShuttle().getName(), true, false, null);
 
-            if (sMapState.getSelectedStopMarker() != null) { //If a stop is currently selected
-                if (!sMapState.isStopsVisible()){
-                    sMapState.getSelectedStopMarker().setVisible(false);
-                }
-                sMapState.getSelectedStopMarker().hideInfoWindow();
-                sMapState.setSelectedStopMarker(null, false);
-            }
-
-
-
+            //sMapState.getSelectedMarkerManager().animateSelectedStopTitle(drawerItems.get(groupPosition).getShuttle().getName(), true, false, null);
+            activity.onMapMarkerClick(drawerItems.get(groupPosition).getShuttle().getMarker());
             mDrawerLayout.closeDrawer(mDrawerList);
         }
 
     }
 
     private void selectItemChild(int groupPosition, int childPosition){
-        if (sMapState.getSelectedStopMarker() != null && !sMapState.isStopsVisible()){
-            sMapState.setSelectedStopMarkerVisibility(false);
-        }
-
         Marker marker;
         switch (groupPosition) {    //Switch to find which stopsIndex map to search in for childPosition
             case NORTH:
-                marker = sMapState.getNorthMap().get(childPosition).getMarker();
+                marker = sMapState.getNorthStops().get(childPosition).getMarker();
                 break;
             case WEST:
-                marker = sMapState.getWestMap().get(childPosition).getMarker();
+                marker = sMapState.getWestStops().get(childPosition).getMarker();
                 break;
             case EAST:
-                marker = sMapState.getEastMap().get(childPosition).getMarker();
+                marker = sMapState.getEastStops().get(childPosition).getMarker();
                 break;
             default:
                 marker = null;
         }
         if(marker != null) {
-            sMapState.animateMap(marker.getPosition());
-            sMapState.setSelectedStopMarker(marker, true);
-            activity.animateSelectedStopTitle(marker.getTitle(), true, false, null);
-            marker.setVisible(true);
-            marker.showInfoWindow();
+            //sMapState.animateMap(marker.getPosition());
+            activity.onMapMarkerClick(marker);
+            activity.animateSelectedStopTitle(marker.getTitle(), true, false, null, false);
         }
 
         mDrawerLayout.closeDrawer(mDrawerList);

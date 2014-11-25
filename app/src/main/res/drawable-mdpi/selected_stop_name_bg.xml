@@ -6,12 +6,12 @@
             <gradient
                 android:startColor="@color/transparent_OSU_white"
                 android:centerColor="@color/transparent_OSU_white"
-                android:endColor="@color/very_transparent_OSU_white"
+                android:endColor="@color/transparent_OSU_white"
                 android:angle="90"/>
             <corners
-                android:radius="8dp"/>
+                android:radius="0dp"/>
             <stroke
-                android:width="1dp"
+                android:width="2dp"
                 android:color="@color/transparent_OSU_black" />
         </shape>
     </item>
