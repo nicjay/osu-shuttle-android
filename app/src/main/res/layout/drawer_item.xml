@@ -16,6 +16,18 @@
         android:textSize="20sp"
         android:textColor="#e7e0d4"
         />
+    <TextView
+        android:id="@+id/drawer_item_offline_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/drawer_item_title"
+        android:textSize="12sp"
+        android:textColor="@color/Navigation_Drawer_Item_Offline_Text"
+        android:text="OFFLINE"
+        android:textStyle="bold"
+        android:paddingLeft="16dp"
+        android:layout_centerVertical="true"
+        android:visibility="invisible"/>
     <ImageView
         android:id="@+id/drawer_item_carrot"
         android:layout_width="wrap_content"

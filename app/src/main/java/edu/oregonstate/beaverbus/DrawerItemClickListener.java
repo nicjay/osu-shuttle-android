@@ -47,12 +47,10 @@ public class DrawerItemClickListener implements ExpandableListView.OnGroupClickL
 
     private void selectItemGroup(int groupPosition) {
         ArrayList<DrawerItem> drawerItems = sMapState.getDrawerItems();
-
-        if (drawerItems.get(groupPosition).getTypeId() == 1){
+        Shuttle shuttle = drawerItems.get(groupPosition).getShuttle();
+        if (drawerItems.get(groupPosition).getTypeId() == 1 && shuttle.isOnline()){
             //Jump to shuttle location, hide Nav drawer
-            sMapState.animateMap(drawerItems.get(groupPosition).getShuttle().getLatLng());
-
-
+            sMapState.animateMap(shuttle.getLatLng());
             //sMapState.getSelectedMarkerManager().animateSelectedStopTitle(drawerItems.get(groupPosition).getShuttle().getName(), true, false, null);
             activity.onMapMarkerClick(drawerItems.get(groupPosition).getShuttle().getMarker());
             mDrawerLayout.closeDrawer(mDrawerList);

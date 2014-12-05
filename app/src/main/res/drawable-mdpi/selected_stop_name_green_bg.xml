@@ -3,15 +3,12 @@
     <item>
         <shape
             android:shape="rectangle" >
-            <gradient
-                android:startColor="@color/selected_stop_green"
-                android:centerColor="@color/selected_stop_green"
-                android:endColor="@color/selected_stop_green"
-                android:angle="90"/>
+            <solid
+                android:color="@color/OSU_white"/>
             <corners
-                android:radius="0dp"/>
+                android:radius="8dp"/>
             <stroke
-                android:width="6dp"
+                android:width="4dp"
                 android:color="@color/selected_stop_green_border" />
         </shape>
     </item

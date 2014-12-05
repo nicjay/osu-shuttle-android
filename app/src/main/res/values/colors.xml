@@ -14,7 +14,12 @@
     <color name="super_transparent_OSU_white">#16f5f2ed</color>
     <color name="infowindow_font">#373737</color>
 
+
+    <color name="Navigation_Drawer_Shuttle_Disabled_Text">#737373</color>
+
     <color name="Navigation_Drawer_Background">#191b1b</color>
+
+    <color name="Navigation_Drawer_Item_Offline_Text">#c0392b</color>
 
     <color name="Navigation_Drawer_Item_Bg">#282828</color>
     <color name="Navigation_Drawer_Item_Bg_Selected">#424242</color>
@@ -39,24 +44,31 @@
 
     <color name="favorite_times_white">#E6f5f2ed</color>
 
-    <color name="favorite_row_selected">#d9373737</color>
+    <color name="favorite_row_selected">#373737</color>
 
-    <color name="favorite_name_gradient0">#F2D47D45</color> <!--  F2D78B5F, F2DC9C77, F2D58253-->
-    <color name="favorite_name_gradient1">#F2D88957</color>
-    <color name="favorite_name_gradient2">#F2D17032</color>
+    <color name="favorite_name_gradient0">#F2F38F54</color>    <!--F2D3783E, F2D88957, F2D47D45-->
+    <color name="favorite_name_gradient1">#F2F49964</color>
+    <color name="favorite_name_gradient2">#F2F38F54</color>
+
+
+    <color name="material_orange">#e9621a</color>
+
+
+
 
     <color name="favorite_name_gradient3">#F2ecc8b4</color>
 
-    <color name="selected_stop_purple">#F2caa0e0</color>
-    <color name="selected_stop_purple_border">#F28639ae</color>
+    <color name="selected_stop_purple">#F2DCBFEB</color>
+    <color name="selected_stop_purple_border">#AA66CD</color>
 
-    <color name="selected_stop_green">#F2d9ff8e</color>
-    <color name="selected_stop_green_border">#F25e8e00</color>
+    <color name="selected_stop_green">#CDF383</color> <!-- F2E7FFB7 -->
+    <color name="selected_stop_green_border">#70A800</color>
 
-    <color name="selected_stop_orange">#F2f3c749</color>
-    <color name="selected_stop_orange_border">#F298740a</color>
+    <color name="selected_stop_orange">#F2F7DB8B</color>
+    <color name="selected_stop_orange_border">#E0AA0F</color>
 
-
+    <color name="transparent">#99000000</color>
+    <color name="progress_transparent">#CC000000</color>
 
 
 

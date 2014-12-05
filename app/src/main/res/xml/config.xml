@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <NorthRoute>
+        <LatLng>44.566792, -123.289718</LatLng><LatLng>44.566783, -123.284842</LatLng>
+        <LatLng>44.566799, -123.284738</LatLng><LatLng>44.566798, -123.284360</LatLng>
+        <LatLng>44.567408, -123.284354</LatLng><LatLng>44.567685, -123.284553</LatLng>
+        <LatLng>44.567904, -123.284555</LatLng><LatLng>44.567957, -123.279962</LatLng>
+        <LatLng>44.566784, -123.279930</LatLng><LatLng>44.566765, -123.272398</LatLng>
+        <LatLng>44.565833, -123.272961</LatLng><LatLng>44.564669, -123.274050</LatLng>
+        <LatLng>44.564643, -123.275300</LatLng><LatLng>44.564635, -123.279935</LatLng>
+        <LatLng>44.564650, -123.284575</LatLng><LatLng>44.564590, -123.289720</LatLng>
+        <LatLng>44.566792, -123.289718</LatLng>
+        <Color>#BD70A800</Color>
+        <Width>10</Width>
+    </NorthRoute>
+    <WestRoute>
+        <LatLng>44.558993, -123.279550</LatLng><LatLng>44.561972, -123.279550</LatLng>
+        <LatLng>44.563391, -123.279526</LatLng><LatLng>44.563401, -123.279520</LatLng>
+        <LatLng>44.563829, -123.279737</LatLng><LatLng>44.564158, -123.279826</LatLng>
+        <LatLng>44.564495, -123.279901</LatLng><LatLng>44.564500, -123.284775</LatLng>
+        <LatLng>44.562234, -123.284775</LatLng><LatLng>44.561965, -123.284625</LatLng>
+        <LatLng>44.560529, -123.284625</LatLng><LatLng>44.560538, -123.282576</LatLng>
+        <LatLng>44.560012, -123.283142</LatLng><LatLng>44.559246, -123.283160</LatLng>
+        <LatLng>44.558254, -123.281967</LatLng><LatLng>44.558305, -123.280559</LatLng>
+        <LatLng>44.558993, -123.279550</LatLng>
+        <Color>#BDE0AA0F</Color>
+        <Width>10</Width>
+    </WestRoute>
+    <EastRoute>
+        <LatLng>44.564507, -123.274058</LatLng><LatLng>44.564489, -123.275318</LatLng>
+        <LatLng>44.564495, -123.280051</LatLng><LatLng>44.564158, -123.280016</LatLng>
+        <LatLng>44.563829, -123.279917</LatLng><LatLng>44.563401, -123.279700</LatLng>
+        <LatLng>44.563371, -123.279686</LatLng><LatLng>44.561972, -123.279700</LatLng>
+        <LatLng>44.560713, -123.279700</LatLng><LatLng>44.560713, -123.281585</LatLng>
+        <LatLng>44.560538, -123.282356</LatLng><LatLng>44.559992, -123.282962</LatLng>
+        <LatLng>44.559296, -123.283010</LatLng><LatLng>44.558409, -123.281948</LatLng>
+        <LatLng>44.558455, -123.280609</LatLng><LatLng>44.559033, -123.279740</LatLng>
+        <LatLng>44.557859, -123.279679</LatLng><LatLng>44.559460, -123.276646</LatLng>
+        <LatLng>44.559873, -123.273996</LatLng><LatLng>44.561578, -123.274318</LatLng>
+        <LatLng>44.562113, -123.274114</LatLng><LatLng>44.564507, -123.274058</LatLng>
+        <Color>#BDAA66CD</Color>
+        <Width>10</Width>
+    </EastRoute>
+
+    <StopNames>
+        <LatLng>44.56461, -123.27522</LatLng><Name>Valley Library</Name> <!--Kerr Administration-->
+        <LatLng>44.56462, -123.27785</LatLng><Name>Memorial Union</Name> <!--Student Experience Center-->
+        <LatLng>44.56467, -123.28133</LatLng><Name>Austin Hall</Name> <!--Buxton Hall, Weatherford Hall-->
+        <LatLng>44.56466, -123.28903</LatLng><Name>Energy Center</Name> <!--Radiation Center-->
+        <LatLng>44.56674, -123.28903</LatLng><Name>National Forage Seed Research Center</Name> <!--Horticulture Crops Research Lab-->
+        <LatLng>44.56675, -123.28501</LatLng><Name>Wiegand Hall</Name> <!--Campus Way &amp; 30th-->
+        <LatLng>44.56788, -123.28118</LatLng><Name>Burt Hall</Name> <!--Cordley_27th &amp; Orchard-->
+        <LatLng>44.56698, -123.27991</LatLng><Name>Hallie Ford Center</Name> <!--26th &amp; Campus-->
+        <LatLng>44.56676, -123.27696</LatLng><Name>Gilkey Hall</Name> <!--Bexell Hall, Campus &amp; Waldo-->
+        <LatLng>44.56675, -123.27345</LatLng><Name>Owen Hall</Name> <!--Kearny Hall, Campus &amp; 14th-->
+        <LatLng>44.55839, -123.28176</LatLng><Name>Reser Stadium</Name> <!-- -->
+        <LatLng>44.560371, -123.274086</LatLng><Name>Student Sustainability Center</Name> <!--15th &amp; Western-->
+        <LatLng>44.56368, -123.27405</LatLng><Name>Calahan</Name> <!--McNary, 15th &amp; Jefferson -->
+        <LatLng>44.563538, -123.279706</LatLng><Name>Unnecessary Stop</Name> <!-- -->
+        <LatLng>44.56418, -123.27986</LatLng><Name>Weatherford Hall</Name> <!-- -->
+        <LatLng>44.56156, -123.2795</LatLng><Name>Beaver Store</Name> <!-- -->
+        <LatLng>44.560524, -123.282411</LatLng><Name>North Reser Stadium</Name> <!--Ralph Miller Ln-->
+        <LatLng>44.5605, -123.28415</LatLng><Name>Merrit Truax Indoor Practice Facility</Name> <!--N Reser Stadium-->
+
+    </StopNames>
+
+</config>

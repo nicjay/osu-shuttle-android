@@ -134,9 +134,6 @@ public class ShuttleUpdater {
            Gson gson = new Gson();
            boolean[] onlineStates = {false, false, false, false};
 
-           Shuttle shut1 = sMapState.getShuttles().get(1);
-           Shuttle shut2 = sMapState.getShuttles().get(2);
-
             Log.d(TAG, "~~~! shuttles set");
            if (JSONShuttles != null) {
                for (int i = 0; i < JSONShuttles.length(); i++) {
@@ -155,6 +152,10 @@ public class ShuttleUpdater {
                    Log.d(TAG, "OH!heading: " + shuttle.getHeading());
                    shuttle.setOnline(true);
 
+                   Log.d(TAG, "&& RouteId: " + shuttle.getRouteID() + ", name: " + shuttle.getName());
+
+
+
                    switch (shuttle.getRouteID()) {
                        case NORTH_ROUTE_ID:
                            sMapState.setShuttle(0, shuttle);
@@ -164,21 +165,19 @@ public class ShuttleUpdater {
                            if (sMapState.getShuttles().get(1).getVehicleId() == shuttle.getVehicleId()) {
                                sMapState.setShuttle(1, shuttle);
                                onlineStates[1] = true;
-                               Log.d(TAG, "~~! 1");
-                           } if (sMapState.getShuttles().get(2).getVehicleId() == shuttle.getVehicleId()) {
+                               Log.d(TAG, "&& 1");
+                           } else if (sMapState.getShuttles().get(2).getVehicleId() == shuttle.getVehicleId()) {
                                sMapState.setShuttle(2, shuttle);
                                onlineStates[2] = true;
-                           Log.d(TAG, "~~! 2");
+                               Log.d(TAG, "&& 2");
                            } else if (!sMapState.getShuttles().get(1).isOnline()) {
                                sMapState.setShuttle(1, shuttle);
                                onlineStates[1] = true;
-                           Log.d(TAG, "~~! 3");
+                               Log.d(TAG, "&& 3");
                            } else if (!sMapState.getShuttles().get(2).isOnline()) {
-                           Log.d(TAG, "~~!4   3: " + sMapState.getShuttles().get(1).isOnline() + " , 4 : " + sMapState.getShuttles().get(2).isOnline());
-                           Log.d(TAG, "~~!   " + sMapState.getShuttles().get(1).getName());
-                           sMapState.setShuttle(2, shuttle);
+                               Log.d(TAG, "&& 4");
+                               sMapState.setShuttle(2, shuttle);
                                onlineStates[2] = true;
-
                            }
                            break;
                        case EAST_ROUTE_ID:

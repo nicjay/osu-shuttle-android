@@ -2,14 +2,15 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="horizontal"
-              android:layout_width="match_parent"
+              android:layout_width="wrap_content"
               android:layout_height="match_parent"
-               android:paddingLeft="10dp"
-               android:paddingRight="10dp">
+              android:paddingLeft="7dp"
+              android:paddingRight="7dp"
+              android:layout_weight="1">
     <View
         android:id="@+id/favorite_info_stop_square"
-        android:layout_width="11dp"
-        android:layout_height="11dp"
+        android:layout_width="9dp"
+        android:layout_height="9dp"
         android:background="@color/OSU_orange"
         android:layout_gravity="center_vertical"/>
 
@@ -17,10 +18,9 @@
         android:id="@+id/favorite_info_stop_eta"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="14"
         android:textColor="@color/OSU_black"
-        android:textSize="20dp"
+        android:textSize="24dp"
         android:layout_gravity="center_vertical"
-        android:layout_marginLeft="6dp"/>
+        android:layout_marginLeft="4dp"/>
 
 </LinearLayout>

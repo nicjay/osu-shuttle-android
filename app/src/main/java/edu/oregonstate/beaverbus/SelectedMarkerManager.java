@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.graphics.Typeface;
 import android.opengl.Visibility;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -42,6 +43,11 @@ public class SelectedMarkerManager {
         selectedMarkerTextView = ((TextView)activity.findViewById(R.id.selected_stop));
         selectedMarkerTextView.setTypeface(Typeface.create("sans-serif-condensed", Typeface.BOLD));
         selectedMarkerTextView.setVisibility(View.INVISIBLE);
+
+        //Log.d(TAG, "<3 sMapState.getPolyline(\"North\");" + sMapState.getPolyline("North"));
+
+
+
     }
 
     public static Marker getSelectedMarker() {
@@ -72,12 +78,17 @@ public class SelectedMarkerManager {
         Boolean isShuttle = marker.isFlat();
 
         setRouteLineWidthToDefault();
+
+        Log.d(TAG, "*& showSelectedInfoWindow: " + showSelectedInfoWindow);
         if (selectedMarker != null && !sMapState.isStopsVisible() && showSelectedInfoWindow){
             selectedMarker.setVisible(false);
+            Log.d(TAG, "&& North selectedMarker set to invisible");
         }
 
         sMapState.animateMap(marker.getPosition());
-        marker.setVisible(true);
+        if(!isShuttle) {
+            marker.setVisible(true);
+        }
 
         if (selectedMarker == null) {
             animateSelectedStopTitle(marker.getTitle(), true, true, isShuttle, false);
@@ -87,6 +98,7 @@ public class SelectedMarkerManager {
 
         //If stop
         if (!isShuttle) {
+            Log.d(TAG, "^^ selectedMarker is: " +selectedMarker);
             setSelectedMarker(marker, true);
             marker.showInfoWindow();
         } else {
@@ -250,9 +262,9 @@ public class SelectedMarkerManager {
         if(polylineWest.getWidth() > 10) polylineWest.setWidth(10);
     }
 
-    public void setPolylines(Polyline north, Polyline east, Polyline west){
-        polylineNorth = north;
-        polylineEast = east;
-        polylineWest = west;
+    public void setPolylines(){
+        polylineNorth = sMapState.getPolyline("North");
+        polylineWest = sMapState.getPolyline("West");
+        polylineEast = sMapState.getPolyline("East");
     }
 }

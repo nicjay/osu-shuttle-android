@@ -2,18 +2,32 @@
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar">
-
+        <item name="android:windowBackground">@color/OSU_black</item>
         <!-- Customize your theme here. -->
     </style>
 
-    <style name="CustomDialog" parent="@android:style/Theme.Dialog">
-        <item name="android:background">@color/OSU_black</item>
+    <style name="CustomDialog" parent="android:Theme.DeviceDefault.Dialog">
         <item name="android:textColor">@color/OSU_white</item>
         <item name="android:progressBarStyle">@android:style/Widget.DeviceDefault.ProgressBar.Large</item>
+        <item name="android:gravity">center</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:windowBackground">@color/transparent</item>
+        <item name="android:colorBackground">@color/OSU_orange</item>
+
+
+
+
     </style>
 
-    <style name="BusInfoDialogTheme" parent="@android:style/Theme.Dialog">
-        <item name="android:textColor">@color/OSU_orange</item>
+    <style name="BusInfoDialogTheme">
+
+        <item name="android:gravity">center</item>
+        <item name="android:layout_gravity">center</item>
+
+
+
+        <item name="android:windowBackground">@color/transparent</item>
+        <item name="android:colorBackground">@color/transparent</item>
     </style>
 
 </resources>

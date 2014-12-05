@@ -52,7 +52,7 @@ public class MapInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
                         View stopSection = inflater.inflate(R.layout.info_stop_section, null);
                         View square = stopSection.findViewById(R.id.info_stop_square);
                         TextView etaText = (TextView)stopSection.findViewById(R.id.info_stop_eta);
-                        etaText.setTypeface(Typeface.create("sans-serif-condensed", Typeface.NORMAL));
+                        //etaText.setTypeface(Typeface.create("sans-serif-condensed", Typeface.NORMAL));
 
                         //Set square color based on ETA index
                         switch (i){

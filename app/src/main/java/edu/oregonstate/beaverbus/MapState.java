@@ -1,6 +1,8 @@
 package edu.oregonstate.beaverbus;
 
 import android.content.Context;
+import android.content.res.XmlResourceParser;
+import android.graphics.Color;
 import android.util.Log;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -9,7 +11,13 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -20,7 +28,6 @@ import java.util.HashMap;
  * Maintains most persistent data, such as shuttles, stops, and drawer items, to be used between classes and the lifecycle of the app.
  */
 public class MapState {
-
     private static final String TAG = "MapState";
     private static final String TAG_DB = "SpecialTag";
 
@@ -59,6 +66,12 @@ public class MapState {
     public ArrayList<Stop> westStops = new ArrayList<Stop>();
     public ArrayList<Stop> eastStops = new ArrayList<Stop>();
 
+    private Polyline northPolyline;
+    private Polyline westPolyline;
+    private Polyline eastPolyline;
+
+
+    private boolean firstTime;
 
     public SelectedMarkerManager getSelectedMarkerManager() {
         return mSelectedMarkerManager;
@@ -80,6 +93,8 @@ public class MapState {
         mDrawerItems = new ArrayList<DrawerItem>();
         mStopsVisible = true;
         stopsTaskStatus = true;
+        firstTime = true;
+
     }
 
     public static MapState get(){
@@ -91,6 +106,8 @@ public class MapState {
 
     public static void setCurrentContext(Context currentContext) {
         sCurrentContext = currentContext;
+
+
     }
 
     public static Context getCurrentContext() {
@@ -157,6 +174,99 @@ public class MapState {
         CameraPosition cameraPosition = new CameraPosition(latLng, mMap.getCameraPosition().zoom, mMap.getCameraPosition().tilt, mMap.getCameraPosition().bearing);
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), CAMERA_ANIMATION_SPEED, null);
     }
+
+
+    public void readConfigurationFile(){
+        XmlResourceParser xpp = sCurrentContext.getResources().getXml(R.xml.config);
+
+        try {
+            int eventType = xpp.getEventType();
+
+            String startTag = "";
+
+            while (eventType != XmlPullParser.END_DOCUMENT) {
+                if (eventType == XmlPullParser.START_DOCUMENT) {
+                    Log.d(TAG, "<3 1");
+                } else if (eventType == XmlPullParser.START_TAG) {
+                    Log.d(TAG, "<3 2" +  xpp.getName());
+                    if(xpp.getName().equals("NorthRoute")){
+                        parseRoute(xpp, "North");
+                    }else if(xpp.getName().equals("WestRoute")){
+                        parseRoute(xpp, "West");
+                    }else if(xpp.getName().equals("EastRoute")){
+                        parseRoute(xpp, "East");
+                    } else if (xpp.getName().equals("StopNames")){
+                        parseStopNames(xpp);
+                    }
+                } else if (eventType == XmlPullParser.END_TAG) {
+                    Log.d(TAG, "<3 3" + xpp.getName());
+                } else if (eventType == XmlPullParser.TEXT) {
+                    Log.d(TAG, "<3 4" + xpp.getText());
+
+                }
+                eventType = xpp.next();
+            }
+        } catch (XmlPullParserException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
+    private void parseStopNames(XmlResourceParser xpp)throws IOException, XmlPullParserException{
+
+        int setCount = 0;
+        boolean set = false;
+
+        while (xpp.nextTag() == XmlPullParser.START_TAG){
+            set = false;
+            if (xpp.getName().equals("LatLng")) {
+                String coords[] = xpp.nextText().split(",");
+              //  LatLng stopLatLng = new LatLng(Double.valueOf(coords[0]), Double.valueOf(coords[1]));
+                Log.d(TAG, "<3 coords: "+coords[0]+""+coords[1]);
+                for (Stop stop : mStops) {   //Find stopObj that matches LatLng
+                    if(stop.getLatLng().latitude == Double.valueOf(coords[0]) && stop.getLatLng().longitude == Double.valueOf(coords[1])){
+                        set = true;
+                        String prev = stop.getName();
+                        xpp.nextTag();
+                        stop.setName(xpp.nextText());
+                        setCount++;
+                        Log.d(TAG, "<3   "+prev +">>"+stop.getName());
+                        break;
+                    }
+                }
+                 if (!set){
+                     xpp.nextTag();
+                     xpp.nextText();
+                 }
+
+            }
+
+        }
+
+        Log.d(TAG, "<3 missed: "+(mStops.size() - setCount));
+    }
+
+    private void parseRoute(XmlResourceParser xpp, String routeName) throws IOException, XmlPullParserException {
+        PolylineOptions polylineOptions = new PolylineOptions();
+
+        while (xpp.nextTag() == XmlPullParser.START_TAG){
+            if (xpp.getName().equals("LatLng")){
+                String coords[] = xpp.nextText().split(",");
+                polylineOptions.add(new LatLng(Double.valueOf(coords[0]), Double.valueOf(coords[1])));
+            } else if (xpp.getName().equals("Color")){
+                Polyline polyline = mMap.addPolyline(polylineOptions);
+                String color = xpp.nextText();
+                polyline.setColor(Color.parseColor(color));
+                setPolyline(polyline, routeName);
+            } else if (xpp.getName().equals("Width")){
+                getPolyline(routeName).setWidth(Float.valueOf(xpp.nextText()));
+            }
+        }
+    }
+
 
     public GoogleMap getMap() {
         return mMap;
@@ -252,6 +362,14 @@ public class MapState {
         return false;
     }
 
+    public boolean isFirstTime() {
+        return firstTime;
+    }
+
+    public void setFirstTime(boolean firstTime) {
+        this.firstTime = firstTime;
+    }
+
     public void setDrawerShuttleStatus(Shuttle shuttle, boolean newStatus){
     }
 
@@ -290,4 +408,25 @@ public class MapState {
     public void setEastStops(ArrayList<Stop> eastStops) {
         this.eastStops = eastStops;
     }
+
+    public Polyline getPolyline(String route) {
+        if(route.equals("North"))
+            return northPolyline;
+        else if(route.equals("West"))
+            return  westPolyline;
+        else if(route.equals("East"))
+            return  eastPolyline;
+        return null;
+    }
+
+    public void setPolyline(Polyline polyline, String route) {
+        if(route.equals("North")){
+            northPolyline = polyline;
+        }else if(route.equals("West")){
+            westPolyline = polyline;
+        }else if(route.equals("East")){
+            eastPolyline = polyline;
+        }
+    }
+
 }

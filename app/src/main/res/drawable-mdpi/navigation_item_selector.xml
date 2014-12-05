@@ -7,4 +7,7 @@
           android:drawable="@color/Navigation_Drawer_Item_Bg_Selected"/>
     <item android:state_enabled="true"
           android:drawable="@color/Navigation_Drawer_Item_Bg"/>
+
+    <item android:state_enabled="false"
+          android:drawable="@color/Navigation_Drawer_Item_Bg"/>
 </selector>

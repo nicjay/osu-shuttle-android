@@ -9,6 +9,8 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 
 /*
@@ -61,6 +63,7 @@ public class ExpandableDrawerAdapter extends BaseExpandableListAdapter {
 
             itemView = inflater.inflate(R.layout.drawer_item, parent, false);
             TextView itemTitle = (TextView)itemView.findViewById(R.id.drawer_item_title);
+            TextView itemOfflineText = (TextView)itemView.findViewById(R.id.drawer_item_offline_text);
 
             if (groupPosition < 5){ //Indices 1-4: shuttle  //TODO: set title on click
                 Shuttle shuttle = mDrawerItems.get(groupPosition).getShuttle();
@@ -96,9 +99,16 @@ public class ExpandableDrawerAdapter extends BaseExpandableListAdapter {
                 ((RelativeLayout)itemView.findViewById(R.id.drawer_item_relative_layout)).addView(square);
 
                 //Disable offline shuttles
-                if(!mDrawerItems.get(groupPosition).isRowEnabled()){
+//                if(!mDrawerItems.get(groupPosition).isRowEnabled()){
+//                    itemView.setEnabled(false);
+//                    //TODO: gray out offline shuttle
+//                }
+                if(!shuttle.isOnline()){
                     itemView.setEnabled(false);
-                    //TODO: gray out offline shuttle
+                    itemTitle.setTextColor(mContext.getResources().getColor(R.color.Navigation_Drawer_Shuttle_Disabled_Text));
+                    itemOfflineText.setVisibility(View.VISIBLE);
+                }else{
+                    itemView.setEnabled(true);
                 }
             } else {    //Expandable Route Headers
 

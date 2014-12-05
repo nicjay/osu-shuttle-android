@@ -6,14 +6,14 @@
           android:title="Favorite"
           android:showAsAction="ifRoom" />
 
+    <item android:id="@+id/view_info"
+          android:title="Bus Information" />
+
     <item android:id="@+id/toggle_stops"
           android:title="Hide Stops"/>
 
     <item android:id="@+id/clear_favorites"
           android:title="Clear Favorites"/>
-
-    <item android:id="@+id/view_info"
-          android:title="Bus Information" />
 
     <item android:id="@+id/rate_app"
         android:title="Rate the App" />

@@ -52,11 +52,15 @@ public class FavoriteManager {
             int[] shuttleETAs = row.getFavStopObj().getShuttleETAs();
 
             TextView[] textViews = row.getFavStopETAs();
-
+            boolean timeSet = false;
             //TODO: fails sometimes. shuttleETAs[j] is null
             for (int j = 0; j < shuttleETAs.length; j++){
                 if(shuttleETAs[j] == -1) continue;
                 textViews[j].setText(String.valueOf(shuttleETAs[j]));
+                timeSet = true;
+            }
+            if(!timeSet){
+
             }
         }
     }
@@ -165,7 +169,7 @@ public class FavoriteManager {
             TextView stopETA = (TextView)newTime.findViewById(R.id.favorite_info_stop_eta);
 
             stopETA.setText(Integer.toString(newStop.getShuttleETA(i)));
-            stopETA.setTypeface(Typeface.create("sans-serif-condensed", Typeface.NORMAL));
+            //stopETA.setTypeface(Typeface.create("sans-serif-condensed", Typeface.NORMAL));
 
 
 
@@ -252,10 +256,10 @@ public class FavoriteManager {
                 item.setIcon(R.drawable.favorite_star_disabled);
                 break;
             case FAV_ICON_EMPTY:
-                item.setIcon(R.drawable.favorite_star_empty);
+                item.setIcon(R.drawable.favorite_star_empty2);
                 break;
             case FAV_ICON_FILLED:
-                item.setIcon(R.drawable.favorite_star_filled);
+                item.setIcon(R.drawable.favorite_star_filled_2);
                 break;
         }
     }

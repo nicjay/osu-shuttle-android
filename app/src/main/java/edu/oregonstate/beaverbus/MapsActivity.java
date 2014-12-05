@@ -15,6 +15,8 @@ import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -50,15 +52,14 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
     //Map and Singleton variables
     private GoogleMap mMap;
     private MapState mMapState;
-    private boolean firstTime = true;
     private final LatLng MAP_CENTER = new LatLng(44.563731, -123.279534);
     private final float MAP_ZOOM_LEVEL = 14.5f;
 
-
+    private static LinearLayout progressSpinner;
 
     //Navigation Drawer variables
     private DrawerLayout mDrawerLayout;
-    private ExpandableDrawerAdapter mAdapter;
+    private static ExpandableDrawerAdapter mAdapter;
     private ExpandableListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
 
@@ -101,7 +102,7 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
         selectedStopTitle.setVisibility(View.INVISIBLE);
 
 
-        selectedMarkerManager = new SelectedMarkerManager(this);
+
 
         favoriteManager = new FavoriteManager(this, getApplicationContext(), selectedMarkerManager);
 
@@ -110,18 +111,28 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
         //Get singleton, set context
         mMapState = MapState.get();
         mMapState.setCurrentContext(this);
-        mMapState.setSelectedMarkerManager(selectedMarkerManager);
+
+
 
         //Initialization
         setUpMapIfNeeded();
+
+
+
+        selectedMarkerManager = new SelectedMarkerManager(this);
+        mMapState.setSelectedMarkerManager(selectedMarkerManager);
 
         //Show Loading Dialog
         sProgressDialog = new ProgressDialog(this, R.style.CustomDialog);
         sProgressDialog.setMessage("Loading...");
         sProgressDialog.setCancelable(false);
-        sProgressDialog.show();
+        //sProgressDialog.show();
         //sProgressDialog = ProgressDialog.show(this, "", "Loading...", true, false);
         //sProgressDialog.setProgressStyle(R.style.CustomDialog);
+
+        progressSpinner = (LinearLayout)findViewById(R.id.progress_spinner);
+        progressSpinner.setVisibility(View.VISIBLE);
+
 
         //Start initial HTTP request
         initialNetworkRequestor = new InitialNetworkRequestor();
@@ -146,8 +157,16 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
         Log.d(TAG, "LIFECYCLE - onResume");
         super.onResume();
 
-        if(!firstTime){
+        Log.d(TAG, "$# firstTime: " + mMapState.isFirstTime());
+
+        if(!mMapState.isFirstTime()){
             shuttleUpdater.startShuttleUpdater();
+            //mAdapter.notifyDataSetInvalidated();
+
+            for(Shuttle shuttle : mMapState.getShuttles()){
+                Log.d(TAG, "$# shuttle : " + shuttle.getName() + " = " + shuttle.isOnline() );
+            }
+
             //For shuttle move from (0,0) to actual coords, don't animate.
             mMapState.noAnimate = true;
         }
@@ -166,7 +185,7 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
         Log.d(TAG, "LIFECYCLE - onStop");
         super.onStop();
 
-        firstTime = false;
+        mMapState.setFirstTime(false);
     }
 
     @Override
@@ -179,7 +198,7 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
     protected void onDestroy() {
         Log.d(TAG, "LIFECYCLE - onDestroy");
         super.onDestroy();
-
+        selectedMarkerManager.setSelectedMarker(null, false);
         menuGlobal = null;
         mMap = null;
         mMapState.setMap(null);
@@ -202,7 +221,6 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
             mMap.clear();
 
             if (mMap != null) {
-                setUpRouteLines();
                 mMap.setMyLocationEnabled(true);
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(MAP_CENTER, MAP_ZOOM_LEVEL));
             }
@@ -276,6 +294,7 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
                 }
                 public void onDrawerOpened(View drawerView) {
                     super.onDrawerOpened(drawerView);
+                    mAdapter.notifyDataSetInvalidated();
                     //invalidateOptionsMenu();
                 }
             };
@@ -295,9 +314,10 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
     public void onPostInitialRequest(boolean success){
         Log.d(TAG, "..! ON POST INITIAL requEST");
         if (success){
-            Log.d(TAG, "onPostInitialRequest success");
+            Log.d(TAG, "&& onPostInitialRequest success");
+            mMapState.readConfigurationFile();
             mMapState.setStopsMarkers();
-
+            selectedMarkerManager.setPolylines();
             shuttleUpdater.startShuttleUpdater();
         } else {
             Log.d(TAG, "onPostInitialRequest fail");
@@ -327,12 +347,16 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
 
                 //Set the stop title back to normal
                 RelativeLayout.LayoutParams selectedStopTitleParams = (RelativeLayout.LayoutParams)selectedStopTitle.getLayoutParams();
-                selectedStopTitleParams.setMargins(0, 15, 55, 0);
+                //selectedStopTitleParams.setMargins(0, 15, 55, 0);
+                selectedStopTitleParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE);
+                selectedStopTitleParams.addRule(RelativeLayout.BELOW, 0);
                 selectedStopTitle.setLayoutParams(selectedStopTitleParams);
             }
         }else{
             Log.d(TAG, "onPostShuttleRequest fail");
             sProgressDialog.dismiss();
+
+            hideProgressSpinner();
             if(errorLayout.getVisibility() == View.INVISIBLE && !networkFailureDialog.isShowing()) {
                 //Show the error view
                 Animation animationSlideLeft = AnimationUtils.makeInAnimation(this, true);
@@ -342,7 +366,9 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
 
                 //Reposition stop title below error view
                 RelativeLayout.LayoutParams selectedStopTitleParams = (RelativeLayout.LayoutParams)selectedStopTitle.getLayoutParams();
-                selectedStopTitleParams.setMargins(0, 90, 55, 0);
+                //selectedStopTitleParams.setMargins(0, 90, 55, 0);
+                selectedStopTitleParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
+                selectedStopTitleParams.addRule(RelativeLayout.BELOW, errorLayout.getId());
                 selectedStopTitle.setLayoutParams(selectedStopTitleParams);
             }
             //Clear last ETA data. Maybe not necessary.
@@ -356,6 +382,30 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
             */
         }
     }
+
+    private void hideProgressSpinner(){
+        if(progressSpinner.getVisibility() == View.VISIBLE) {
+            Animation fadeOutAnimation = AnimationUtils.loadAnimation(this, R.anim.fade_out);
+            progressSpinner.startAnimation(fadeOutAnimation);
+            fadeOutAnimation.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    progressSpinner.setVisibility(View.INVISIBLE);
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+
+                }
+            });
+        }
+    }
+
     public void animateSelectedStopTitle(final String markerTitle, final Boolean slideNewTitle, Boolean fromHidden, final Boolean isShuttle, Boolean mapClick) {
         if(isShuttle == null) Log.d(TAG, "!@# NULL");
         selectedMarkerManager.animateSelectedStopTitle(markerTitle, slideNewTitle, fromHidden, isShuttle, mapClick);
@@ -375,9 +425,14 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
     public void updateMap(){
         Log.d(TAG, "updateMap");
         favoriteManager.updateFavorites();
+        boolean updateDrawer = false;
         for (Shuttle shuttle : mMapState.getShuttles()) {
             if (!shuttle.isOnline()) {
-                shuttle.getMarker().setVisible(false);
+                Log.d(TAG, "$# " + shuttle.getName() + " . " + shuttle.isOnline());
+                if(shuttle.getMarker().isVisible()) {
+                    shuttle.getMarker().setVisible(false);
+                    updateDrawer = true;
+                }
             } else {
                 if (shuttle.getLatLng() != shuttle.getMarker().getPosition()) {
                     if (shuttle.getLatLng() != new LatLng(0,0)) {
@@ -390,8 +445,14 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
                         shuttle.updateMarkerWithoutAnim();
                     }
                 }
-                shuttle.getMarker().setVisible(true);
+                if(!shuttle.getMarker().isVisible()) {
+                    shuttle.getMarker().setVisible(true);
+                    updateDrawer = true;
+                }
             }
+        }
+        if(updateDrawer){
+            mAdapter.notifyDataSetInvalidated();
         }
         if(mMapState.noAnimate){
             mMapState.noAnimate = false;
@@ -405,6 +466,7 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
         }
 
         sProgressDialog.dismiss();
+        hideProgressSpinner();
     }
 
 
@@ -505,72 +567,34 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
         if (busInfoDialog != null) {
             busInfoDialog.show();
         }
+
     }
 
     public void createBusInfoDialog(){
+
+
+
         AlertDialog.Builder busInfoDialogBuilder = new AlertDialog.Builder(this, R.style.BusInfoDialogTheme);
+
+
+        TextView title = new TextView(getApplicationContext());
+        title.setText("Beaver Bus");
+        title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 24);
+        title.setTypeface(title.getTypeface(), Typeface.BOLD);
+        title.setGravity(Gravity.CENTER);
+        title.setTextColor(getResources().getColor(R.color.OSU_orange));
+        title.setPadding(0, 24, 0, 24);
+
 
         busInfoDialogBuilder.setMessage("Hours of Operation:\n7:00 AM to 7:00 PM\n\nEstimated loop times:\n5 to 14 minutes")
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                     }
-                }).setTitle("Beaver Bus");
+                }).setCustomTitle(title);
         busInfoDialog = busInfoDialogBuilder.create();
 
     }
-
-    public void setUpRouteLines() {
-
-        //NORTH ROUTE
-        PolylineOptions rectOptionsNorth = new PolylineOptions()
-                .add(new LatLng(44.566792, -123.289718)).add(new LatLng(44.566783, -123.284842))
-                .add(new LatLng(44.566799, -123.284738)).add(new LatLng(44.566798, -123.284360))
-                .add(new LatLng(44.567408, -123.284354)).add(new LatLng(44.567685, -123.284553))
-                .add(new LatLng(44.567904, -123.284555)).add(new LatLng(44.567957, -123.279962))
-                .add(new LatLng(44.566784, -123.279930)).add(new LatLng(44.566765, -123.272398))
-                .add(new LatLng(44.565833, -123.272961)).add(new LatLng(44.564669, -123.274050))
-                .add(new LatLng(44.564643, -123.275300)).add(new LatLng(44.564635, -123.279935))
-                .add(new LatLng(44.564650, -123.284575)).add(new LatLng(44.564590, -123.289720))
-                .add(new LatLng(44.566792, -123.289718));
-        polylineNorth = mMap.addPolyline(rectOptionsNorth);
-        polylineNorth.setColor(0xBD70A800);
-        polylineNorth.setWidth(10);
-
-        //SOUTH ROUTE
-        PolylineOptions rectOptionsEast = new PolylineOptions()
-                .add(new LatLng(44.564507, -123.274058)).add(new LatLng(44.564489, -123.275318))
-                .add(new LatLng(44.564495, -123.280051)).add(new LatLng(44.564158, -123.280016))
-                .add(new LatLng(44.563829, -123.279917)).add(new LatLng(44.563401, -123.279700))
-                .add(new LatLng(44.563371, -123.279686)).add(new LatLng(44.561972, -123.279700))
-                .add(new LatLng(44.560713, -123.279700)).add(new LatLng(44.560713, -123.281585))
-                .add(new LatLng(44.560538, -123.282356)).add(new LatLng(44.559992, -123.282962))
-                .add(new LatLng(44.559296, -123.283010)).add(new LatLng(44.558409, -123.281948))
-                .add(new LatLng(44.558455, -123.280609)).add(new LatLng(44.559033, -123.279740))
-                .add(new LatLng(44.557859, -123.279679)).add(new LatLng(44.559460, -123.276646))
-                .add(new LatLng(44.559873, -123.273996)).add(new LatLng(44.561578, -123.274318))
-                .add(new LatLng(44.562113, -123.274114)).add(new LatLng(44.564507, -123.274058));
-        polylineEast = mMap.addPolyline(rectOptionsEast);
-        polylineEast.setColor(0xBDAA66CD);
-        polylineEast.setWidth(10);
-
-        //EAST ROUTE
-        PolylineOptions rectOptionsWest = new PolylineOptions()
-                .add(new LatLng(44.558993, -123.279550)).add(new LatLng(44.561972, -123.279550))
-                .add(new LatLng(44.563391, -123.279526)).add(new LatLng(44.563401, -123.279520))
-                .add(new LatLng(44.563829, -123.279737)).add(new LatLng(44.564158, -123.279826))
-                .add(new LatLng(44.564495, -123.279901)).add(new LatLng(44.564500, -123.284775))
-                .add(new LatLng(44.562234, -123.284775)).add(new LatLng(44.561965, -123.284625))
-                .add(new LatLng(44.560529, -123.284625)).add(new LatLng(44.560538, -123.282576))
-                .add(new LatLng(44.560012, -123.283142)).add(new LatLng(44.559246, -123.283160))
-                .add(new LatLng(44.558254, -123.281967)).add(new LatLng(44.558305, -123.280559))
-                .add(new LatLng(44.558993, -123.279550));
-        polylineWest = mMap.addPolyline(rectOptionsWest);
-        polylineWest.setColor(0xBDE0AA0F);
-        polylineWest.setWidth(10);
-        selectedMarkerManager.setPolylines(polylineNorth, polylineEast, polylineWest);
-    }
-
 
     public boolean isNetworkAvailable(){
         ConnectivityManager cm = (ConnectivityManager)this.getSystemService(Context.CONNECTIVITY_SERVICE);

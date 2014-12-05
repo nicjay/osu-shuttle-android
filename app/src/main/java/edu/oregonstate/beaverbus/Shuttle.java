@@ -111,13 +111,13 @@ public class Shuttle {
         final float endHeading = (float)getHeading();
 
         Log.d(TAG, "!@ Starting position: " + startLatLng.latitude + " / " + startLatLng.longitude + "\n Marker: " + getName() + " end:  "+ endLatLng.latitude + " / " + endLatLng.longitude);
-        long value = 1000;
-        if (!mMarker.isVisible()){
-            Log.d(TAG, "OH! marker not visible");
-            mMarker.setVisible(true);
-            value = 0;
-        }
-        final long duration = value;
+//        long value = 1000;
+//        if (!mMarker.isVisible()){
+//            Log.d(TAG, "OH! marker not visible");
+//            mMarker.setVisible(true);
+//            value = 0;
+//        }
+        final long duration = 1000;
         final long start = SystemClock.uptimeMillis();
 
         final Handler handler = new Handler();

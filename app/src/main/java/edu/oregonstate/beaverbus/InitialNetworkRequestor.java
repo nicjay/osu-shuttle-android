@@ -194,51 +194,9 @@ public class InitialNetworkRequestor extends AsyncTask<Void, Void, Boolean> {
         sMapState.setWestStops(westStops);
         sMapState.setEastStops(eastStops);
 
-        //Now that stopObjs are set. Initiate function to set their names based on res>>raw>>stop_names.jpg
-        setStopNames();
         return true;
     }
 
-    private void setStopNames(){
-        try {
-            //File I/O variables
-            FileInputStream fileInputStream = (sMapState.getCurrentContext().getResources().openRawResourceFd(R.raw.stop_names)).createInputStream();
-            InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream);
-            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-
-            String line;
-            ArrayList<Stop> stops = sMapState.getStops();
-
-            int[] setStopNameBoolean = new int[stops.size()];
-            for (int i = 0; i < setStopNameBoolean.length; i++) {
-                setStopNameBoolean[i] = 0;
-            }
-
-            while ((line = bufferedReader.readLine()) != null){
-                String[] words = line.split("_"); //File lines are: Lat, Lng, StopName. Separated by '_'
-
-
-                for (Stop stop : stops) {   //Find stopObj that matches LatLng
-                    if(stop.getLatLng().latitude == Double.parseDouble(words[0]) && stop.getLatLng().longitude == Double.parseDouble(words[1])){
-                        stop.setName(words[2]);
-                        setStopNameBoolean[stops.indexOf(stop)] = 1;
-                        break;
-                    }
-                }
-            }
-            int count = 0;
-            for (int i = 0; i < setStopNameBoolean.length; i++) {
-                if(setStopNameBoolean[i] == 0){
-                    count++;
-                }
-            }
-            if(count > 0) Log.d(TAG, "ERROR: " + count + " stops not set");
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            Log.e(TAG, "File input parse error");
-        }
-    }
 
     //Adds new stopNum to previously made stopObj
     private void addStopToRouteMap(int routeId, Stop stop){
