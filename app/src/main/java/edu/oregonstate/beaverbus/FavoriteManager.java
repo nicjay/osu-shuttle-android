@@ -2,6 +2,7 @@ package edu.oregonstate.beaverbus;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.nfc.Tag;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
@@ -91,6 +92,7 @@ public class FavoriteManager {
 
 
     private void setFavoriteRowOffline(boolean offline, FavoriteStopRow row){
+        Log.d(TAG, "** offline:"+offline);
         TextView offlineTextView = (TextView)row.getFavRow().findViewById(R.id.favorite_offline_text);
         LinearLayout timesLayout = (LinearLayout)row.getFavRow().findViewById(R.id.favorite_times_layout);
 
@@ -200,10 +202,9 @@ public class FavoriteManager {
         boolean isSet = false;
 
         for (int i = 0; i < 4; i++){ //For each ETA in shuttleETAs
-            //if (newStop.getShuttleETA(i) == -1) continue;
-
-            isSet = true;
-
+            if (newStop.getShuttleETA(i) != -1) {
+                isSet = true;
+            }
             View newTime = mActivity.getLayoutInflater().inflate(R.layout.favorite_row_eta, null, false);
           //  LinearLayout.LayoutParams newTimeParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.MATCH_PARENT, 1.0f);
           //  newTimeParams.gravity = Gravity.CENTER;
