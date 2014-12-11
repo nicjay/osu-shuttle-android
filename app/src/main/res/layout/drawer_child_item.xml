@@ -7,6 +7,7 @@
               android:gravity="center_vertical"
               android:paddingLeft="32dp"
               android:paddingRight="16dp"
+              android:fontFamily="sans-serif-light"
               android:textColor="@color/OSU_white"
               android:background="@drawable/navigation_item_child_selector"
               android:textSize="16sp"

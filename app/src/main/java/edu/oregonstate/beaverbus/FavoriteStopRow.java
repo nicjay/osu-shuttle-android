@@ -14,8 +14,18 @@ public class FavoriteStopRow {
     private View favRow;    //Row view for favorite
     private TextView favStopName;
     private TextView[] favStopETAs = new TextView[4];
+    private View[] favStopSquares = new View[4];
+    private View[] favStopETAContainers = new View[4];
 
     public Stop favStopObj;
+
+    public View[] getFavStopETAContainers() {
+        return favStopETAContainers;
+    }
+
+    public void setFavStopETAContainer(View favStopETAContainer, int index) {
+        this.favStopETAContainers[index] = favStopETAContainer;
+    }
 
     public View getFavRow() {
         return favRow;
@@ -47,5 +57,13 @@ public class FavoriteStopRow {
 
     public void setFavStopObj(Stop favStopObj) {
         this.favStopObj = favStopObj;
+    }
+
+    public View[] getFavStopSquares() {
+        return favStopSquares;
+    }
+
+    public void setFavStopSquare(View favStopSquare, int index) {
+        this.favStopSquares[index] = favStopSquare;
     }
 }

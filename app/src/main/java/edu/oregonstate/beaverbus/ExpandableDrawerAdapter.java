@@ -55,7 +55,7 @@ public class ExpandableDrawerAdapter extends BaseExpandableListAdapter {
                 sectionIcon.setImageResource(R.drawable.nav_drawer_bus_icon);
             }else{
                 sectionIcon.setImageResource(R.drawable.nav_drawer_map_marker_icon);
-                sectionIcon.getLayoutParams().height = 25;
+                sectionIcon.getLayoutParams().height = 28;
                 //sectionIcon.setPadding(3, 3, 3, 3);
             }
             return sectionView;
@@ -77,16 +77,20 @@ public class ExpandableDrawerAdapter extends BaseExpandableListAdapter {
                 square.setId(R.id.drawer_item_square);
                 switch (groupPosition){
                     case 1:
-                        square.setBackgroundColor(0xFF70A800);  //North
+                        //North
+                        square.setBackgroundResource(R.color.shuttle_green);
                         break;
                     case 2:
-                        square.setBackgroundColor(0xFFE0AA0F);  //West 1
+                        //West 1
+                        square.setBackgroundResource(R.color.shuttle_orange);
                         break;
                     case 3:
-                        square.setBackgroundColor(0xFFE0AA0F);  //West 2
+                        //West 2
+                        square.setBackgroundResource(R.color.shuttle_orange);
                         break;
                     case 4:
-                        square.setBackgroundColor(0xFFAA66CD);  //East
+                        //East
+                        square.setBackgroundResource(R.color.shuttle_purple);
                 }
                 square.setLayoutParams(layoutParams);
 

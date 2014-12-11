@@ -41,7 +41,6 @@ public class SelectedMarkerManager {
         sMapState = MapState.get();
 
         selectedMarkerTextView = ((TextView)activity.findViewById(R.id.selected_stop));
-        selectedMarkerTextView.setTypeface(Typeface.create("sans-serif-condensed", Typeface.BOLD));
         selectedMarkerTextView.setVisibility(View.INVISIBLE);
 
         //Log.d(TAG, "<3 sMapState.getPolyline(\"North\");" + sMapState.getPolyline("North"));

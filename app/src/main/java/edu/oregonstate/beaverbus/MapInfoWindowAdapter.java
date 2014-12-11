@@ -3,6 +3,7 @@ package edu.oregonstate.beaverbus;
 import android.content.Context;
 
 import android.graphics.Typeface;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -75,7 +76,10 @@ public class MapInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
                 }
                 if(!shuttleShown){ //Write "Offline" in place of 0 ETA times
                     TextView textView = new TextView(mContext);
-                    textView.setText("Offline");
+                    textView.setText(R.string.offline);
+                    textView.setTextColor(mContext.getResources().getColor(R.color.Favorite_Offline_Text));
+                    textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+                    textView.setTypeface(textView.getTypeface(), Typeface.BOLD);
                     container.addView(textView);
                 }
 

@@ -2,8 +2,8 @@ package edu.oregonstate.beaverbus;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Typeface;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -12,6 +12,8 @@ import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
@@ -24,6 +26,7 @@ public class FavoriteManager {
     //Favorites view variables
     private static ArrayList<FavoriteStopRow> favoriteStopRows;
     private static LinearLayout favoritesView;
+    private static LinearLayout favoritesViewTitle;
     public final int FAV_ICON_DISABLED = 0;
     public final int FAV_ICON_EMPTY = 1;
     public final int FAV_ICON_FILLED = 2;
@@ -34,11 +37,24 @@ public class FavoriteManager {
 
     private static SelectedMarkerManager mSelectedMarkerManager;
 
+    public FavoriteManager(MapsActivity activity, Context context, SelectedMarkerManager selectedMarkerManager) {
+        mContext = context;
+        mSelectedMarkerManager = selectedMarkerManager;
+        favoritesView = (LinearLayout)activity.findViewById(R.id.favorites_view);
+        favoritesViewTitle = (LinearLayout)activity.findViewById(R.id.favorites_view_title_container);
+
+        favoriteStopRows = new ArrayList<FavoriteStopRow>();
+        mMapState = mMapState.get();
+        mActivity = activity;
+
+    }
+
     public void clearFavorites(){
         favoriteStopRows.clear();
         favoritesView.removeAllViews();
         saveFavoriteStopRows();
         if (mSelectedMarkerManager.getSelectedMarker() != null) setFavIcon(FAV_ICON_EMPTY);
+
     }
 
     public void initSavedFavorites(){
@@ -52,27 +68,43 @@ public class FavoriteManager {
             int[] shuttleETAs = row.getFavStopObj().getShuttleETAs();
 
             TextView[] textViews = row.getFavStopETAs();
+            View[] favStopETAContainers = row.getFavStopETAContainers();
+
             boolean timeSet = false;
             //TODO: fails sometimes. shuttleETAs[j] is null
             for (int j = 0; j < shuttleETAs.length; j++){
+                Log.d(TAG, "shuttleETAs[" + j + "] : " + shuttleETAs[j]);
+               // Integer eta = shuttleETAs[j];
                 if(shuttleETAs[j] == -1) continue;
-                textViews[j].setText(String.valueOf(shuttleETAs[j]));
+                String etaText = String.valueOf(shuttleETAs[j]);
+                textViews[j].setText(etaText);
+                favStopETAContainers[j].setVisibility(View.VISIBLE);
                 timeSet = true;
             }
-            if(!timeSet){
 
-            }
+
+            setFavoriteRowOffline(!timeSet, row);
+
+
         }
     }
 
-    public FavoriteManager(MapsActivity activity, Context context, SelectedMarkerManager selectedMarkerManager) {
-        mContext = context;
-        mSelectedMarkerManager = selectedMarkerManager;
-        favoritesView = (LinearLayout)activity.findViewById(R.id.favorites_view);
-        favoriteStopRows = new ArrayList<FavoriteStopRow>();
-        mMapState = mMapState.get();
-        mActivity = activity;
+
+    private void setFavoriteRowOffline(boolean offline, FavoriteStopRow row){
+        TextView offlineTextView = (TextView)row.getFavRow().findViewById(R.id.favorite_offline_text);
+        LinearLayout timesLayout = (LinearLayout)row.getFavRow().findViewById(R.id.favorite_times_layout);
+
+        if(offline){
+            timesLayout.setVisibility(View.GONE);
+            offlineTextView.setVisibility(View.VISIBLE);
+
+        }else{
+            timesLayout.setVisibility(View.VISIBLE);
+            offlineTextView.setVisibility(View.GONE);
+        }
     }
+
+
 
     public void onMapClick(Marker marker){
         boolean favorite = false;
@@ -101,7 +133,10 @@ public class FavoriteManager {
                     for (int j = 0; j < favoriteStopRows.size(); j++){
                         if (favoriteStopRows.get(j).getFavStopObj().equals(stop)){ //If stopObj is already in favorites, remove
                             favoritesView.removeView(favoriteStopRows.get(j).getFavRow());
+                            Log.d(TAG, " %% fav stopRows: " + favoriteStopRows);
                             favoriteStopRows.remove(j);
+                            Log.d(TAG, " %% POST fav stopRows: " + favoriteStopRows);
+                            setFavoritesViewDrawables();
                             setFavIcon(FAV_ICON_EMPTY);
                             saveFavoriteStopRows();
                             break outerloop;
@@ -129,14 +164,15 @@ public class FavoriteManager {
         LinearLayout timesView = (LinearLayout)newFavRow.findViewById(R.id.favorite_times_layout);
 
         TextView favStopName = (TextView)newFavRow.findViewById(R.id.favorite_stop_name);
-        favStopName.setTypeface(Typeface.create("sans-serif-condensed", Typeface.BOLD));
         favStopName.setText(newStop.getName());
 
         newFavRow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d(TAG, "newFavRow Click Listner called");
+                //Log.d(TAG, "newFavRow Click Listner called " + timesView.getChildCount());
+
                 mActivity.onMapMarkerClick(newStop.getMarker());
+
                 //newFavoriteStop.getMarker().showInfoWindow();
             }
         });
@@ -161,16 +197,21 @@ public class FavoriteManager {
 //            Log.d(TAG, "Setting to no Top");
 //        }
 
+        boolean isSet = false;
+
         for (int i = 0; i < 4; i++){ //For each ETA in shuttleETAs
-            if (newStop.getShuttleETA(i) == -1) continue;
+            //if (newStop.getShuttleETA(i) == -1) continue;
+
+            isSet = true;
 
             View newTime = mActivity.getLayoutInflater().inflate(R.layout.favorite_row_eta, null, false);
+          //  LinearLayout.LayoutParams newTimeParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.MATCH_PARENT, 1.0f);
+          //  newTimeParams.gravity = Gravity.CENTER;
+          // newTime.setLayoutParams(newTimeParams);
             View stopSquare = (View)newTime.findViewById(R.id.favorite_info_stop_square);
             TextView stopETA = (TextView)newTime.findViewById(R.id.favorite_info_stop_eta);
 
             stopETA.setText(Integer.toString(newStop.getShuttleETA(i)));
-            //stopETA.setTypeface(Typeface.create("sans-serif-condensed", Typeface.NORMAL));
-
 
 
             int etaColor;
@@ -192,11 +233,24 @@ public class FavoriteManager {
 
             }
             stopSquare.setBackgroundColor(etaColor);
+            if (newStop.getShuttleETA(i) == -1){
+                newTime.setVisibility(View.GONE);
+            }
             timesView.addView(newTime);
+            timesView.invalidate();
 
             //Set textView of ETA in favObj for updating
+
             newFavoriteStopRow.setFavStopETA(stopETA, i);
+            newFavoriteStopRow.setFavStopSquare(stopSquare, i);
+            newFavoriteStopRow.setFavStopETAContainer(newTime, i);
         }
+
+
+        setFavoriteRowOffline(!isSet, newFavoriteStopRow);
+
+
+
         favoritesView.addView(newFavRow);
         favoriteStopRows.add(newFavoriteStopRow);
 
@@ -206,11 +260,15 @@ public class FavoriteManager {
     private void setFavoritesViewDrawables(){
         for (FavoriteStopRow row : favoriteStopRows){
             if (favoriteStopRows.indexOf(row) == 0){
+                Log.d(TAG, "%% set to top");
                 row.getFavRow().findViewById(R.id.favorite_times_layout).setBackgroundResource(R.drawable.favorite_times_border);
                 row.getFavRow().findViewById(R.id.favorite_stop_name).setBackgroundResource(R.drawable.favorite_name_border);
+                row.getFavRow().findViewById(R.id.favorite_offline_text).setBackgroundResource(R.drawable.favorite_times_border);
             }else{
+                Log.d(TAG, "%% set to NO top");
                 row.getFavRow().findViewById(R.id.favorite_times_layout).setBackgroundResource(R.drawable.favorite_times_border_no_top);
                 row.getFavRow().findViewById(R.id.favorite_stop_name).setBackgroundResource(R.drawable.favorite_name_border_no_top);
+                row.getFavRow().findViewById(R.id.favorite_offline_text).setBackgroundResource(R.drawable.favorite_times_border_no_top);
             }
 
         }
@@ -222,6 +280,11 @@ public class FavoriteManager {
         SharedPreferences.Editor prefsEditor = sharedPreferences.edit();
 
         String savedString = "";
+        if(favoriteStopRows.size() == 0){
+            favoritesViewTitle.setVisibility(View.INVISIBLE);
+        }else{
+            favoritesViewTitle.setVisibility(View.VISIBLE);
+        }
         for(int i = 0; i < favoriteStopRows.size(); i++){
             if(i != 0) savedString = savedString.concat("_");
             FavoriteStopRow favoriteStopRow = favoriteStopRows.get(i);
@@ -245,7 +308,10 @@ public class FavoriteManager {
                 }
             }
         }
-        if(favoriteStopNames.length > 0) saveFavoriteStopRows();
+        if(favoriteStopNames.length > 0){
+            saveFavoriteStopRows();
+
+        }
     }
 
     public void setFavIcon(int newState){

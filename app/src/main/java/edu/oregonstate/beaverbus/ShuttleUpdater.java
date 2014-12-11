@@ -138,6 +138,8 @@ public class ShuttleUpdater {
            if (JSONShuttles != null) {
                for (int i = 0; i < JSONShuttles.length(); i++) {
 
+
+
                    String json = null;
                    try {
                        JSONObject rawJson = JSONShuttles.getJSONObject(i);
@@ -187,11 +189,17 @@ public class ShuttleUpdater {
                    }
                }
            }
+
+
+
+
            ArrayList<Shuttle> shuttles = sMapState.getShuttles();
+           ArrayList<Stop> stops = sMapState.getStops();
+
            for (int i = 0; i < 4; i++) {
                Shuttle shuttle = shuttles.get(i);
                if (!onlineStates[i]) shuttle.setOnline(false);
-               else shuttle.setOnline(true);
+                else shuttle.setOnline(true);
            }
 
            if (JSONEstimates != null) {
@@ -264,6 +272,33 @@ public class ShuttleUpdater {
                }
 
            }
+
+
+/*
+           for (int i = 0; i < 4; i++) {
+               Shuttle shuttle = shuttles.get(i);
+               if (!onlineStates[i]) shuttle.setOnline(false);
+                   // else shuttle.setOnline(true);
+                   //TODO: remove. testing offline
+
+               else{
+                    if (i == 0 || i == 1) {
+                        shuttle.setOnline(false);
+                        for (Stop stop : stops) {
+                            stop.setShuttleETA(i, -1);
+                        }
+                    }
+                   else shuttle.setOnline(true);
+
+               }
+
+           }
+*/
+
+
+
+
+
        }
     }
 }

@@ -57,6 +57,12 @@ public class Stop {
         mShuttleETAs = shuttleETAs;
     }
 
+    public void invalidateShuttleETAs(){
+        for (int i = 0; i < mShuttleETAs.length;i++ ){
+            mShuttleETAs[i] = -1;
+        }
+    }
+
     public void setShuttleETA(int index, int ETA){
         mShuttleETAs[index] = ETA;
     }

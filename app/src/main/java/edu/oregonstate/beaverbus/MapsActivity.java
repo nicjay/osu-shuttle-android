@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.Uri;
@@ -98,10 +99,7 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
         //View references within main screen
         errorLayout = (LinearLayout) findViewById(R.id.error_view);
         selectedStopTitle = ((TextView)findViewById(R.id.selected_stop));
-        selectedStopTitle.setTypeface(Typeface.create("sans-serif-condensed", Typeface.BOLD));
         selectedStopTitle.setVisibility(View.INVISIBLE);
-
-
 
 
         favoriteManager = new FavoriteManager(this, getApplicationContext(), selectedMarkerManager);
@@ -218,6 +216,7 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
             final MapFragment mapFragment = ((MapFragment) getFragmentManager().findFragmentById(R.id.map));
             mapFragment.setRetainInstance(true);
             mMap = mapFragment.getMap();
+            mMap.getUiSettings().setZoomControlsEnabled(false);
             mMap.clear();
 
             if (mMap != null) {
@@ -370,6 +369,11 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
                 selectedStopTitleParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
                 selectedStopTitleParams.addRule(RelativeLayout.BELOW, errorLayout.getId());
                 selectedStopTitle.setLayoutParams(selectedStopTitleParams);
+
+                mMapState.invalidateStopETAs();
+                favoriteManager.updateFavorites();
+
+
             }
             //Clear last ETA data. Maybe not necessary.
             /*

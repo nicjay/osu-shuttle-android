@@ -30,6 +30,7 @@
         android:textSize="16sp"
         android:textColor="#a0a0a0"
         android:layout_toRightOf="@id/drawer_section_icon"
+        android:fontFamily="sans-serif-light"
 
         />
 

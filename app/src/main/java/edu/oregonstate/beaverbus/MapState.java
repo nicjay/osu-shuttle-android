@@ -429,4 +429,12 @@ public class MapState {
         }
     }
 
+
+
+    public void invalidateStopETAs(){
+        for (Stop stop : mStops){
+            stop.invalidateShuttleETAs();
+        }
+    }
+
 }

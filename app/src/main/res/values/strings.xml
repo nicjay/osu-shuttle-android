@@ -7,4 +7,6 @@
     <string name="max_favorites">Favorites full</string>
     <string name="disabled_favorites">No stop selected</string>
     <string name="no_connection_message">Real-time updates unavailable. Retrying...</string>
+    <string name="offline">INACTIVE</string>
+    <string name="favorites_view_title">Favorites</string>
 </resources>
