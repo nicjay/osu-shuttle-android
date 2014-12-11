@@ -1,31 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:gravity="center"
-              android:padding="8dp"
-                >
-   <View
-       android:id="@+id/info_stop_square"
-       android:layout_width="13dp"
-       android:layout_height="13dp"
-       android:background="@color/OSU_orange"
-       android:layout_marginBottom="8dp"/>
+              android:orientation="vertical"
+              android:padding="8dp">
+
+    <View
+        android:id="@+id/info_stop_square"
+        android:layout_width="13dp"
+        android:layout_height="13dp"
+        android:layout_marginBottom="8dp"
+        android:background="@color/OSU_orange"/>
 
     <TextView
         android:id="@+id/info_stop_eta"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="8"
         android:textSize="28sp"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="min"
-        android:textSize="14sp"
-        android:textColor="#3f3f3f"/>
+        android:textColor="#3f3f3f"
+        android:textSize="14sp"/>
 
 </LinearLayout>

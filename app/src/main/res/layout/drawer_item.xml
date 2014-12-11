@@ -1,40 +1,40 @@
-<!--  "#282828   -->
+<RelativeLayout
+    android:id="@+id/drawer_item_relative_layout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/navigation_item_selector">
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:id="@+id/drawer_item_relative_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/navigation_item_selector">
     <TextView
         android:id="@+id/drawer_item_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-light"
+        android:paddingBottom="8dp"
         android:paddingLeft="16dp"
         android:paddingRight="8dp"
         android:paddingTop="8dp"
-        android:paddingBottom="8dp"
-        android:textSize="20sp"
         android:textColor="#e7e0d4"
-        android:fontFamily="sans-serif-light"
-        />
+        android:textSize="20sp"/>
+
     <TextView
         android:id="@+id/drawer_item_offline_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:textSize="14sp"
-        android:textColor="@color/Navigation_Drawer_Item_Offline_Text"
-        android:text="@string/offline"
-        android:textStyle="bold"
-        android:paddingRight="32dp"
         android:layout_centerVertical="true"
+        android:paddingRight="32dp"
+        android:text="@string/offline"
+        android:textColor="@color/Navigation_Drawer_Item_Offline_Text"
+        android:textSize="14sp"
+        android:textStyle="bold"
         android:visibility="invisible"/>
+
     <ImageView
         android:id="@+id/drawer_item_carrot"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:padding="8dp"
-        />
+        android:padding="8dp"/>
 
 </RelativeLayout>

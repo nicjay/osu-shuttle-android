@@ -1,7 +1,6 @@
 package edu.oregonstate.beaverbus;
 
 import android.content.Context;
-
 import android.graphics.Typeface;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -9,6 +8,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Marker;
 
@@ -33,30 +33,25 @@ public class MapInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
 
     @Override
     public View getInfoWindow(final Marker marker) {
-        //Find stopObj that matches marker
-        for (Stop stop : sMapState.getStops()){
-            if (stop.getMarker().equals(marker)){ //Found stopObj
+        for (Stop stop : sMapState.getStops()) { //Find stopObj that matches marker
+            if (stop.getMarker().equals(marker)) { //Found stopObj
+                boolean shuttleShown = false; //Initialized to false. If any ETA exists, it is set to true. Allows "Offline" to be written.
 
-                //Initialized to false. If any ETA exists, it is set to true.
-                //Allows "Offline" to be written.
-                boolean shuttleShown = false;
-
-                View stopView = inflater.inflate(R.layout.info_stop_new, null);
-                LinearLayout container = (LinearLayout)stopView.findViewById(R.id.eta_container);
+                View stopView = inflater.inflate(R.layout.info_stop, null);
+                LinearLayout container = (LinearLayout) stopView.findViewById(R.id.eta_container);
 
                 int[] shuttleEtas = stop.getShuttleETAs();
-                for(int i = 0; i < shuttleEtas.length; i++){
+                for (int i = 0; i < shuttleEtas.length; i++) {
                     int eta = shuttleEtas[i];
-                    if(eta != -1){
+                    if (eta != -1) {
                         shuttleShown = true;
 
                         View stopSection = inflater.inflate(R.layout.info_stop_section, null);
                         View square = stopSection.findViewById(R.id.info_stop_square);
-                        TextView etaText = (TextView)stopSection.findViewById(R.id.info_stop_eta);
-                        //etaText.setTypeface(Typeface.create("sans-serif-condensed", Typeface.NORMAL));
+                        TextView etaText = (TextView) stopSection.findViewById(R.id.info_stop_eta);
 
                         //Set square color based on ETA index
-                        switch (i){
+                        switch (i) {
                             case 0:
                                 square.setBackgroundColor(mContext.getResources().getColor(R.color.shuttle_green));
                                 break;
@@ -70,11 +65,11 @@ public class MapInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
                                 square.setBackgroundColor(mContext.getResources().getColor(R.color.shuttle_purple));
                                 break;
                         }
-                        etaText.setText(""+eta);
+                        etaText.setText("" + eta);
                         container.addView(stopSection);
                     }
                 }
-                if(!shuttleShown){ //Write "Offline" in place of 0 ETA times
+                if (!shuttleShown) { //Write "offline status text" in place of 0 ETA times
                     TextView textView = new TextView(mContext);
                     textView.setText(R.string.offline);
                     textView.setTextColor(mContext.getResources().getColor(R.color.Favorite_Offline_Text));

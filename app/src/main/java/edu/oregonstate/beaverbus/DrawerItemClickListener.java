@@ -74,9 +74,8 @@ public class DrawerItemClickListener implements ExpandableListView.OnGroupClickL
                 marker = null;
         }
         if(marker != null) {
-            //sMapState.animateMap(marker.getPosition());
             activity.onMapMarkerClick(marker);
-            activity.animateSelectedStopTitle(marker.getTitle(), true, false, null, false);
+            activity.animateSelectedStopTitle(marker.getTitle(), null, false);
         }
 
         mDrawerLayout.closeDrawer(mDrawerList);

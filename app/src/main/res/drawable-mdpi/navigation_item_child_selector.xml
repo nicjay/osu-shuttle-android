@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_pressed="true"
-          android:drawable="@color/Navigation_Drawer_Item_Child_Bg_Selected"/>
-    <item android:state_enabled="true"
-          android:drawable="@color/Navigation_Drawer_Item_Child_Bg"/>
+    <item android:drawable="@color/Navigation_Drawer_Item_Child_Bg_Selected"
+          android:state_pressed="true"/>
+    <item android:drawable="@color/Navigation_Drawer_Item_Child_Bg"
+          android:state_enabled="true"/>
 </selector>

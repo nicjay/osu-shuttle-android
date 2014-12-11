@@ -1,7 +1,0 @@
-Preferred ImageSizes
-          H           72x72
-          M           48x48
-          XH          96x96
-          XXH         144x144
-
-

@@ -1,10 +1,5 @@
 package edu.oregonstate.beaverbus;
 
-import android.app.Activity;
-import android.graphics.Typeface;
-import android.opengl.Visibility;
-import android.util.Log;
-import android.util.TypedValue;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -14,8 +9,6 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.Polyline;
 
-import java.util.Map;
-
 /**
  * Created by sellersk on 11/20/2014.
  */
@@ -23,81 +16,61 @@ public class SelectedMarkerManager {
     private static final String TAG = "SelectedMarkerManager";
 
     private MapsActivity mActivity;
-    
     private static TextView selectedMarkerTextView;
-    
     private static Marker selectedMarker;
-    
     private static MapState sMapState;
-
     private Boolean showSelectedInfoWindow = false;
 
     private Polyline polylineNorth;
     private Polyline polylineWest;
     private Polyline polylineEast;
-    
+
     public SelectedMarkerManager(MapsActivity activity) {
         mActivity = activity;
         sMapState = MapState.get();
-
-        selectedMarkerTextView = ((TextView)activity.findViewById(R.id.selected_stop));
+        selectedMarkerTextView = ((TextView) activity.findViewById(R.id.selected_stop));
         selectedMarkerTextView.setVisibility(View.INVISIBLE);
-
-        //Log.d(TAG, "<3 sMapState.getPolyline(\"North\");" + sMapState.getPolyline("North"));
-
-
-
     }
 
-    public static Marker getSelectedMarker() {
-        return selectedMarker;
-    }
 
-    public static void setSelectedMarker(Marker selectedMarker) {
-        SelectedMarkerManager.selectedMarker = selectedMarker;
-    }
-
-    public void onMapClick(){
+    public void onMapClick() {
         setRouteLineWidthToDefault();
-        if (selectedMarker != null){
+        if (selectedMarker != null) {
             if (!sMapState.isStopsVisible() && showSelectedInfoWindow) {
                 selectedMarker.setVisible(false);
             }
             setSelectedMarker(null, false);
         }
-        animateSelectedStopTitle(null, false, false, false, true);
+        animateSelectedStopTitle(null, false, true);
 
     }
 
-    public void refreshMarker(){
-        if(selectedMarker != null && showSelectedInfoWindow) selectedMarker.showInfoWindow();
+    public void refreshMarker() {
+        if (selectedMarker != null && showSelectedInfoWindow) selectedMarker.showInfoWindow();
     }
 
-    public Boolean onMarkerClick(Marker marker){
+    public Boolean onMarkerClick(Marker marker) {
         Boolean isShuttle = marker.isFlat();
 
         setRouteLineWidthToDefault();
 
-        Log.d(TAG, "*& showSelectedInfoWindow: " + showSelectedInfoWindow);
-        if (selectedMarker != null && !sMapState.isStopsVisible() && showSelectedInfoWindow){
+        if (selectedMarker != null && !sMapState.isStopsVisible() && showSelectedInfoWindow) {
             selectedMarker.setVisible(false);
-            Log.d(TAG, "&& North selectedMarker set to invisible");
         }
 
         sMapState.animateMap(marker.getPosition());
-        if(!isShuttle) {
+        if (!isShuttle) {
             marker.setVisible(true);
         }
 
         if (selectedMarker == null) {
-            animateSelectedStopTitle(marker.getTitle(), true, true, isShuttle, false);
+            animateSelectedStopTitle(marker.getTitle(), isShuttle, false);
         } else {
-            animateSelectedStopTitle(marker.getTitle(), true, false, isShuttle, false);
+            animateSelectedStopTitle(marker.getTitle(), isShuttle, false);
         }
 
         //If stop
         if (!isShuttle) {
-            Log.d(TAG, "^^ selectedMarker is: " +selectedMarker);
             setSelectedMarker(marker, true);
             marker.showInfoWindow();
         } else {
@@ -107,45 +80,35 @@ public class SelectedMarkerManager {
         return true;
     }
 
+    public static Marker getSelectedMarker() {
+        return selectedMarker;
+    }
+
     public void setSelectedMarker(Marker newMarker, boolean showInfoWindow) {
-        if(selectedMarker != null && !selectedMarker.isFlat()) selectedMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.marker_dot_plus));
-        if(newMarker!= null && showInfoWindow)newMarker.setIcon((BitmapDescriptorFactory.fromResource(R.drawable.marker_dot_empty)));
+        if (selectedMarker != null && !selectedMarker.isFlat())
+            selectedMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.marker_dot_plus));
+        if (newMarker != null && showInfoWindow)
+            newMarker.setIcon((BitmapDescriptorFactory.fromResource(R.drawable.marker_dot_empty)));
 
         showSelectedInfoWindow = showInfoWindow;
-        if (newMarker != null) {
 
-            for(Stop stop: sMapState.getStops()){
-                if(stop.getMarker().equals(newMarker)){
-                    //selectedMarkerTimes = stop.getShuttleETAs();
-                }
-            }
-            selectedMarker = newMarker;
-
-        } else {
-            //selectedMarkerTimes = null;
-            selectedMarker = null;
-        }
+        selectedMarker = newMarker; //Null is passed in when map is clicked
     }
-    
-    public void animateSelectedStopTitle(final String markerTitle, final Boolean slideNewTitle, Boolean fromHidden, Boolean shuttleBool, Boolean mapClick){
-        if(shuttleBool == null) shuttleBool = false;
+
+    public void animateSelectedStopTitle(final String markerTitle, Boolean shuttleBool, Boolean mapClick) {
+        if (shuttleBool == null) shuttleBool = false;
         final Boolean isShuttle = shuttleBool;
 
         final Animation fadeInAnim = AnimationUtils.makeInAnimation(mActivity.getApplicationContext(), true);
         fadeInAnim.setDuration(400);
 
-        Log.d(TAG, "%% AnimateSelectedStopTitle markerTitle: " + markerTitle);
-
-        if(mapClick){
-            Log.d(TAG, "%% if(mapClick");
-            if(selectedMarkerTextView.getVisibility() == View.VISIBLE){
-                Log.d(TAG, "%% if(selectedMarkerTextView.getVisibility() == View.VISIBLE)");
+        if (mapClick) {
+            if (selectedMarkerTextView.getVisibility() == View.VISIBLE) {
                 Animation fadeOutAnim = AnimationUtils.makeOutAnimation(mActivity, true);
                 fadeOutAnim.setDuration(300);
                 fadeOutAnim.setAnimationListener(new Animation.AnimationListener() {
                     @Override
                     public void onAnimationStart(Animation animation) {
-
                     }
 
                     @Override
@@ -155,15 +118,12 @@ public class SelectedMarkerManager {
 
                     @Override
                     public void onAnimationRepeat(Animation animation) {
-
                     }
                 });
                 selectedMarkerTextView.startAnimation(fadeOutAnim);
             }
-        }else{
-            Log.d(TAG, "%% else{");
-            if(selectedMarkerTextView.getVisibility() == View.VISIBLE){
-                Log.d(TAG, "%% selectedMarkerTextView.getVisibility() == View.VISIBLE");
+        } else {
+            if (selectedMarkerTextView.getVisibility() == View.VISIBLE) {
                 Animation fadeOutAnim = AnimationUtils.makeOutAnimation(mActivity, true);
                 fadeOutAnim.setDuration(300);
                 fadeOutAnim.setAnimationListener(new Animation.AnimationListener() {
@@ -178,7 +138,7 @@ public class SelectedMarkerManager {
                             selectedMarkerTextView.setVisibility(View.VISIBLE);
                             selectedMarkerTextView.setText(markerTitle);
                             selectedMarkerTextView.startAnimation(fadeInAnim);
-                        }else{
+                        } else {
                             selectedMarkerTextView.setVisibility(View.INVISIBLE);
                         }
                     }
@@ -188,80 +148,41 @@ public class SelectedMarkerManager {
                     }
                 });
                 selectedMarkerTextView.startAnimation(fadeOutAnim);
-            }else{
+            } else {
                 selectedMarkerTextView.setVisibility(View.VISIBLE);
                 selectedMarkerTextView.setText(markerTitle);
                 selectedMarkerTextView.startAnimation(fadeInAnim);
                 setSelectedStopDrawable(markerTitle, isShuttle);
             }
         }
-       /*
-
-
-        if (selectedMarkerTextView.getVisibility() == View.INVISIBLE){
-            selectedMarkerTextView.setVisibility(View.VISIBLE);
-            selectedMarkerTextView.setText(markerTitle);
-            selectedMarkerTextView.startAnimation(fadeInAnim);
-            setSelectedStopDrawable(markerTitle, isShuttle);
-        } else {
-            Animation fadeOutAnim = AnimationUtils.makeOutAnimation(mActivity, true);
-            fadeOutAnim.setDuration(300);
-            fadeOutAnim.setAnimationListener(new Animation.AnimationListener() {
-                @Override
-                public void onAnimationStart(Animation animation) {
-                }
-
-                @Override
-                public void onAnimationEnd(Animation animation) {
-                    setSelectedStopDrawable(markerTitle, isShuttle);
-                    if (slideNewTitle || markerTitle != null) {
-                        selectedMarkerTextView.setVisibility(View.VISIBLE);
-                        selectedMarkerTextView.setText(markerTitle);
-                        selectedMarkerTextView.startAnimation(fadeInAnim);
-                    }else{
-                        selectedMarkerTextView.setVisibility(View.INVISIBLE);
-                    }
-                }
-
-                @Override
-                public void onAnimationRepeat(Animation animation) {
-                }
-            });
-            selectedMarkerTextView.startAnimation(fadeOutAnim);
-        }
-        */
     }
 
 
-
-    private void setSelectedStopDrawable(String title, Boolean isShuttle){
-        Log.d("TAG", "title: " + title);
-        if(isShuttle){
-            if(title.equals("East Bus")){
+    private void setSelectedStopDrawable(String title, Boolean isShuttle) {
+        if (isShuttle) {
+            if (title.equals("East Bus")) {
                 selectedMarkerTextView.setBackgroundResource(R.drawable.selected_stop_name_purple_bg);
                 polylineEast.setWidth(20);
-            }
-            else if(title.equals("West 1 Bus") || title.equals("West 2 Bus")) {
+            } else if (title.equals("West 1 Bus") || title.equals("West 2 Bus")) {
                 selectedMarkerTextView.setBackgroundResource(R.drawable.selected_stop_name_orange_bg);
                 polylineWest.setWidth(20);
-            }
-            else if(title.equals("North Bus")){
+            } else if (title.equals("North Bus")) {
                 selectedMarkerTextView.setBackgroundResource(R.drawable.selected_stop_name_green_bg);
                 polylineNorth.setWidth(20);
             }
-        }else{
+        } else {
             selectedMarkerTextView.setBackgroundResource(R.drawable.selected_stop_name_bg);
         }
         selectedMarkerTextView.setPadding(24, 12, 24, 12);
     }
 
-    private void setRouteLineWidthToDefault(){
-        if(polylineNorth.getWidth() > 10) polylineNorth.setWidth(10);
-        if(polylineEast.getWidth() > 10) polylineEast.setWidth(10);
-        if(polylineWest.getWidth() > 10) polylineWest.setWidth(10);
+    private void setRouteLineWidthToDefault() {
+        if (polylineNorth.getWidth() > 10) polylineNorth.setWidth(10);
+        if (polylineEast.getWidth() > 10) polylineEast.setWidth(10);
+        if (polylineWest.getWidth() > 10) polylineWest.setWidth(10);
     }
 
-    public void setPolylines(){
+    public void setPolylines() {
         polylineNorth = sMapState.getPolyline("North");
         polylineWest = sMapState.getPolyline("West");
         polylineEast = sMapState.getPolyline("East");

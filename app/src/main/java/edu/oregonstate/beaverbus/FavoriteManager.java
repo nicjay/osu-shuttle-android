@@ -2,9 +2,7 @@ package edu.oregonstate.beaverbus;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.nfc.Tag;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -13,8 +11,6 @@ import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
@@ -316,6 +312,7 @@ public class FavoriteManager {
     }
 
     public void setFavIcon(int newState){
+        //TODO 12/11/2014: reduce sloppiness for menuGlobal var
         MenuItem item = mActivity.menuGlobal.getItem(0);
         favIconState = newState;
         switch (newState){
@@ -323,10 +320,10 @@ public class FavoriteManager {
                 item.setIcon(R.drawable.favorite_star_disabled);
                 break;
             case FAV_ICON_EMPTY:
-                item.setIcon(R.drawable.favorite_star_empty2);
+                item.setIcon(R.drawable.favorite_star_empty);
                 break;
             case FAV_ICON_FILLED:
-                item.setIcon(R.drawable.favorite_star_filled_2);
+                item.setIcon(R.drawable.favorite_star_filled);
                 break;
         }
     }

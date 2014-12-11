@@ -6,7 +6,10 @@
     <string name="drawer_close">CLOSE</string>
     <string name="max_favorites">Favorites full</string>
     <string name="disabled_favorites">No stop selected</string>
-    <string name="no_connection_message">Real-time updates unavailable. Retrying...</string>
+    <string name="no_connection_message">Real-time updates unavailable. Retrying…</string>
     <string name="offline">INACTIVE</string>
     <string name="favorites_view_title">Favorites</string>
+    <string name="hide_stops">Hide Stops</string>
+    <string name="show_stops">Show Stops</string>
+    <string name="bus_info_message">"Hours of Operation:\n7:00 AM to 7:00 PM\n\nEstimated loop times:\n5 to 14 minutes"</string>
 </resources>

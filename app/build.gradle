@@ -5,7 +5,7 @@ android {
     buildToolsVersion '20'
 
     defaultConfig {
-        applicationId "com.jordann.maptest"
+        applicationId "edu.oregonstate.beaverbus"
         minSdkVersion 15
         targetSdkVersion 20
         versionCode 1

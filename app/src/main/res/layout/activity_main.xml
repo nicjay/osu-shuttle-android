@@ -1,10 +1,8 @@
-<!-- A DrawerLayout is intended to be used as the top-level content view using match_parent for both width and height to consume the full space available. -->
 <RelativeLayout
     android:id="@+id/top_layout"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    >
+    android:layout_height="match_parent">
 
     <android.support.v4.widget.DrawerLayout
         android:id="@+id/drawer_layout"
@@ -12,34 +10,26 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <!-- As the main content view, the view below consumes the entire
-             space available using match_parent in both dimensions.-->
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
+
             <fragment
                 android:id="@+id/map"
                 android:name="com.google.android.gms.maps.MapFragment"
                 xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                />
-
+                android:layout_height="match_parent"/>
 
             <LinearLayout
                 android:id="@+id/favorites_view"
-                android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
+                android:layout_marginBottom="6dp"
                 android:layout_marginLeft="6dp"
                 android:layout_marginRight="6dp"
-                android:layout_marginBottom="6dp"
-                >
-
-
-
+                android:orientation="vertical">
             </LinearLayout>
 
             <LinearLayout
@@ -49,129 +39,101 @@
                 android:layout_above="@id/favorites_view"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
+                android:layout_marginBottom="2dp"
                 android:layout_marginLeft="10dp"
                 android:layout_marginStart="10dp"
-                android:layout_marginBottom="2dp"
                 android:orientation="horizontal"
                 android:visibility="invisible">
 
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/favorite_star_outline2"
+                    android:scaleX=".55"
                     android:scaleY=".55"
-                    android:scaleX=".55"/>
+                    android:src="@drawable/favorite_star_outline"/>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/favorites_view_title"
-                    android:textSize="18sp"
-                    android:textColor="@color/favorites_view_title"
-                    android:fontFamily="sans-serif-light"
                     android:layout_gravity="center_vertical"
-                    />
-
-
+                    android:fontFamily="sans-serif-light"
+                    android:text="@string/favorites_view_title"
+                    android:textColor="@color/favorites_view_title"
+                    android:textSize="18sp"/>
             </LinearLayout>
-
-
 
             <LinearLayout
                 android:id="@+id/error_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/transparent_error"
                 android:layout_alignParentTop="true"
+                android:background="@color/transparent_error"
                 android:orientation="horizontal"
-                android:visibility="invisible"
-                >
+                android:visibility="invisible">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/no_connection_message"
-                    android:gravity="center_vertical"
                     android:layout_gravity="center_vertical"
+                    android:gravity="center_vertical"
                     android:paddingLeft="16dp"
-                    android:textSize="16dp"
-                    android:textColor="#FFFFFF"/>
+                    android:text="@string/no_connection_message"
+                    android:textColor="#FFFFFF"
+                    android:textSize="16dp"/>
 
                 <ProgressBar
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:paddingLeft="8dp"
-                    />
-
+                    android:paddingLeft="8dp"/>
             </LinearLayout>
+
             <LinearLayout
                 android:id="@+id/progress_spinner"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:gravity="center"
-                android:background="@color/progress_transparent">
+                android:background="@color/progress_transparent"
+                android:gravity="center">
+
                 <ProgressBar
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:scaleX="2"
-                    android:scaleY="2"
-                    android:indeterminate="true"
                     android:layout_marginBottom="45dp"
-                    />
+                    android:indeterminate="true"
+                    android:scaleX="2"
+                    android:scaleY="2"/>
             </LinearLayout>
 
             <TextView
                 android:id="@+id/selected_stop"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-condensed"
                 android:layout_alignParentTop="true"
-                android:textSize="23sp"
                 android:layout_centerInParent="true"
                 android:layout_marginRight="55dp"
                 android:layout_marginTop="15dp"
                 android:background="@drawable/selected_stop_name_bg"
+                android:fontFamily="sans-serif-condensed"
+                android:gravity="center_horizontal"
+                android:maxWidth="225dp"
+                android:paddingBottom="4dp"
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp"
                 android:paddingTop="4dp"
-                android:paddingBottom="4dp"
-                android:maxWidth="225dp"
-                android:gravity="center_horizontal"
-
-                />
-          <!--  <Button
-                style="?android:attr/buttonStyleSmall"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                android:id="@+id/favorite_button"
-                android:layout_alignParentLeft="true"
-                android:background="#CCFFFFFF"
-                android:layout_alignParentTop="true"
-                android:layout_marginLeft="8dp"
-                android:layout_marginTop="8dp"/> -->
+                android:textSize="23sp"/>
         </RelativeLayout>
 
-        <!-- android:layout_gravity="start" tells DrawerLayout to treat
-             this as a sliding drawer on the left side for left-to-right
-             languages and on the right side for right-to-left languages.
-             The drawer is given a fixed width in dp and extends the full height of
-             the container. A solid background is used for contrast
-             with the content view. -->
         <ExpandableListView
             android:id="@+id/left_drawer"
             android:layout_width="240dp"
             android:layout_height="match_parent"
             android:layout_gravity="start"
-
             android:background="@color/Navigation_Drawer_Background"
             android:choiceMode="singleChoice"
             android:divider="#333333"
             android:dividerHeight="1dp"
-            android:groupIndicator="@null"
-
-            />
+            android:groupIndicator="@null"/>
 
     </android.support.v4.widget.DrawerLayout>
 

@@ -1,30 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android" >
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item>
-        <shape android:shape="rectangle" >
+        <shape android:shape="rectangle">
             <gradient
-                android:startColor="@color/transparent_OSU_white"
+                android:angle="90"
                 android:centerColor="@color/transparent_OSU_white"
                 android:endColor="@color/transparent_OSU_white"
-                android:angle="90"/>
+                android:startColor="@color/transparent_OSU_white"/>
             <corners
                 android:radius="0dp"/>
             <stroke
                 android:width="2dp"
-                android:color="@color/transparent_OSU_black" />
+                android:color="@color/transparent_OSU_black"/>
         </shape>
     </item>
-    <item android:top="-4dp" android:right="-5dp" android:left="-5dp">
+    <item
+        android:left="-5dp"
+        android:right="-5dp"
+        android:top="-4dp">
         <shape>
             <solid android:color="@android:color/transparent"/>
             <stroke
-
                 android:width="0dp"
-                android:color="@color/OSU_orange" />
+                android:color="@color/OSU_orange"/>
         </shape>
     </item>
-
 
 
 </layer-list>

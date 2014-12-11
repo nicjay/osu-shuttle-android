@@ -1,16 +1,16 @@
- <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_alignParentLeft="true"
-              android:id="@+id/drawer_list_item_title"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:textAppearance="?android:attr/textAppearanceListItemSmall"
-              android:gravity="center_vertical"
-              android:paddingLeft="32dp"
-              android:paddingRight="16dp"
-              android:fontFamily="sans-serif-light"
-              android:textColor="@color/OSU_white"
-              android:background="@drawable/navigation_item_child_selector"
-              android:textSize="16sp"
-              android:minHeight="?android:attr/listPreferredItemHeightSmall"/>
-
+<TextView
+    android:id="@+id/drawer_list_item_title"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_alignParentLeft="true"
+    android:background="@drawable/navigation_item_child_selector"
+    android:fontFamily="sans-serif-light"
+    android:gravity="center_vertical"
+    android:minHeight="?android:attr/listPreferredItemHeightSmall"
+    android:paddingLeft="32dp"
+    android:paddingRight="16dp"
+    android:textAppearance="?android:attr/textAppearanceListItemSmall"
+    android:textColor="@color/OSU_white"
+    android:textSize="16sp"/>
 

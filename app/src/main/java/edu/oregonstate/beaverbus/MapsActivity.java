@@ -2,18 +2,13 @@ package edu.oregonstate.beaverbus;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.graphics.Typeface;
-import android.net.ConnectivityManager;
 import android.net.Uri;
+import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentActivity;
-import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.util.TypedValue;
@@ -22,14 +17,12 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ExpandableListView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -37,15 +30,11 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.Polyline;
-import com.google.android.gms.maps.model.PolylineOptions;
-
-import java.util.ArrayList;
 
 /*
-    CLASS- MapsActivty
-        Handles the overall order of events within the app lifecycle.
-        Initialization > Updating > Shut Down
+*    CLASS- MapsActivity
+*        Handles the overall order of events within the app lifecycle.
+*        Initialization >> Updating >> Shut Down
 */
 public class MapsActivity extends FragmentActivity implements InitialNetworkRequestor.OnInitialRequestComplete, ShuttleUpdater.OnMapStateUpdate {
     private static final String TAG = "MapsActivity";
@@ -56,7 +45,14 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
     private final LatLng MAP_CENTER = new LatLng(44.563731, -123.279534);
     private final float MAP_ZOOM_LEVEL = 14.5f;
 
+    private FavoriteManager favoriteManager;
+    private SelectedMarkerManager selectedMarkerManager;
+
+    //Loading overlay
     private static LinearLayout progressSpinner;
+
+    //TextView displayed at top of screen
+    private static TextView selectedStopTitle;
 
     //Navigation Drawer variables
     private DrawerLayout mDrawerLayout;
@@ -64,30 +60,17 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
     private ExpandableListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
 
-    //HTTP Request Interface
-    private InitialNetworkRequestor initialNetworkRequestor;
-    private ShuttleUpdater shuttleUpdater;
-
-    //Various shown dialogs
-    private static Dialog busInfoDialog;
-    private static ProgressDialog sProgressDialog;
-    private static AlertDialog networkFailureDialog;
-    private static LinearLayout errorLayout;
-
-    //TextView displayed at top of screen
-    private static TextView selectedStopTitle;
-
-    //Route Lines
-    Polyline polylineWest;
-    Polyline polylineNorth;
-    Polyline polylineEast;
-
-
     //Options Menu
     public static Menu menuGlobal;
 
-    private FavoriteManager favoriteManager;
-    private SelectedMarkerManager selectedMarkerManager;
+    //Various shown dialogs
+    private static Dialog busInfoDialog;
+    private static AlertDialog networkFailureDialog;
+    private static LinearLayout errorLayout;
+
+    //HTTP Request Interface
+    private InitialNetworkRequestor initialNetworkRequestor;
+    private ShuttleUpdater shuttleUpdater;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,39 +81,24 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
 
         //View references within main screen
         errorLayout = (LinearLayout) findViewById(R.id.error_view);
-        selectedStopTitle = ((TextView)findViewById(R.id.selected_stop));
+        selectedStopTitle = ((TextView) findViewById(R.id.selected_stop));
         selectedStopTitle.setVisibility(View.INVISIBLE);
 
-
         favoriteManager = new FavoriteManager(this, getApplicationContext(), selectedMarkerManager);
-
-
 
         //Get singleton, set context
         mMapState = MapState.get();
         mMapState.setCurrentContext(this);
 
-
-
         //Initialization
         setUpMapIfNeeded();
-
-
 
         selectedMarkerManager = new SelectedMarkerManager(this);
         mMapState.setSelectedMarkerManager(selectedMarkerManager);
 
         //Show Loading Dialog
-        sProgressDialog = new ProgressDialog(this, R.style.CustomDialog);
-        sProgressDialog.setMessage("Loading...");
-        sProgressDialog.setCancelable(false);
-        //sProgressDialog.show();
-        //sProgressDialog = ProgressDialog.show(this, "", "Loading...", true, false);
-        //sProgressDialog.setProgressStyle(R.style.CustomDialog);
-
-        progressSpinner = (LinearLayout)findViewById(R.id.progress_spinner);
+        progressSpinner = (LinearLayout) findViewById(R.id.progress_spinner);
         progressSpinner.setVisibility(View.VISIBLE);
-
 
         //Start initial HTTP request
         initialNetworkRequestor = new InitialNetworkRequestor();
@@ -139,6 +107,7 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
         //Initialize shuttleUpdater for subsequent HTTP requests
         shuttleUpdater = ShuttleUpdater.get(this);
 
+        //Create dialog to display if HTTP fails
         initNetworkFailureDialog();
     }
 
@@ -146,7 +115,6 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
     protected void onStart() {
         Log.d(TAG, "LIFECYCLE - onStart");
         super.onStart();
-
         initNavigationDrawer();
     }
 
@@ -154,17 +122,8 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
     protected void onResume() {
         Log.d(TAG, "LIFECYCLE - onResume");
         super.onResume();
-
-        Log.d(TAG, "$# firstTime: " + mMapState.isFirstTime());
-
-        if(!mMapState.isFirstTime()){
+        if (!mMapState.isFirstTime()) {
             shuttleUpdater.startShuttleUpdater();
-            //mAdapter.notifyDataSetInvalidated();
-
-            for(Shuttle shuttle : mMapState.getShuttles()){
-                Log.d(TAG, "$# shuttle : " + shuttle.getName() + " = " + shuttle.isOnline() );
-            }
-
             //For shuttle move from (0,0) to actual coords, don't animate.
             mMapState.noAnimate = true;
         }
@@ -174,7 +133,6 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
     protected void onPause() {
         Log.d(TAG, "LIFECYCLE - onPause");
         super.onPause();
-
         shuttleUpdater.stopShuttleUpdater();
     }
 
@@ -182,7 +140,6 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
     protected void onStop() {
         Log.d(TAG, "LIFECYCLE - onStop");
         super.onStop();
-
         mMapState.setFirstTime(false);
     }
 
@@ -208,7 +165,7 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
        Retrieves map from mapFragment. Initializes marker and map click listeners, sets infoAdapter, restricts map zoomLevel.
        Finally, performs initialization of key app objects.
     */
-    public void setUpMapIfNeeded() {
+    private void setUpMapIfNeeded() {
         Log.d(TAG, "setUpMapIfNeeded");
 
         mMap = mMapState.getMap();
@@ -235,8 +192,7 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
             mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                 @Override
                 public boolean onMarkerClick(Marker marker) {
-                    Log.d(TAG, "!@# markerClick. Map : " + mMap);
-                   return onMapMarkerClick(marker);
+                    return onMapMarkerClick(marker);
                 }
             });
 
@@ -251,20 +207,19 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
 
             //Restricts zoom level to 13 and above. Can't zoom out that far.
             mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
-
                 @Override
                 public void onCameraChange(CameraPosition cameraPosition) {
-                    if (cameraPosition.zoom < 13){
-                        //TODO: put this back
-                         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mMap.getCameraPosition().target, 13));
+                    if (cameraPosition.zoom < 13) {
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mMap.getCameraPosition().target, 13));
                     }
                 }
             });
 
             mMapState.setMap(mMap);
-            mMapState.initShuttles();
+            mMapState.initShuttles(); //Init shuttle markers
         }
     }
+
     /*
     METHOD - initNavigationDrawer()
        Creates all components needed for navDrawer.
@@ -289,18 +244,21 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
             mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close) {
                 public void onDrawerClosed(View view) {
                     super.onDrawerClosed(view);
-                    //invalidateOptionsMenu();
                 }
+
                 public void onDrawerOpened(View drawerView) {
                     super.onDrawerOpened(drawerView);
                     mAdapter.notifyDataSetInvalidated();
-                    //invalidateOptionsMenu();
                 }
             };
             mDrawerLayout.setDrawerListener(mDrawerToggle);
             mDrawerToggle.syncState();
             //Enable and show navigation drawer icon
-            getActionBar().setDisplayHomeAsUpEnabled(true);
+            try {
+                getActionBar().setDisplayHomeAsUpEnabled(true);
+            }catch (NullPointerException e){
+                e.printStackTrace();
+            }
             getActionBar().setHomeButtonEnabled(true);
         }
     }
@@ -310,16 +268,13 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
     METHOD - onPostInitialRequest()
         Callback, handles the success or failure result of the initial stop+shuttle request.
      */
-    public void onPostInitialRequest(boolean success){
-        Log.d(TAG, "..! ON POST INITIAL requEST");
-        if (success){
-            Log.d(TAG, "&& onPostInitialRequest success");
+    public void onPostInitialRequest(boolean success) {
+        if (success) {
             mMapState.readConfigurationFile();
             mMapState.setStopsMarkers();
             selectedMarkerManager.setPolylines();
             shuttleUpdater.startShuttleUpdater();
         } else {
-            Log.d(TAG, "onPostInitialRequest fail");
             networkFailureDialog.show();
         }
     }
@@ -331,13 +286,11 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
         The general updater function is called if needed.
         Error views and loading dialogs are added or removed accordingly.
      */
-    public void onPostShuttleRequest(boolean success){
-        Log.d(TAG, "..! ON POST SHUTTLE requEST");
-        if(success){
-            Log.d(TAG, "onPostShuttleRequest success");
+    public void onPostShuttleRequest(boolean success) {
+        if (success) {
             favoriteManager.initSavedFavorites();
             updateMap();
-            if(errorLayout.getVisibility() == View.VISIBLE) {
+            if (errorLayout.getVisibility() == View.VISIBLE) {
                 //Remove the error view if it was there
                 Animation animation = AnimationUtils.makeOutAnimation(this, true);
                 animation.setDuration(1000);
@@ -345,18 +298,14 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
                 errorLayout.setVisibility(View.INVISIBLE);
 
                 //Set the stop title back to normal
-                RelativeLayout.LayoutParams selectedStopTitleParams = (RelativeLayout.LayoutParams)selectedStopTitle.getLayoutParams();
-                //selectedStopTitleParams.setMargins(0, 15, 55, 0);
+                RelativeLayout.LayoutParams selectedStopTitleParams = (RelativeLayout.LayoutParams) selectedStopTitle.getLayoutParams();
                 selectedStopTitleParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE);
                 selectedStopTitleParams.addRule(RelativeLayout.BELOW, 0);
                 selectedStopTitle.setLayoutParams(selectedStopTitleParams);
             }
-        }else{
-            Log.d(TAG, "onPostShuttleRequest fail");
-            sProgressDialog.dismiss();
-
+        } else {
             hideProgressSpinner();
-            if(errorLayout.getVisibility() == View.INVISIBLE && !networkFailureDialog.isShowing()) {
+            if (errorLayout.getVisibility() == View.INVISIBLE && !networkFailureDialog.isShowing()) {
                 //Show the error view
                 Animation animationSlideLeft = AnimationUtils.makeInAnimation(this, true);
                 animationSlideLeft.setDuration(1000);
@@ -364,38 +313,24 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
                 errorLayout.setVisibility(View.VISIBLE);
 
                 //Reposition stop title below error view
-                RelativeLayout.LayoutParams selectedStopTitleParams = (RelativeLayout.LayoutParams)selectedStopTitle.getLayoutParams();
-                //selectedStopTitleParams.setMargins(0, 90, 55, 0);
+                RelativeLayout.LayoutParams selectedStopTitleParams = (RelativeLayout.LayoutParams) selectedStopTitle.getLayoutParams();
                 selectedStopTitleParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
                 selectedStopTitleParams.addRule(RelativeLayout.BELOW, errorLayout.getId());
                 selectedStopTitle.setLayoutParams(selectedStopTitleParams);
 
                 mMapState.invalidateStopETAs();
                 favoriteManager.updateFavorites();
-
-
             }
-            //Clear last ETA data. Maybe not necessary.
-            /*
-            for (Stop stop : mMapState.getStops()){
-                stop.setShuttleETA(0, -1);
-                stop.setShuttleETA(1, -1);
-                stop.setShuttleETA(2, -1);
-                stop.setShuttleETA(3, -1);
-            }
-            */
         }
     }
 
-    private void hideProgressSpinner(){
-        if(progressSpinner.getVisibility() == View.VISIBLE) {
+    private void hideProgressSpinner() {
+        if (progressSpinner.getVisibility() == View.VISIBLE) {
             Animation fadeOutAnimation = AnimationUtils.loadAnimation(this, R.anim.fade_out);
             progressSpinner.startAnimation(fadeOutAnimation);
             fadeOutAnimation.setAnimationListener(new Animation.AnimationListener() {
                 @Override
-                public void onAnimationStart(Animation animation) {
-
-                }
+                public void onAnimationStart(Animation animation) {}
 
                 @Override
                 public void onAnimationEnd(Animation animation) {
@@ -403,19 +338,16 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
                 }
 
                 @Override
-                public void onAnimationRepeat(Animation animation) {
-
-                }
+                public void onAnimationRepeat(Animation animation) {}
             });
         }
     }
 
-    public void animateSelectedStopTitle(final String markerTitle, final Boolean slideNewTitle, Boolean fromHidden, final Boolean isShuttle, Boolean mapClick) {
-        if(isShuttle == null) Log.d(TAG, "!@# NULL");
-        selectedMarkerManager.animateSelectedStopTitle(markerTitle, slideNewTitle, fromHidden, isShuttle, mapClick);
+    public void animateSelectedStopTitle(final String markerTitle, final Boolean isShuttle, Boolean mapClick) {
+        selectedMarkerManager.animateSelectedStopTitle(markerTitle, isShuttle, mapClick);
     }
 
-    public boolean onMapMarkerClick(Marker marker){
+    public boolean onMapMarkerClick(Marker marker) {
         favoriteManager.onMapClick(marker);
         return selectedMarkerManager.onMarkerClick(marker);
     }
@@ -426,57 +358,45 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
        Sets positions and visibility of each shuttleMarker.
        Updates shuttle & stop objects with latest routeEstimates.
     */
-    public void updateMap(){
+    private void updateMap() {
         Log.d(TAG, "updateMap");
         favoriteManager.updateFavorites();
         boolean updateDrawer = false;
         for (Shuttle shuttle : mMapState.getShuttles()) {
             if (!shuttle.isOnline()) {
-                Log.d(TAG, "$# " + shuttle.getName() + " . " + shuttle.isOnline());
-                if(shuttle.getMarker().isVisible()) {
+                if (shuttle.getMarker().isVisible()) {
                     shuttle.getMarker().setVisible(false);
                     updateDrawer = true;
                 }
             } else {
                 if (shuttle.getLatLng() != shuttle.getMarker().getPosition()) {
-                    if (shuttle.getLatLng() != new LatLng(0,0)) {
-                        Log.d(TAG, "Starting position. WITHOUT AIM");
+                    if (shuttle.getLatLng() != new LatLng(0, 0)) {
                         shuttle.updateMarker(!mMapState.noAnimate);
-                    }
-                    else{
-
-
+                    } else {
                         shuttle.updateMarkerWithoutAnim();
                     }
                 }
-                if(!shuttle.getMarker().isVisible()) {
+                if (!shuttle.getMarker().isVisible()) {
                     shuttle.getMarker().setVisible(true);
                     updateDrawer = true;
                 }
             }
         }
-        if(updateDrawer){
-            mAdapter.notifyDataSetInvalidated();
-        }
-        if(mMapState.noAnimate){
+        if (mMapState.noAnimate) {
             mMapState.noAnimate = false;
         }
         //Only executes if any StopIndex array is null (first run)
         mMapState.initStopsArrays();
 
         //Only executes if drawerItems is null (first run)
-        if(mMapState.initDrawerItems()){
+        if (mMapState.initDrawerItems() || updateDrawer) {
             mAdapter.notifyDataSetInvalidated();
         }
-
-        sProgressDialog.dismiss();
         hideProgressSpinner();
     }
 
 
-
-
-    public void initNetworkFailureDialog(){
+    private void initNetworkFailureDialog() {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         alertDialogBuilder.setMessage("Network unavailable")
                 .setPositiveButton("Try Again", new DialogInterface.OnClickListener() {
@@ -499,8 +419,6 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        Log.d(TAG, "onOptionsItemSelected");
-
         //Navigation drawer "option"
         if (mDrawerToggle.onOptionsItemSelected(item)) {
             return true;
@@ -511,7 +429,6 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
             case R.id.toggle_stops:
                 toggleStopsVisibility(item);
                 return true;
-            //TODO: create information window
             case R.id.clear_favorites:
                 favoriteManager.clearFavorites();
                 return true;
@@ -519,13 +436,14 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
                 showBusInfoDialog(item);
                 return true;
             case R.id.rate_app:
-                final String myappPackageName = getPackageName(); // getPackageName() from Context or Activity object
+                //TODO 12/11/2014: fix link to GooglePlay for rating the app
+                final String packageName = getPackageName(); // getPackageName() from Context or Activity object
                 try {
-                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + myappPackageName)));
-                } catch (android.content.ActivityNotFoundException anfe) {
-                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://play.google.com/store/apps/details?id=" + myappPackageName)));
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + packageName)));
+                } catch (android.content.ActivityNotFoundException e) {
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://play.google.com/store/apps/details?id=" + packageName)));
                 }
-                    return true;
+                return true;
             case R.id.add_favorite:
                 favoriteManager.addFavorite();
                 return true;
@@ -533,8 +451,6 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
                 return super.onOptionsItemSelected(item);
         }
     }
-
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -546,63 +462,48 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        Log.d(TAG, "onPrepareOptionsMenu");
         createBusInfoDialog();
-        if (mMapState != null){
-            if (mMapState.isStopsVisible()) menu.findItem(R.id.toggle_stops).setTitle("Hide Stops");
-            else menu.findItem(R.id.toggle_stops).setTitle("Show Stops");
+        if (mMapState != null) {
+            if (mMapState.isStopsVisible()) menu.findItem(R.id.toggle_stops).setTitle(R.string.hide_stops);
+            else menu.findItem(R.id.toggle_stops).setTitle(R.string.show_stops);
         }
         return super.onPrepareOptionsMenu(menu);
     }
 
-    public void toggleStopsVisibility(MenuItem item){
+    private void toggleStopsVisibility(MenuItem item) {
         boolean stopsVisible = mMapState.isStopsVisible();
 
-        if (stopsVisible) item.setTitle("Hide Stops");
-        else item.setTitle("Show Stops");
+        if (stopsVisible) item.setTitle(R.string.hide_stops);
+        else item.setTitle(R.string.show_stops);
 
-        for (Stop stop : mMapState.getStops()){
+        for (Stop stop : mMapState.getStops()) {
             stop.getMarker().setVisible(!stopsVisible);
         }
         mMapState.setStopsVisible(!stopsVisible);
     }
 
-    public void showBusInfoDialog(MenuItem item){
+    private void showBusInfoDialog(MenuItem item) {
         if (busInfoDialog != null) {
             busInfoDialog.show();
         }
-
     }
 
-    public void createBusInfoDialog(){
-
-
-
+    private void createBusInfoDialog() {
         AlertDialog.Builder busInfoDialogBuilder = new AlertDialog.Builder(this, R.style.BusInfoDialogTheme);
-
-
         TextView title = new TextView(getApplicationContext());
-        title.setText("Beaver Bus");
+        title.setText(R.string.app_name);
         title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 24);
         title.setTypeface(title.getTypeface(), Typeface.BOLD);
         title.setGravity(Gravity.CENTER);
         title.setTextColor(getResources().getColor(R.color.OSU_orange));
         title.setPadding(0, 24, 0, 24);
 
-
-        busInfoDialogBuilder.setMessage("Hours of Operation:\n7:00 AM to 7:00 PM\n\nEstimated loop times:\n5 to 14 minutes")
+        busInfoDialogBuilder.setMessage(R.string.bus_info_message)
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                     }
                 }).setCustomTitle(title);
         busInfoDialog = busInfoDialogBuilder.create();
-
     }
-
-    public boolean isNetworkAvailable(){
-        ConnectivityManager cm = (ConnectivityManager)this.getSystemService(Context.CONNECTIVITY_SERVICE);
-        return(cm.getActiveNetworkInfo() != null);
-    }
-
 }

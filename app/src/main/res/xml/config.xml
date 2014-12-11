@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <config xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!--Route line coordinates-->
+
     <NorthRoute>
         <LatLng>44.566792, -123.289718</LatLng><LatLng>44.566783, -123.284842</LatLng>
         <LatLng>44.566799, -123.284738</LatLng><LatLng>44.566798, -123.284360</LatLng>
@@ -42,6 +44,9 @@
         <Color>#BDAA66CD</Color>
         <Width>10</Width>
     </EastRoute>
+
+
+    <!--Maps stop names to same coordinates retrieved from RideSystems JSON -->
 
     <StopNames>
         <LatLng>44.56461, -123.27522</LatLng><Name>Valley Library</Name> <!--Kerr Administration-->
