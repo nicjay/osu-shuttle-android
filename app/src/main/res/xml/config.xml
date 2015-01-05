@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <config xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- NOTES
+        IT CAMPUS OPS
+
+    -->
+
+
     <!--Route line coordinates-->
 
     <NorthRoute>
@@ -47,6 +53,13 @@
 
 
     <!--Maps stop names to same coordinates retrieved from RideSystems JSON -->
+
+    <Urls>
+        <StopLocations>http://www.osushuttles.com/Services/JSONPRelay.svc/GetStops</StopLocations>
+        <ShuttleLocations>http://www.osushuttles.com/Services/JSONPRelay.svc/GetMapVehiclePoints</ShuttleLocations>
+        <ShuttleEstimates>http://www.osushuttles.com/Services/JSONPRelay.svc/GetRouteStopArrivals</ShuttleEstimates>
+    </Urls>
+
 
     <StopNames>
         <LatLng>44.56461, -123.27522</LatLng><Name>Valley Library</Name> <!--Kerr Administration-->

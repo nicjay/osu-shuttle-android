@@ -9,8 +9,6 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 
 /*
@@ -21,7 +19,7 @@ public class ExpandableDrawerAdapter extends BaseExpandableListAdapter {
 
     private final Context mContext;
     private ArrayList<DrawerItem> mDrawerItems;
-    private static  MapState sMapState;
+    private static MapState sMapState;
 
     private static final int NORTH = 6, WEST = 7, EAST = 8; //Indices for expandable list headers
 
@@ -45,27 +43,26 @@ public class ExpandableDrawerAdapter extends BaseExpandableListAdapter {
             sectionView.setEnabled(false);
             sectionView.setOnClickListener(null);
 
-            TextView sectionTitle = (TextView)sectionView.findViewById(R.id.drawer_section_header_title);
+            TextView sectionTitle = (TextView) sectionView.findViewById(R.id.drawer_section_header_title);
             sectionTitle.setText(mDrawerItems.get(groupPosition).getTitle());
 
-            ImageView sectionIcon = (ImageView)sectionView.findViewById(R.id.drawer_section_icon);
+            ImageView sectionIcon = (ImageView) sectionView.findViewById(R.id.drawer_section_icon);
 
             //Two different icons: stop and shuttle, 0 and 5.
-            if(groupPosition == 0) {
+            if (groupPosition == 0) {
                 sectionIcon.setImageResource(R.drawable.nav_drawer_bus_icon);
-            }else{
+            } else {
                 sectionIcon.setImageResource(R.drawable.nav_drawer_map_marker_icon);
                 sectionIcon.getLayoutParams().height = 28;
-                //sectionIcon.setPadding(3, 3, 3, 3);
             }
             return sectionView;
         } else {    //ELSE it's a child
 
             itemView = inflater.inflate(R.layout.drawer_item, parent, false);
-            TextView itemTitle = (TextView)itemView.findViewById(R.id.drawer_item_title);
-            TextView itemOfflineText = (TextView)itemView.findViewById(R.id.drawer_item_offline_text);
+            TextView itemTitle = (TextView) itemView.findViewById(R.id.drawer_item_title);
+            TextView itemOfflineText = (TextView) itemView.findViewById(R.id.drawer_item_offline_text);
 
-            if (groupPosition < 5){ //Indices 1-4: shuttle  //TODO: set title on click
+            if (groupPosition < 5) { //Indices 1-4: shuttle
                 Shuttle shuttle = mDrawerItems.get(groupPosition).getShuttle();
                 itemTitle.setText(shuttle.getName());
 
@@ -75,7 +72,7 @@ public class ExpandableDrawerAdapter extends BaseExpandableListAdapter {
                 layoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
                 layoutParams.setMargins(16, 0, 0, 0);
                 square.setId(R.id.drawer_item_square);
-                switch (groupPosition){
+                switch (groupPosition) {
                     case 1:
                         //North
                         square.setBackgroundResource(R.color.shuttle_green);
@@ -94,55 +91,51 @@ public class ExpandableDrawerAdapter extends BaseExpandableListAdapter {
                 }
                 square.setLayoutParams(layoutParams);
 
-                //Set square to leftOf Title
-                RelativeLayout.LayoutParams LL = (RelativeLayout.LayoutParams)itemTitle.getLayoutParams();
+                //Set title to right of square
+                RelativeLayout.LayoutParams LL = (RelativeLayout.LayoutParams) itemTitle.getLayoutParams();
                 LL.addRule(RelativeLayout.RIGHT_OF, R.id.drawer_item_square);
                 itemTitle.setLayoutParams(LL);
 
                 //Add square to view
-                ((RelativeLayout)itemView.findViewById(R.id.drawer_item_relative_layout)).addView(square);
+                ((RelativeLayout) itemView.findViewById(R.id.drawer_item_relative_layout)).addView(square);
 
-                //Disable offline shuttles
-//                if(!mDrawerItems.get(groupPosition).isRowEnabled()){
-//                    itemView.setEnabled(false);
-//                    //TODO: gray out offline shuttle
-//                }
-                if(!shuttle.isOnline()){
+                //Disable offline shuttles (show "OFFLINE" text)
+                if (!shuttle.isOnline()) {
                     itemView.setEnabled(false);
                     itemTitle.setTextColor(mContext.getResources().getColor(R.color.Navigation_Drawer_Shuttle_Disabled_Text));
                     itemOfflineText.setVisibility(View.VISIBLE);
-                }else{
+                } else {
                     itemView.setEnabled(true);
                 }
-            } else {    //Expandable Route Headers
 
+            } else {    //Expandable Route Headers
                 String stopTitle = mDrawerItems.get(groupPosition).getTitle();
-                ImageView imageView = (ImageView)itemView.findViewById(R.id.drawer_item_carrot);
+                ImageView imageView = (ImageView) itemView.findViewById(R.id.drawer_item_carrot);
                 imageView.setVisibility(View.VISIBLE);
 
                 //Set correct icon based on state of expanded list header
-                if(isExpanded){
+                if (isExpanded) {
                     imageView.setImageResource(R.drawable.ic_action_collapse);
-                }else{
+                } else {
                     imageView.setImageResource(R.drawable.ic_action_expand);
                 }
 
                 itemTitle.setText(stopTitle);
             }
+
             return itemView;
         }
     }
 
     @Override
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
-        if(convertView == null){
-            LayoutInflater inflater = (LayoutInflater)mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        if (convertView == null) {
+            LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(R.layout.drawer_child_item, parent, false);
         }
-        TextView childTitle = (TextView)convertView.findViewById(R.id.drawer_list_item_title); //Title
-        switch (groupPosition){ //TODO: add in new stopNames once finalized
+        TextView childTitle = (TextView) convertView.findViewById(R.id.drawer_list_item_title);
+        switch (groupPosition) {
             case NORTH:
-                //childTitle.setText(sMapState.getNorthMap().get(childPosition).getName());
                 childTitle.setText(sMapState.getNorthStops().get(childPosition).getName());
                 break;
             case WEST:
@@ -164,7 +157,7 @@ public class ExpandableDrawerAdapter extends BaseExpandableListAdapter {
 
     @Override
     public int getChildrenCount(int groupPosition) {
-        switch (groupPosition){
+        switch (groupPosition) {
             case NORTH:
                 return sMapState.getNorthStops().size();
             case WEST:

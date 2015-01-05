@@ -74,7 +74,7 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d(TAG, "LIFECYCLE - onCreate");
+        //Log.d(TAG, "LIFECYCLE - onCreate");
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
@@ -89,6 +89,7 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
         //Get singleton, set context
         mMapState = MapState.get();
         mMapState.setCurrentContext(this);
+        mMapState.readConfigurationFile(true); //Read only urls from configuration file
 
         //Initialization
         setUpMapIfNeeded();
@@ -113,14 +114,14 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
 
     @Override
     protected void onStart() {
-        Log.d(TAG, "LIFECYCLE - onStart");
+        //Log.d(TAG, "LIFECYCLE - onStart");
         super.onStart();
         initNavigationDrawer();
     }
 
     @Override
     protected void onResume() {
-        Log.d(TAG, "LIFECYCLE - onResume");
+        //Log.d(TAG, "LIFECYCLE - onResume");
         super.onResume();
         if (!mMapState.isFirstTime()) {
             shuttleUpdater.startShuttleUpdater();
@@ -131,27 +132,27 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
 
     @Override
     protected void onPause() {
-        Log.d(TAG, "LIFECYCLE - onPause");
+        //Log.d(TAG, "LIFECYCLE - onPause");
         super.onPause();
         shuttleUpdater.stopShuttleUpdater();
     }
 
     @Override
     protected void onStop() {
-        Log.d(TAG, "LIFECYCLE - onStop");
+        //Log.d(TAG, "LIFECYCLE - onStop");
         super.onStop();
         mMapState.setFirstTime(false);
     }
 
     @Override
     protected void onRestart() {
-        Log.d(TAG, "LIFECYCLE - onRestart");
+        //Log.d(TAG, "LIFECYCLE - onRestart");
         super.onRestart();
     }
 
     @Override
     protected void onDestroy() {
-        Log.d(TAG, "LIFECYCLE - onDestroy");
+        //Log.d(TAG, "LIFECYCLE - onDestroy");
         super.onDestroy();
         selectedMarkerManager.setSelectedMarker(null, false);
         menuGlobal = null;
@@ -166,7 +167,7 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
        Finally, performs initialization of key app objects.
     */
     private void setUpMapIfNeeded() {
-        Log.d(TAG, "setUpMapIfNeeded");
+        //Log.d(TAG, "setUpMapIfNeeded");
 
         mMap = mMapState.getMap();
         if (mMap == null) { //Saved map is null. Recreate
@@ -227,7 +228,7 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
        Sets custom adapter so data can be refreshed when needed.
     */
     private void initNavigationDrawer() {
-        Log.d(TAG, "initNavigationDrawer");
+        //Log.d(TAG, "initNavigationDrawer");
 
         if (mDrawerLayout == null || mDrawerList == null) {
             //Get views
@@ -270,7 +271,7 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
      */
     public void onPostInitialRequest(boolean success) {
         if (success) {
-            mMapState.readConfigurationFile();
+            mMapState.readConfigurationFile(false); //Read remainder of configuration file. (URLs are read in onCreate using same function)
             mMapState.setStopsMarkers();
             selectedMarkerManager.setPolylines();
             shuttleUpdater.startShuttleUpdater();
@@ -359,7 +360,7 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
        Updates shuttle & stop objects with latest routeEstimates.
     */
     private void updateMap() {
-        Log.d(TAG, "updateMap");
+        //Log.d(TAG, "updateMap");
         favoriteManager.updateFavorites();
         boolean updateDrawer = false;
         for (Shuttle shuttle : mMapState.getShuttles()) {

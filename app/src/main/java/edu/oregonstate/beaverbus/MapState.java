@@ -59,6 +59,9 @@ public class MapState {
     private Polyline westPolyline;
     private Polyline eastPolyline;
 
+    private String stopLocationsUrl = "";
+    private String shuttleLocationsUrl = "";
+    private String shuttleEstimatesUrl = "";
 
     public SelectedMarkerManager getSelectedMarkerManager() {
         return mSelectedMarkerManager;
@@ -137,7 +140,8 @@ public class MapState {
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), CAMERA_ANIMATION_SPEED, null);
     }
 
-    public void readConfigurationFile() {
+
+    public void readConfigurationFile(boolean readUrls) {
         XmlResourceParser xpp = sCurrentContext.getResources().getXml(R.xml.config);
 
         try {
@@ -146,14 +150,18 @@ public class MapState {
             while (eventType != XmlPullParser.END_DOCUMENT) {
                 if (eventType == XmlPullParser.START_DOCUMENT) {
                 } else if (eventType == XmlPullParser.START_TAG) {
-                    if (xpp.getName().equals("NorthRoute")) {
-                        parseRoute(xpp, "North");
-                    } else if (xpp.getName().equals("WestRoute")) {
-                        parseRoute(xpp, "West");
-                    } else if (xpp.getName().equals("EastRoute")) {
-                        parseRoute(xpp, "East");
-                    } else if (xpp.getName().equals("StopNames")) {
-                        parseStopNames(xpp);
+                    if(!readUrls) {
+                        if (xpp.getName().equals("NorthRoute")) {
+                            parseRoute(xpp, "North");
+                        } else if (xpp.getName().equals("WestRoute")) {
+                            parseRoute(xpp, "West");
+                        } else if (xpp.getName().equals("EastRoute")) {
+                            parseRoute(xpp, "East");
+                        } else if (xpp.getName().equals("StopNames")) {
+                            parseStopNames(xpp);
+                        }
+                    } else if (xpp.getName().equals("Urls")){
+                        parseUrls(xpp);
                     }
                 } else if (eventType == XmlPullParser.END_TAG) {
                     // Continue
@@ -166,6 +174,18 @@ public class MapState {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void parseUrls(XmlResourceParser xpp) throws  IOException, XmlPullParserException {
+        while(xpp.nextTag() == XmlPullParser.START_TAG){
+            if(xpp.getName().equals("StopLocations")){
+                setStopLocationsUrl(xpp.nextText());
+            } else if(xpp.getName().equals("ShuttleLocations")){
+                setShuttleLocationsUrl(xpp.nextText());
+            } else if(xpp.getName().equals("ShuttleEstimates")){
+                setShuttleEstimatesUrl(xpp.nextText());
+            }
         }
     }
 
@@ -372,4 +392,27 @@ public class MapState {
         }
     }
 
+    public String getStopLocationsUrl() {
+        return stopLocationsUrl;
+    }
+
+    public void setStopLocationsUrl(String stopLocationsUrl) {
+        this.stopLocationsUrl = stopLocationsUrl;
+    }
+
+    public String getShuttleLocationsUrl() {
+        return shuttleLocationsUrl;
+    }
+
+    public void setShuttleLocationsUrl(String shuttleLocationsUrl) {
+        this.shuttleLocationsUrl = shuttleLocationsUrl;
+    }
+
+    public String getShuttleEstimatesUrl() {
+        return shuttleEstimatesUrl;
+    }
+
+    public void setShuttleEstimatesUrl(String shuttleEstimatesUrl) {
+        this.shuttleEstimatesUrl = shuttleEstimatesUrl;
+    }
 }

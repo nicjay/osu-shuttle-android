@@ -3,7 +3,6 @@ package edu.oregonstate.beaverbus;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
@@ -12,10 +11,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -31,8 +26,8 @@ public class InitialNetworkRequestor extends AsyncTask<Void, Void, Boolean> {
     private static final String TAG = "InitialNetworkRequestor";
 
     private static MapState sMapState;
-    private static final String stopUrl = "http://www.osushuttles.com/Services/JSONPRelay.svc/GetStops";
-    private static final String shuttleUrl = "http://www.osushuttles.com/Services/JSONPRelay.svc/GetMapVehiclePoints";
+    private static String stopUrl;
+    private static String shuttleUrl;
 
     private static final int NORTH_ROUTE_ID = 7;
     private static final int WEST_ROUTE_ID = 9;
@@ -45,19 +40,23 @@ public class InitialNetworkRequestor extends AsyncTask<Void, Void, Boolean> {
 
     //Interface to handle callback of 'network request' in MapsActivity
     private OnInitialRequestComplete listener;
-    public interface OnInitialRequestComplete{
+
+    public interface OnInitialRequestComplete {
         void onPostInitialRequest(boolean success);
     }
 
-    public InitialNetworkRequestor(){
+    public InitialNetworkRequestor() {
         sMapState = MapState.get();
-        listener = (OnInitialRequestComplete)sMapState.getCurrentContext();
+        listener = (OnInitialRequestComplete) sMapState.getCurrentContext();
+
+        stopUrl = sMapState.getStopLocationsUrl();
+        shuttleUrl = sMapState.getShuttleLocationsUrl();
     }
 
     @Override
     protected Boolean doInBackground(Void... params) {
         //False return at any point indicates a network or JSON error
-        if(!isNetworkAvailable()) return false;
+        if (!isNetworkAvailable()) return false;
 
         //Get stops information
         JSONGetter stopGetter = new JSONGetter();
@@ -78,15 +77,14 @@ public class InitialNetworkRequestor extends AsyncTask<Void, Void, Boolean> {
         listener.onPostInitialRequest(success);
     }
 
-    //TODO: reduce number of string conversions here and JSONGetter
-    private boolean parseJSON(JSONArray jStopsArray, JSONArray jShuttlesArray){
+    private boolean parseJSON(JSONArray jStopsArray, JSONArray jShuttlesArray) {
         ArrayList<Stop> stops = new ArrayList<Stop>();
         ArrayList<LatLng> seenLatLngs = new ArrayList<LatLng>();
 
         HashMap<Integer, Stop> stopsMap = new HashMap<Integer, Stop>();
 
         try {
-            for (int i = 0, len = jStopsArray.length(); i < len; i++){
+            for (int i = 0, len = jStopsArray.length(); i < len; i++) {
                 //Get JSONObject
                 JSONObject stopJson = jStopsArray.getJSONObject(i);
 
@@ -97,7 +95,7 @@ public class InitialNetworkRequestor extends AsyncTask<Void, Void, Boolean> {
                 String stopName = stopJson.getString("Description");
 
                 // JSON returns duplicate stop LatLngs for each Route they are on.
-                if (!seenLatLngs.contains(latLng)){ //New stop object must be made.
+                if (!seenLatLngs.contains(latLng)) { //New stop object must be made.
 
                     Stop stop = new Stop(latLng, stopName, routeId, stopId, new int[]{-1, -1, -1, -1});
 
@@ -107,9 +105,9 @@ public class InitialNetworkRequestor extends AsyncTask<Void, Void, Boolean> {
 
                     addStopToRouteMap(routeId, stop);
 
-                }else{ //Find existing stop object and add (routeId, stopId) to it
-                    for(Stop existingStop : stops){
-                        if(existingStop.areLatLngEqual(latLng)){ //Found matching existing stop
+                } else { //Find existing stop object and add (routeId, stopId) to it
+                    for (Stop existingStop : stops) {
+                        if (existingStop.areLatLngEqual(latLng)) { //Found matching existing stop
 
                             existingStop.addServicedRoute(routeId);
                             existingStop.addStopId(stopId);
@@ -132,8 +130,8 @@ public class InitialNetworkRequestor extends AsyncTask<Void, Void, Boolean> {
         //Parse shuttle JSON
         ArrayList<Shuttle> shuttles = sMapState.getShuttles();
         Gson gson = new Gson();
-        boolean[] onlineStates = {false,false,false,false};
-        if(jShuttlesArray != null) {
+        boolean[] onlineStates = {false, false, false, false};
+        if (jShuttlesArray != null) {
             for (int i = 0; i < jShuttlesArray.length(); i++) {
                 String json = null;
 
@@ -198,9 +196,10 @@ public class InitialNetworkRequestor extends AsyncTask<Void, Void, Boolean> {
     }
 
 
-    //Adds new stopNum to previously made stopObj
-    private void addStopToRouteMap(int routeId, Stop stop){
-        switch (routeId){
+    //Adds new stopNum to previously made stopObj.
+    //Used to create list of stops for each route, shown in Navigation Drawer
+    private void addStopToRouteMap(int routeId, Stop stop) {
+        switch (routeId) {
             case NORTH_ROUTE_ID:
                 northStops.add(stop);
                 break;
@@ -213,8 +212,8 @@ public class InitialNetworkRequestor extends AsyncTask<Void, Void, Boolean> {
         }
     }
 
-    public boolean isNetworkAvailable(){
-        ConnectivityManager cm = (ConnectivityManager)sMapState.getCurrentContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-        return(cm.getActiveNetworkInfo() != null);
+    public boolean isNetworkAvailable() {
+        ConnectivityManager cm = (ConnectivityManager) sMapState.getCurrentContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        return (cm.getActiveNetworkInfo() != null);
     }
 }

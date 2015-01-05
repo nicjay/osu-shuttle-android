@@ -31,8 +31,8 @@ public class ShuttleUpdater {
     private static final long ASYNC_DELAY = 5000;
     private boolean isBusy = false, stop = true;
 
-    private String shuttleUrl = "http://www.osushuttles.com/Services/JSONPRelay.svc/GetMapVehiclePoints";
-    private String estimatesUrl = "http://www.osushuttles.com/Services/JSONPRelay.svc/GetRouteStopArrivals";
+    private static String shuttleUrl;
+    private static String estimatesUrl;
 
     private static final int NORTH_ROUTE_ID = 7, EAST_ROUTE_ID = 8, WEST_ROUTE_ID = 9;
 
@@ -45,6 +45,9 @@ public class ShuttleUpdater {
         this.listener = listener;
         sMapState = MapState.get();
         mHandler = new Handler();
+
+        shuttleUrl = sMapState.getShuttleLocationsUrl();
+        estimatesUrl = sMapState.getShuttleEstimatesUrl();
     }
 
     public static ShuttleUpdater get(OnMapStateUpdate listener) {
