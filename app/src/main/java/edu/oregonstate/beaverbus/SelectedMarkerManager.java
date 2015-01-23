@@ -187,4 +187,5 @@ public class SelectedMarkerManager {
         polylineWest = sMapState.getPolyline("West");
         polylineEast = sMapState.getPolyline("East");
     }
+
 }

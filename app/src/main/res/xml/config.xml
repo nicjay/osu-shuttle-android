@@ -62,24 +62,29 @@
 
 
     <StopNames>
+
+        <LatLng>44.563011, -123.284799</LatLng><Name>Dryden Hall</Name> <!--  -->
+        <LatLng>44.564335, -123.279873</LatLng><Name>Moreland Hall</Name> <!--  -->
+        <LatLng>44.559522, -123.279547</LatLng><Name>LaSells Stewart Center</Name> <!-- East Reser Stadium -->
+        <LatLng>44.564203, -123.28001</LatLng><Name>Weatherford Hall</Name> <!-- Moreland Hall -->
+        <LatLng>44.564566, -123.279019</LatLng><Name>Memorial Union</Name> <!-- Student Experience Center, Moreland Hall -->
+        <LatLng>44.564641, -123.283296</LatLng><Name>Sackett Hall</Name> <!--West Dining, Heckart Lodge -->
         <LatLng>44.56461, -123.27522</LatLng><Name>Valley Library</Name> <!--Kerr Administration-->
-        <LatLng>44.56462, -123.27785</LatLng><Name>Memorial Union</Name> <!--Student Experience Center-->
+        <LatLng>44.56462, -123.27785</LatLng><Name>Student Experience Center</Name> <!-- Langton Hall-->
         <LatLng>44.56467, -123.28133</LatLng><Name>Austin Hall</Name> <!--Buxton Hall, Weatherford Hall-->
-        <LatLng>44.56466, -123.28903</LatLng><Name>Energy Center</Name> <!--Radiation Center-->
-        <LatLng>44.56674, -123.28903</LatLng><Name>National Forage Seed Research Center</Name> <!--Horticulture Crops Research Lab-->
+        <LatLng>44.56466, -123.28903</LatLng><Name>Radiation Center</Name> <!--Energy Center-->
+        <LatLng>44.56674, -123.28903</LatLng><Name>National Forage Seed Research Center</Name> <!--Horticulture Crops Research Lab, Campus Way &amp 35th-->
         <LatLng>44.56675, -123.28501</LatLng><Name>Wiegand Hall</Name> <!--Campus Way &amp; 30th-->
-        <LatLng>44.56788, -123.28118</LatLng><Name>Burt Hall</Name> <!--Cordley_27th &amp; Orchard-->
+        <LatLng>44.56788, -123.28118</LatLng><Name>Cordley Hall</Name> <!--Cordley_27th &amp; Orchard-->
         <LatLng>44.56698, -123.27991</LatLng><Name>Hallie Ford Center</Name> <!--26th &amp; Campus-->
         <LatLng>44.56676, -123.27696</LatLng><Name>Gilkey Hall</Name> <!--Bexell Hall, Campus &amp; Waldo-->
-        <LatLng>44.56675, -123.27345</LatLng><Name>Owen Hall</Name> <!--Kearny Hall, Campus &amp; 14th-->
-        <LatLng>44.55839, -123.28176</LatLng><Name>Reser Stadium</Name> <!-- -->
+        <LatLng>44.56675, -123.27345</LatLng><Name>Kearney Hall</Name> <!--Owen Hall, Campus &amp; 14th-->
+        <LatLng>44.55839, -123.28176</LatLng><Name>Reser Stadium South</Name> <!-- -->
         <LatLng>44.560371, -123.274086</LatLng><Name>Student Sustainability Center</Name> <!--15th &amp; Western-->
-        <LatLng>44.56368, -123.27405</LatLng><Name>Calahan</Name> <!--McNary, 15th &amp; Jefferson -->
-        <LatLng>44.563538, -123.279706</LatLng><Name>Unnecessary Stop</Name> <!-- -->
-        <LatLng>44.56418, -123.27986</LatLng><Name>Weatherford Hall</Name> <!-- -->
-        <LatLng>44.56156, -123.2795</LatLng><Name>Beaver Store</Name> <!-- -->
-        <LatLng>44.560524, -123.282411</LatLng><Name>North Reser Stadium</Name> <!--Ralph Miller Ln-->
-        <LatLng>44.5605, -123.28415</LatLng><Name>Merrit Truax Indoor Practice Facility</Name> <!--N Reser Stadium-->
+        <LatLng>44.56368, -123.27405</LatLng><Name>Kerr South</Name> <!--McNary, 15th &amp; Jefferson -->
+        <LatLng>44.56156, -123.2795</LatLng><Name>OSU Beaver Store</Name> <!-- -->
+        <LatLng>44.560524, -123.282411</LatLng><Name>Reser Stadium North</Name> <!--Ralph Miller Ln-->
+        <LatLng>44.5605, -123.28415</LatLng><Name>Reser Stadium West</Name> <!--N Reser Stadium-->
 
     </StopNames>
 

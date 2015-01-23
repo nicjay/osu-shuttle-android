@@ -13,6 +13,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -42,7 +43,7 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
     //Map and Singleton variables
     private GoogleMap mMap;
     private MapState mMapState;
-    private final LatLng MAP_CENTER = new LatLng(44.563731, -123.279534);
+    private final LatLng MAP_CENTER = new LatLng(44.562231, -123.281114);
     private final float MAP_ZOOM_LEVEL = 14.5f;
 
     private FavoriteManager favoriteManager;
@@ -474,13 +475,18 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
     private void toggleStopsVisibility(MenuItem item) {
         boolean stopsVisible = mMapState.isStopsVisible();
 
-        if (stopsVisible) item.setTitle(R.string.hide_stops);
+        if (stopsVisible){
+            item.setTitle(R.string.hide_stops);
+            selectedMarkerManager.onMapClick(); //Hide "selected stop" title if shown
+        }
         else item.setTitle(R.string.show_stops);
 
         for (Stop stop : mMapState.getStops()) {
             stop.getMarker().setVisible(!stopsVisible);
         }
         mMapState.setStopsVisible(!stopsVisible);
+
+
     }
 
     private void showBusInfoDialog(MenuItem item) {
@@ -499,12 +505,30 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
         title.setTextColor(getResources().getColor(R.color.OSU_orange));
         title.setPadding(0, 24, 0, 24);
 
-        busInfoDialogBuilder.setMessage(R.string.bus_info_message)
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+
+        LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(LAYOUT_INFLATER_SERVICE);
+        View layout = (View) inflater.inflate(R.layout.custom_bus_info_dialog, null);
+
+        TextView messageTextView = (TextView) layout.findViewById(R.id.bus_info_message);
+        TextView noteTextView = (TextView)layout.findViewById(R.id.bus_info_note);
+
+        messageTextView.setText(R.string.bus_info_message);
+        noteTextView.setText(R.string.bus_info_note);
+
+//        busInfoDialogBuilder.setMessage(R.string.bus_info_message)
+//                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                    }
+//                }).setCustomTitle(title);
+        busInfoDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                     }
                 }).setCustomTitle(title);
+
+        busInfoDialogBuilder.setView(layout);
+
         busInfoDialog = busInfoDialogBuilder.create();
     }
 }

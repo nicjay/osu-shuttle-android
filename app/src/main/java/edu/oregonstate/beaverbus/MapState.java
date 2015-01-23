@@ -211,6 +211,11 @@ public class MapState {
                 }
             }
         }
+        for (Stop stop : mStops){
+            if(stop.getName().toCharArray()[1] == '-'){
+                Log.d(TAG, "Stop: " + stop.getName() + " = " + stop.getLatLng());
+            }
+        }
     }
 
     private void parseRoute(XmlResourceParser xpp, String routeName) throws IOException, XmlPullParserException {
