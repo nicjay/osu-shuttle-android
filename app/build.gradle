@@ -8,8 +8,8 @@ android {
         applicationId "edu.oregonstate.beaverbus"
         minSdkVersion 15
         targetSdkVersion 21
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "1.1"
     }
     signingConfigs {
         release {
@@ -21,7 +21,9 @@ android {
     }
     buildTypes {
         release {
-            runProguard false
+            // runProguard false  //Removed for newer version below
+            minifyEnabled false
+
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
         }

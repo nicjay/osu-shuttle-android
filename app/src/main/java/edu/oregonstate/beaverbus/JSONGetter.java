@@ -1,5 +1,6 @@
 package edu.oregonstate.beaverbus;
 
+import android.text.format.Time;
 import android.util.Log;
 
 import org.apache.http.HttpEntity;
@@ -47,7 +48,6 @@ public class JSONGetter {
                 InputStream content = entity.getContent();
                 BufferedReader reader = new BufferedReader(new InputStreamReader(content));
                 String line;
-
                 while ((line = reader.readLine()) != null) {
                     builder.append(line);
                 }
@@ -68,7 +68,7 @@ public class JSONGetter {
         try {
             mJSON = new JSONArray(builder.toString());
         } catch (JSONException e) {
-            Log.e(TAG, "JSONException");
+            Log.e(TAG, "JSONException. URL: " + url + ", toString: " + builder.toString());
 
         }
         return mJSON;

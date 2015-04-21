@@ -28,10 +28,10 @@
         <LatLng>44.563829, -123.279737</LatLng><LatLng>44.564158, -123.279826</LatLng>
         <LatLng>44.564495, -123.279901</LatLng><LatLng>44.564500, -123.284775</LatLng>
         <LatLng>44.562234, -123.284775</LatLng><LatLng>44.561965, -123.284625</LatLng>
-        <LatLng>44.560529, -123.284625</LatLng><LatLng>44.560538, -123.282576</LatLng>
-        <LatLng>44.560012, -123.283142</LatLng><LatLng>44.559246, -123.283160</LatLng>
-        <LatLng>44.558254, -123.281967</LatLng><LatLng>44.558305, -123.280559</LatLng>
-        <LatLng>44.558993, -123.279550</LatLng>
+        <LatLng>44.560529, -123.284625</LatLng><LatLng>44.560529, -123.283717</LatLng>
+        <LatLng>44.559747, -123.283806</LatLng><LatLng>44.559695, -123.283140</LatLng>
+        <LatLng>44.559246, -123.283160</LatLng><LatLng>44.558254, -123.281967</LatLng>
+        <LatLng>44.558305, -123.280559</LatLng><LatLng>44.558993, -123.279550</LatLng>
         <Color>#BDE0AA0F</Color>
         <Width>10</Width>
     </WestRoute>
@@ -56,8 +56,12 @@
 
     <Urls>
         <StopLocations>http://www.osushuttles.com/Services/JSONPRelay.svc/GetStops</StopLocations>
-        <ShuttleLocations>http://www.osushuttles.com/Services/JSONPRelay.svc/GetMapVehiclePoints</ShuttleLocations>
-        <ShuttleEstimates>http://www.osushuttles.com/Services/JSONPRelay.svc/GetRouteStopArrivals</ShuttleEstimates>
+        <ShuttleLocations>http://www.osushuttles.com/Services/JSONPRelay.svc/GetMapVehiclePoints?&amp;ApiKey=8882812681</ShuttleLocations>
+        <ShuttleEstimates>http://www.osushuttles.com/Services/JSONPRelay.svc/GetRouteStopArrivals?&amp;TimesPerStopString=2&amp;ApiKey=8882812681</ShuttleEstimates>
+<!--
+        <ShuttleLocations>http://www.osushuttles.com/Services/JSONPRelay.svc/GetMapVehiclePoints?method=jQuery1111043131497502326965_1429641745055&amp;ApiKey=8882812681</ShuttleLocations>
+        <ShuttleEstimates>http://www.osushuttles.com/Services/JSONPRelay.svc/GetRouteStopArrivals?method=jQuery1111043131497502326965_1429641745055&amp;TimesPerStopString=2&amp;ApiKey=8882812681</ShuttleEstimates>
+-->
     </Urls>
 
 

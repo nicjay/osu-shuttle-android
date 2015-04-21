@@ -3,6 +3,7 @@ package edu.oregonstate.beaverbus;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.os.AsyncTask;
+import android.text.format.Time;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -52,6 +53,11 @@ public class InitialNetworkRequestor extends AsyncTask<Void, Void, Boolean> {
 
         stopUrl = sMapState.getStopLocationsUrl();
         shuttleUrl = sMapState.getShuttleLocationsUrl();
+
+        //Append timeStamps
+        long timestamp = System.currentTimeMillis();
+        //stopUrl += "&_=" + String.valueOf(timestamp);
+        shuttleUrl += "&_=" + String.valueOf(timestamp);
     }
 
     @Override
