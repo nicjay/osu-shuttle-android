@@ -94,7 +94,10 @@ public class Shuttle {
                     mMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.bus_green_marker));
                     break;
                 case 9:
-                    mMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.bus_orange_marker));
+                    int drawableResourceId;
+                    if(Name == "West 1") drawableResourceId = R.drawable.bus_orange_marker_dark;
+                    else drawableResourceId = R.drawable.bus_orange_marker_light;
+                    mMarker.setIcon(BitmapDescriptorFactory.fromResource(drawableResourceId));
                     break;
                 case 8:
                     mMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.bus_purple_marker));
@@ -123,7 +126,10 @@ public class Shuttle {
                                     mMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.bus_green_square));
                                     break;
                                 case 9:
-                                    mMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.bus_orange_square));
+                                    int drawableResourceId;
+                                    if(Name == "West 1") drawableResourceId = R.drawable.bus_orange_square_dark;
+                                    else drawableResourceId = R.drawable.bus_orange_square_light;
+                                    mMarker.setIcon(BitmapDescriptorFactory.fromResource(drawableResourceId));
                                     break;
                                 case 8:
                                     mMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.bus_purple_square));

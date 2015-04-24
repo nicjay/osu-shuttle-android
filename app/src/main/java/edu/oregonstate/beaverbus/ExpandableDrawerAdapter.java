@@ -79,11 +79,11 @@ public class ExpandableDrawerAdapter extends BaseExpandableListAdapter {
                         break;
                     case 2:
                         //West 1
-                        square.setBackgroundResource(R.color.shuttle_orange);
+                        square.setBackgroundResource(R.color.shuttle_orange_dark);
                         break;
                     case 3:
                         //West 2
-                        square.setBackgroundResource(R.color.shuttle_orange);
+                        square.setBackgroundResource(R.color.shuttle_orange_light);
                         break;
                     case 4:
                         //East

@@ -50,16 +50,17 @@ public class MapInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
                         View square = stopSection.findViewById(R.id.info_stop_square);
                         TextView etaText = (TextView) stopSection.findViewById(R.id.info_stop_eta);
 
+
                         //Set square color based on ETA index
                         switch (i) {
                             case 0:
                                 square.setBackgroundColor(mContext.getResources().getColor(R.color.shuttle_green));
                                 break;
                             case 1:
-                                square.setBackgroundColor(mContext.getResources().getColor(R.color.shuttle_orange));
+                                square.setBackgroundColor(mContext.getResources().getColor(R.color.shuttle_orange_dark));
                                 break;
                             case 2:
-                                square.setBackgroundColor(mContext.getResources().getColor(R.color.shuttle_orange));
+                                square.setBackgroundColor(mContext.getResources().getColor(R.color.shuttle_orange_light));
                                 break;
                             case 3:
                                 square.setBackgroundColor(mContext.getResources().getColor(R.color.shuttle_purple));

@@ -180,10 +180,10 @@ public class FavoriteManager {
                     etaColor = mContext.getResources().getColor(R.color.shuttle_green);
                     break;
                 case 1:
-                    etaColor = mContext.getResources().getColor(R.color.shuttle_orange);
+                    etaColor = mContext.getResources().getColor(R.color.shuttle_orange_dark);
                     break;
                 case 2:
-                    etaColor = mContext.getResources().getColor(R.color.shuttle_orange);
+                    etaColor = mContext.getResources().getColor(R.color.shuttle_orange_light);
                     break;
                 case 3:
                     etaColor = mContext.getResources().getColor(R.color.shuttle_purple);

@@ -110,11 +110,11 @@ public class MapState {
         mShuttles.add(newShuttle);
 
         newShuttle = new Shuttle("West 1", false);
-        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().alpha(.85f).position(initLatLng).title("West 1 Bus").icon(BitmapDescriptorFactory.fromResource(R.drawable.bus_orange_marker)).flat(true).anchor(0.5f, 0.5f).infoWindowAnchor(.5f, .5f)));
+        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().alpha(.85f).position(initLatLng).title("West 1 Bus").icon(BitmapDescriptorFactory.fromResource(R.drawable.bus_orange_marker_dark)).flat(true).anchor(0.5f, 0.5f).infoWindowAnchor(.5f, .5f)));
         mShuttles.add(newShuttle);
 
         newShuttle = new Shuttle("West 2", false);
-        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().alpha(.85f).position(initLatLng).title("West 2 Bus").icon(BitmapDescriptorFactory.fromResource(R.drawable.bus_orange_marker)).flat(true).anchor(0.5f, 0.5f).infoWindowAnchor(.5f, .5f)));
+        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().alpha(.85f).position(initLatLng).title("West 2 Bus").icon(BitmapDescriptorFactory.fromResource(R.drawable.bus_orange_marker_light)).flat(true).anchor(0.5f, 0.5f).infoWindowAnchor(.5f, .5f)));
         mShuttles.add(newShuttle);
 
         newShuttle = new Shuttle("East", false);
