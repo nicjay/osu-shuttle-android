@@ -1,5 +1,6 @@
 package edu.oregonstate.beaverbus;
 
+import android.support.v7.widget.CardView;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -17,6 +18,7 @@ public class SelectedMarkerManager {
 
     private MapsActivity mActivity;
     private static TextView selectedMarkerTextView;
+    private static CardView selectedMarkerCardView;
     private static Marker selectedMarker;
     private static MapState sMapState;
     private Boolean showSelectedInfoWindow = false;
@@ -29,7 +31,9 @@ public class SelectedMarkerManager {
         mActivity = activity;
         sMapState = MapState.get();
         selectedMarkerTextView = ((TextView) activity.findViewById(R.id.selected_stop));
-        selectedMarkerTextView.setVisibility(View.INVISIBLE);
+        selectedMarkerTextView.setVisibility(View.VISIBLE);
+        selectedMarkerCardView = ((CardView) activity.findViewById(R.id.selected_stop_card));
+        selectedMarkerCardView.setVisibility(View.INVISIBLE);
     }
 
 
@@ -103,7 +107,7 @@ public class SelectedMarkerManager {
         fadeInAnim.setDuration(400);
 
         if (mapClick) {
-            if (selectedMarkerTextView.getVisibility() == View.VISIBLE) {
+            if (selectedMarkerCardView.getVisibility() == View.VISIBLE) {
                 Animation fadeOutAnim = AnimationUtils.makeOutAnimation(mActivity, true);
                 fadeOutAnim.setDuration(300);
                 fadeOutAnim.setAnimationListener(new Animation.AnimationListener() {
@@ -113,17 +117,17 @@ public class SelectedMarkerManager {
 
                     @Override
                     public void onAnimationEnd(Animation animation) {
-                        selectedMarkerTextView.setVisibility(View.INVISIBLE);
+                        selectedMarkerCardView.setVisibility(View.INVISIBLE);
                     }
 
                     @Override
                     public void onAnimationRepeat(Animation animation) {
                     }
                 });
-                selectedMarkerTextView.startAnimation(fadeOutAnim);
+                selectedMarkerCardView.startAnimation(fadeOutAnim);
             }
         } else {
-            if (selectedMarkerTextView.getVisibility() == View.VISIBLE) {
+            if (selectedMarkerCardView.getVisibility() == View.VISIBLE) {
                 Animation fadeOutAnim = AnimationUtils.makeOutAnimation(mActivity, true);
                 fadeOutAnim.setDuration(300);
                 fadeOutAnim.setAnimationListener(new Animation.AnimationListener() {
@@ -135,11 +139,11 @@ public class SelectedMarkerManager {
                     public void onAnimationEnd(Animation animation) {
                         if (markerTitle != null) {
                             setSelectedStopDrawable(markerTitle, isShuttle);
-                            selectedMarkerTextView.setVisibility(View.VISIBLE);
+                            selectedMarkerCardView.setVisibility(View.VISIBLE);
                             selectedMarkerTextView.setText(markerTitle);
-                            selectedMarkerTextView.startAnimation(fadeInAnim);
+                            selectedMarkerCardView.startAnimation(fadeInAnim);
                         } else {
-                            selectedMarkerTextView.setVisibility(View.INVISIBLE);
+                            selectedMarkerCardView.setVisibility(View.INVISIBLE);
                         }
                     }
 
@@ -147,11 +151,11 @@ public class SelectedMarkerManager {
                     public void onAnimationRepeat(Animation animation) {
                     }
                 });
-                selectedMarkerTextView.startAnimation(fadeOutAnim);
+                selectedMarkerCardView.startAnimation(fadeOutAnim);
             } else {
-                selectedMarkerTextView.setVisibility(View.VISIBLE);
+                selectedMarkerCardView.setVisibility(View.VISIBLE);
                 selectedMarkerTextView.setText(markerTitle);
-                selectedMarkerTextView.startAnimation(fadeInAnim);
+                selectedMarkerCardView.startAnimation(fadeInAnim);
                 setSelectedStopDrawable(markerTitle, isShuttle);
             }
         }
@@ -159,7 +163,7 @@ public class SelectedMarkerManager {
 
 
     private void setSelectedStopDrawable(String title, Boolean isShuttle) {
-        if (isShuttle) {
+/*        if (isShuttle) {
             if (title.equals("East Bus")) {
                 selectedMarkerTextView.setBackgroundResource(R.drawable.selected_stop_name_purple_bg);
                 polylineEast.setWidth(20);
@@ -173,7 +177,7 @@ public class SelectedMarkerManager {
         } else {
             selectedMarkerTextView.setBackgroundResource(R.drawable.selected_stop_name_bg);
         }
-        selectedMarkerTextView.setPadding(24, 12, 24, 12);
+        selectedMarkerTextView.setPadding(24, 12, 24, 12);*/
     }
 
     private void setRouteLineWidthToDefault() {

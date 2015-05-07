@@ -7,8 +7,12 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -34,8 +38,21 @@ public class JSONGetter {
     }
 
     public JSONArray getJSONFromUrl(String url) {
-        //Get
-        HttpClient client = new DefaultHttpClient();
+
+        //url += ".";
+
+        //--- Set TIMEOUTS for HTTP Requests ---
+        HttpParams httpParams = new BasicHttpParams();
+        //Set default timeout for connection to establish.
+        int timeoutConnection = 3000;
+        HttpConnectionParams.setConnectionTimeout(httpParams, timeoutConnection);
+        //Set default timeout for waiting for data
+        int timeoutSocket = 5000;
+        HttpConnectionParams.setSoTimeout(httpParams, timeoutSocket);
+
+
+        //GET Request
+        HttpClient client = new DefaultHttpClient(httpParams);
         HttpGet httpGet = new HttpGet(url);
 
         //Parse

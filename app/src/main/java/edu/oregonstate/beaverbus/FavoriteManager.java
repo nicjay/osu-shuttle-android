@@ -39,7 +39,7 @@ public class FavoriteManager {
         mContext = context;
         mSelectedMarkerManager = selectedMarkerManager;
         favoritesView = (LinearLayout) activity.findViewById(R.id.favorites_view);
-        favoritesViewTitle = (LinearLayout) activity.findViewById(R.id.favorites_view_title_container);
+        //favoritesViewTitle = (LinearLayout) activity.findViewById(R.id.favorites_view_title_container);
 
         favoriteStopRows = new ArrayList<FavoriteStopRow>();
         sMapState = sMapState.get();
@@ -209,17 +209,17 @@ public class FavoriteManager {
     }
 
     private void setFavoritesViewDrawables() { //Handles the two types of backgrounds that differ in their borders and margins for each favorite row.
-        for (FavoriteStopRow row : favoriteStopRows) {
-            if (favoriteStopRows.indexOf(row) == 0) {
-                row.getFavRow().findViewById(R.id.favorite_times_layout).setBackgroundResource(R.drawable.favorite_times_border);
-                row.getFavRow().findViewById(R.id.favorite_stop_name).setBackgroundResource(R.drawable.favorite_name_border);
-                row.getFavRow().findViewById(R.id.favorite_offline_text).setBackgroundResource(R.drawable.favorite_times_border);
-            } else {
-                row.getFavRow().findViewById(R.id.favorite_times_layout).setBackgroundResource(R.drawable.favorite_times_border_no_top);
-                row.getFavRow().findViewById(R.id.favorite_stop_name).setBackgroundResource(R.drawable.favorite_name_border_no_top);
-                row.getFavRow().findViewById(R.id.favorite_offline_text).setBackgroundResource(R.drawable.favorite_times_border_no_top);
-            }
-        }
+//        for (FavoriteStopRow row : favoriteStopRows) {
+//            if (favoriteStopRows.indexOf(row) == 0) {
+//                row.getFavRow().findViewById(R.id.favorite_times_layout).setBackgroundResource(R.drawable.favorite_times_border);
+//                row.getFavRow().findViewById(R.id.favorite_stop_name).setBackgroundResource(R.drawable.favorite_name_border);
+//                row.getFavRow().findViewById(R.id.favorite_offline_text).setBackgroundResource(R.drawable.favorite_times_border);
+//            } else {
+//                row.getFavRow().findViewById(R.id.favorite_times_layout).setBackgroundResource(R.drawable.favorite_times_border_no_top);
+//                row.getFavRow().findViewById(R.id.favorite_stop_name).setBackgroundResource(R.drawable.favorite_name_border_no_top);
+//                row.getFavRow().findViewById(R.id.favorite_offline_text).setBackgroundResource(R.drawable.favorite_times_border_no_top);
+//            }
+//        }
     }
 
     public void saveFavoriteStopRows() {
@@ -229,9 +229,9 @@ public class FavoriteManager {
 
         String savedString = "";
         if (favoriteStopRows.size() == 0) {
-            favoritesViewTitle.setVisibility(View.INVISIBLE);
+            //favoritesViewTitle.setVisibility(View.INVISIBLE);
         } else {
-            favoritesViewTitle.setVisibility(View.VISIBLE);
+            //favoritesViewTitle.setVisibility(View.VISIBLE);
         }
         for (int i = 0; i < favoriteStopRows.size(); i++) {
             if (i != 0) savedString = savedString.concat("_");

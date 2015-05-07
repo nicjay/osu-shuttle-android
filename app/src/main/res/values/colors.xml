@@ -44,4 +44,15 @@
     <color name="transparent_error">#B3FF0000</color>
 
 
+    <!--Network Failure Dialog-->
+    <color name="network_failure_dialog_button_pressed">#616161</color>
+
+
+    <!-- Material Theme -->
+    <color name="theme_primary">#E65100</color>
+    <color name="theme_secondary">#EF6C00</color>
+    <color name="theme_accent">#C5CAE9</color>
+    <color name="favorite_name_background">#EF6C00</color>
+
+
 </resources>

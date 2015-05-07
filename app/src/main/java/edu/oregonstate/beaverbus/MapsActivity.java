@@ -18,8 +18,11 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -122,8 +125,22 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
 
     @Override
     protected void onResume() {
-        //Log.d(TAG, "LIFECYCLE - onResume");
+        Log.d(TAG, "LIFECYCLE - onResume");
         super.onResume();
+        if(networkFailureDialog != null) {
+            if (networkFailureDialog.isShowing()) {
+                Log.d(TAG, "progressSpinner vis: " + progressSpinner.getVisibility());
+                progressSpinner.setVisibility(View.VISIBLE);
+
+                Log.d(TAG, "POST progressSpinner vis: " + progressSpinner.getVisibility());
+                WindowManager.LayoutParams lp = networkFailureDialog.getWindow().getAttributes();
+                Log.d(TAG, "OLD Dim AMount: " + lp.dimAmount);
+                lp.dimAmount = 0.8f;
+                networkFailureDialog.getWindow().setAttributes(lp);
+                Log.d(TAG, "New Dim AMount: " + lp.dimAmount);
+            }
+        }
+
         if (!mMapState.isFirstTime()) {
             shuttleUpdater.startShuttleUpdater();
             //For shuttle move from (0,0) to actual coords, don't animate.
@@ -276,6 +293,7 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
             mMapState.setStopsMarkers();
             selectedMarkerManager.setPolylines();
             shuttleUpdater.startShuttleUpdater();
+            networkFailureDialog.dismiss();
         } else {
             networkFailureDialog.show();
         }
@@ -336,7 +354,7 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
 
                 @Override
                 public void onAnimationEnd(Animation animation) {
-                    progressSpinner.setVisibility(View.INVISIBLE);
+                    progressSpinner.setVisibility(View.GONE);
                 }
 
                 @Override
@@ -399,23 +417,34 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
 
 
     private void initNetworkFailureDialog() {
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-        alertDialogBuilder.setMessage("Network unavailable")
-                .setPositiveButton("Try Again", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        initialNetworkRequestor = new InitialNetworkRequestor();
-                        initialNetworkRequestor.execute();
-                    }
-                })
-                .setNegativeButton("Exit", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        finish();
-                    }
-                })
-                .setCancelable(false);
+        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+
+        LayoutInflater inflater = getLayoutInflater();
+        final View dialogView = inflater.inflate(R.layout.network_failure_dialog, null);
+        alertDialogBuilder.setView(dialogView);
+
+        //Get 'EXIT' and 'TRY AGAIN' buttons, and set their OnClickListeners
+        Button exitButton = (Button)dialogView.findViewById(R.id.network_dialog_exit_button);
+        Button tryAgainButton = (Button)dialogView.findViewById(R.id.network_dialog_try_again_button);
+        exitButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+        tryAgainButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                initialNetworkRequestor = new InitialNetworkRequestor();
+                initialNetworkRequestor.execute();
+                networkFailureDialog.dismiss();
+
+            }
+        });
+
+        alertDialogBuilder.setCancelable(false);
         networkFailureDialog = alertDialogBuilder.create();
+        networkFailureDialog.getWindow().setDimAmount(0f);
     }
 
 

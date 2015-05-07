@@ -3,7 +3,10 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar">
         <item name="android:windowBackground">@color/OSU_black</item>
-        <!-- Customize your theme here. -->
+        <item name="android:actionBarStyle">@style/MyActionBar</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:popupMenuStyle">@style/PopupMenu</item>
+        <!--<item name="android:homeAsUpIndicator">@drawable/back_arrow_white</item>-->
     </style>
 
     <style name="BusInfoDialogTheme">
@@ -11,6 +14,26 @@
         <item name="android:layout_gravity">center</item>
         <item name="android:windowBackground">@color/transparent</item>
         <item name="android:colorBackground">@color/transparent</item>
+    </style>
+
+
+    <style name="MyActionBar"
+        parent="@android:style/Widget.Holo.Light.ActionBar.Solid.Inverse">
+        <item name="android:background">@color/theme_secondary</item>
+        <item name="android:displayOptions">showTitle</item>
+        <item name="android:titleTextStyle">@style/MyTitleTextStyle</item>
+    </style>
+
+
+    <style name="MyTitleTextStyle" parent="@android:style/Widget.TextView">
+        <item name="android:textSize">15sp</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="PopupMenu" parent="@android:style/Widget.PopupMenu">
+        <item name="android:windowBackground">@color/theme_secondary</item>
+        <item name="android:actionMenuTextColor">@android:color/white</item>
     </style>
 
 </resources>
