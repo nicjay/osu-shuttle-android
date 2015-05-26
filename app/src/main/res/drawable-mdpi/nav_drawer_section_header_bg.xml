@@ -9,12 +9,12 @@
         <shape android:shape="rectangle">
             <stroke
                 android:width="2dp"
-                android:color="@color/OSU_orange"/>
+                android:color="@color/theme_secondary"/>
 
-            <solid android:color="#FF191b1b"/>
+            <solid android:color="@color/theme_white"/>
 
             <padding
-                android:bottom="10dp"
+                android:bottom="0dp"
                 android:right="10dp"
                 android:top="10dp"/>
         </shape>

@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
@@ -24,6 +25,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ExpandableListView;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -271,6 +273,8 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
                 }
             };
             mDrawerLayout.setDrawerListener(mDrawerToggle);
+            mDrawerList.setDividerHeight(0);
+            mDrawerList.setBackgroundColor(Color.WHITE);
             mDrawerToggle.syncState();
             //Enable and show navigation drawer icon
             try {
@@ -307,6 +311,7 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
         Error views and loading dialogs are added or removed accordingly.
      */
     public void onPostShuttleRequest(boolean success) {
+        Log.d(TAG, "-----------onPostShuttleRequest--------------" + success);
         if (success) {
             favoriteManager.initSavedFavorites();
             updateMap();
@@ -315,17 +320,19 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
                 Animation animation = AnimationUtils.makeOutAnimation(this, true);
                 animation.setDuration(1000);
                 errorLayout.startAnimation(animation);
-                errorLayout.setVisibility(View.INVISIBLE);
+                errorLayout.setVisibility(View.GONE);
 
                 //Set the stop title back to normal
-                RelativeLayout.LayoutParams selectedStopTitleParams = (RelativeLayout.LayoutParams) selectedStopTitle.getLayoutParams();
-                selectedStopTitleParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE);
-                selectedStopTitleParams.addRule(RelativeLayout.BELOW, 0);
-                selectedStopTitle.setLayoutParams(selectedStopTitleParams);
+                FrameLayout.LayoutParams selectedStopTitleParams = (FrameLayout.LayoutParams) selectedStopTitle.getLayoutParams();
+                //selectedStopTitleParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE);
+                //selectedStopTitleParams.addRule(RelativeLayout.BELOW, 0);
+                //selectedStopTitle.setLayoutParams(selectedStopTitleParams);
+
+                Log.d(TAG, "----------- END onPostShuttleRequest--------------");
             }
         } else {
             hideProgressSpinner();
-            if (errorLayout.getVisibility() == View.INVISIBLE && !networkFailureDialog.isShowing()) {
+            if ((errorLayout.getVisibility() == View.INVISIBLE || errorLayout.getVisibility() == View.GONE) && !networkFailureDialog.isShowing()) {
                 //Show the error view
                 Animation animationSlideLeft = AnimationUtils.makeInAnimation(this, true);
                 animationSlideLeft.setDuration(1000);
@@ -333,10 +340,13 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
                 errorLayout.setVisibility(View.VISIBLE);
 
                 //Reposition stop title below error view
-                RelativeLayout.LayoutParams selectedStopTitleParams = (RelativeLayout.LayoutParams) selectedStopTitle.getLayoutParams();
-                selectedStopTitleParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
-                selectedStopTitleParams.addRule(RelativeLayout.BELOW, errorLayout.getId());
-                selectedStopTitle.setLayoutParams(selectedStopTitleParams);
+                if(selectedStopTitle != null) {
+                    //animateSelectedStopTitle(null, null, true);
+                    //RelativeLayout.LayoutParams selectedStopTitleParams = (RelativeLayout.LayoutParams) selectedStopTitle.getLayoutParams();
+                    //selectedStopTitleParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
+                    //selectedStopTitleParams.addRule(RelativeLayout.BELOW, errorLayout.getId());
+                    //selectedStopTitle.setLayoutParams(selectedStopTitleParams);
+                }
 
                 mMapState.invalidateStopETAs();
                 favoriteManager.updateFavorites();
@@ -531,7 +541,7 @@ public class MapsActivity extends FragmentActivity implements InitialNetworkRequ
         title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 24);
         title.setTypeface(title.getTypeface(), Typeface.BOLD);
         title.setGravity(Gravity.CENTER);
-        title.setTextColor(getResources().getColor(R.color.OSU_orange));
+        title.setTextColor(getResources().getColor(R.color.theme_secondary));
         title.setPadding(0, 24, 0, 24);
 
 

@@ -44,11 +44,11 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="7"
-                android:background="@drawable/favorite_times_border"
                 android:gravity="center"
                 android:text="@string/offline"
+                android:background="@color/favorite_times_white"
                 android:textColor="@color/Favorite_Offline_Text"
-                android:textSize="14sp"
+                android:textSize="14dp"
                 android:textStyle="bold"
                 android:visibility="gone"/>
 

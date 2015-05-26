@@ -53,7 +53,7 @@ public class ExpandableDrawerAdapter extends BaseExpandableListAdapter {
                 sectionIcon.setImageResource(R.drawable.nav_drawer_bus_icon);
             } else {
                 sectionIcon.setImageResource(R.drawable.nav_drawer_map_marker_icon);
-                sectionIcon.getLayoutParams().height = 28;
+                //sectionIcon.getLayoutParams().height = 28;
             }
             return sectionView;
         } else {    //ELSE it's a child
@@ -68,7 +68,7 @@ public class ExpandableDrawerAdapter extends BaseExpandableListAdapter {
 
                 //Create colored route square
                 View square = new View(mContext);
-                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(18, 18);
+                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(25, 25);
                 layoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
                 layoutParams.setMargins(16, 0, 0, 0);
                 square.setId(R.id.drawer_item_square);

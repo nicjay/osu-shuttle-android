@@ -14,7 +14,7 @@
         android:paddingLeft="16dp"
         android:paddingRight="8dp"
         android:paddingTop="8dp"
-        android:textColor="#e7e0d4"
+        android:textColor="@color/theme_black"
         android:textSize="20sp"/>
 
     <TextView
@@ -25,7 +25,7 @@
         android:layout_centerVertical="true"
         android:paddingRight="32dp"
         android:text="@string/offline"
-        android:textColor="@color/Navigation_Drawer_Item_Offline_Text"
+        android:textColor="@color/Favorite_Offline_Text"
         android:textSize="14sp"
         android:textStyle="bold"
         android:visibility="invisible"/>

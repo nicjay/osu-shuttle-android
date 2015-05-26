@@ -12,7 +12,7 @@
     <color name="Navigation_Drawer_Background">#191b1b</color>
     <color name="Navigation_Drawer_Item_Offline_Text">#d14233</color>
     <color name="Navigation_Drawer_Item_Bg">#282828</color>
-    <color name="Navigation_Drawer_Item_Bg_Selected">#424242</color>
+    <color name="Navigation_Drawer_Item_Bg_Selected">#F5F5F5</color>
     <color name="Navigation_Drawer_Item_Child_Bg">#383838</color>
     <color name="Navigation_Drawer_Item_Child_Bg_Selected">#525252</color>
 
@@ -28,12 +28,15 @@
     <color name="favorites_view_title">#373737</color>
     <color name="favorite_stop_name_background">#D9FF8441</color>
     <color name="favorite_stop_name_text">#212121</color>
-    <color name="favorite_times_white">#E6f5f2ed</color>
+
+    <color name="favorite_times_white">#ffffff</color>
+    <color name="favorite_times_white_old">#E6f5f2ed</color>
     <color name="favorite_row_selected">#373737</color>
+
     <color name="favorite_name_gradient0">#F2F18446</color>
     <color name="favorite_name_gradient1">#F2F18B52</color>
     <color name="favorite_name_gradient2">#F2F18446</color>
-    <color name="Favorite_Offline_Text">#c0392b</color>
+    <color name="Favorite_Offline_Text">#F44336</color>
 
     <color name="selected_stop_purple_border">#AA66CD</color>
     <color name="selected_stop_green_border">#70A800</color>
@@ -41,7 +44,7 @@
 
     <color name="transparent">#99000000</color>
     <color name="progress_transparent">#CC000000</color>
-    <color name="transparent_error">#B3FF0000</color>
+    <color name="transparent_error">#D9F44336</color>
 
 
     <!--Network Failure Dialog-->
@@ -49,9 +52,12 @@
 
 
     <!-- Material Theme -->
-    <color name="theme_primary">#E65100</color>
+    <color name="theme_primary">#FB8C00</color>
+    <color name="theme_primary_old">#E65100</color>
     <color name="theme_secondary">#EF6C00</color>
     <color name="theme_accent">#C5CAE9</color>
+    <color name="theme_white">#FFFFFF</color>
+    <color name="theme_black">#000000</color>
     <color name="favorite_name_background">#EF6C00</color>
 
 

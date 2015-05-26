@@ -105,20 +105,22 @@ public class MapState {
         mShuttles = new ArrayList<Shuttle>();
         LatLng initLatLng = new LatLng(0, 0);
 
+        float alphaValue = 1f;
+
         Shuttle newShuttle = new Shuttle("North", false);
-        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().alpha(.85f).position(initLatLng).title("North Bus").icon(BitmapDescriptorFactory.fromResource(R.drawable.bus_green_marker)).flat(true).anchor(0.5f, 0.5f).infoWindowAnchor(.5f, .5f)));
+        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().alpha(alphaValue).position(initLatLng).title("North Bus").icon(BitmapDescriptorFactory.fromResource(R.drawable.bus_green_marker)).flat(true).anchor(0.5f, 0.5f).infoWindowAnchor(.5f, .5f)));
         mShuttles.add(newShuttle);
 
         newShuttle = new Shuttle("West 1", false);
-        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().alpha(.85f).position(initLatLng).title("West 1 Bus").icon(BitmapDescriptorFactory.fromResource(R.drawable.bus_orange_marker_dark)).flat(true).anchor(0.5f, 0.5f).infoWindowAnchor(.5f, .5f)));
+        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().alpha(alphaValue).position(initLatLng).title("West 1 Bus").icon(BitmapDescriptorFactory.fromResource(R.drawable.bus_orange_marker_dark)).flat(true).anchor(0.5f, 0.5f).infoWindowAnchor(.5f, .5f)));
         mShuttles.add(newShuttle);
 
         newShuttle = new Shuttle("West 2", false);
-        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().alpha(.85f).position(initLatLng).title("West 2 Bus").icon(BitmapDescriptorFactory.fromResource(R.drawable.bus_orange_marker_light)).flat(true).anchor(0.5f, 0.5f).infoWindowAnchor(.5f, .5f)));
+        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().alpha(alphaValue).position(initLatLng).title("West 2 Bus").icon(BitmapDescriptorFactory.fromResource(R.drawable.bus_orange_marker_light)).flat(true).anchor(0.5f, 0.5f).infoWindowAnchor(.5f, .5f)));
         mShuttles.add(newShuttle);
 
         newShuttle = new Shuttle("East", false);
-        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().alpha(.85f).position(initLatLng).title("East Bus").icon(BitmapDescriptorFactory.fromResource(R.drawable.bus_purple_marker)).flat(true).anchor(.5f, .5f).infoWindowAnchor(.5f, .5f)));
+        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().alpha(alphaValue).position(initLatLng).title("East Bus").icon(BitmapDescriptorFactory.fromResource(R.drawable.bus_purple_marker)).flat(true).anchor(.5f, .5f).infoWindowAnchor(.5f, .5f)));
         mShuttles.add(newShuttle);
 
         if (mDrawerItems != null && mDrawerItems.size() != 0) {
@@ -263,7 +265,7 @@ public class MapState {
 
     public void setStopsMarkers() {
         for (Stop stop : mStops) {
-            stop.setMarker(mMap.addMarker(new MarkerOptions().position(stop.getLatLng()).infoWindowAnchor(.5f, .25f).title(stop.getName()).visible(mStopsVisible).alpha(0.7f).anchor(.5f, .5f).icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_dot_plus))));
+            stop.setMarker(mMap.addMarker(new MarkerOptions().position(stop.getLatLng()).infoWindowAnchor(.5f, .25f).title(stop.getName()).visible(mStopsVisible).alpha(1f).anchor(.5f, .5f).icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_dot_plus))));
         }
     }
 
@@ -309,12 +311,12 @@ public class MapState {
 
     public boolean initDrawerItems() {
         if (mDrawerItems.size() == 0 || mDrawerItems == null) {
-            mDrawerItems.add(new DrawerItem(0, "Buses"));
+            mDrawerItems.add(new DrawerItem(0, "BUSES"));
             mDrawerItems.add(new DrawerItem(1, "North", mShuttles.get(0), true));
             mDrawerItems.add(new DrawerItem(1, "West 1", mShuttles.get(1), true));
             mDrawerItems.add(new DrawerItem(1, "West 2", mShuttles.get(2), true));
             mDrawerItems.add(new DrawerItem(1, "East", mShuttles.get(3), true));
-            mDrawerItems.add(new DrawerItem(0, "Stops"));
+            mDrawerItems.add(new DrawerItem(0, "STOPS"));
             mDrawerItems.add(new DrawerItem(2, "North Route", mNorthStopIndex));
             mDrawerItems.add(new DrawerItem(2, "West Route", mWestStopIndex));
             mDrawerItems.add(new DrawerItem(2, "East Route", mEastStopIndex));
