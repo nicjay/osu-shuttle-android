@@ -28,6 +28,7 @@ public class Stop {
         mServicedRoutes.add(routeId);
         mStopIds = new ArrayList<Integer>();
         mStopIds.add(stopId);
+
     }
 
     public Marker getMarker() {

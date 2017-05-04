@@ -23,7 +23,7 @@ import java.util.HashMap;
 
 /**
  * Created by jordan_n on 8/22/2014.
- *
+ * <p>
  * ClASS - MapState
  * Maintains most persistent data, such as shuttles, stops, and drawer items, to be used between classes and the lifecycle of the app.
  */
@@ -44,6 +44,7 @@ public class MapState {
     public ArrayList<Stop> northStops = new ArrayList<Stop>();
     public ArrayList<Stop> westStops = new ArrayList<Stop>();
     public ArrayList<Stop> eastStops = new ArrayList<Stop>();
+    public ArrayList<Stop> west2Stops = new ArrayList<Stop>();
     private boolean mStopsVisible;
     public boolean noAnimate = false;
 
@@ -51,6 +52,7 @@ public class MapState {
     private static ArrayList<Integer> mNorthStopIndex;
     private static ArrayList<Integer> mWestStopIndex;
     private static ArrayList<Integer> mEastStopIndex;
+    private static ArrayList<Integer> mWest2StopIndex;
 
     //Navigation Drawer items
     private static ArrayList<DrawerItem> mDrawerItems;
@@ -58,6 +60,7 @@ public class MapState {
     private Polyline northPolyline;
     private Polyline westPolyline;
     private Polyline eastPolyline;
+    private Polyline west2Polyline;
 
     private String stopLocationsUrl = "";
     private String shuttleLocationsUrl = "";
@@ -112,11 +115,11 @@ public class MapState {
         mShuttles.add(newShuttle);
 
         newShuttle = new Shuttle("West 1", false);
-        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().alpha(alphaValue).position(initLatLng).title("West 1 Bus").icon(BitmapDescriptorFactory.fromResource(R.drawable.bus_orange_marker_dark)).flat(true).anchor(0.5f, 0.5f).infoWindowAnchor(.5f, .5f)));
+        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().alpha(alphaValue).position(initLatLng).title("West 1 Bus").icon(BitmapDescriptorFactory.fromResource(R.drawable.bus_orange_marker_light)).flat(true).anchor(0.5f, 0.5f).infoWindowAnchor(.5f, .5f)));
         mShuttles.add(newShuttle);
 
         newShuttle = new Shuttle("West 2", false);
-        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().alpha(alphaValue).position(initLatLng).title("West 2 Bus").icon(BitmapDescriptorFactory.fromResource(R.drawable.bus_orange_marker_light)).flat(true).anchor(0.5f, 0.5f).infoWindowAnchor(.5f, .5f)));
+        newShuttle.setMarker(mMap.addMarker(new MarkerOptions().alpha(alphaValue).position(initLatLng).title("West 2 Bus").icon(BitmapDescriptorFactory.fromResource(R.drawable.bus_orange_marker_dark)).flat(true).anchor(0.5f, 0.5f).infoWindowAnchor(.5f, .5f)));
         mShuttles.add(newShuttle);
 
         newShuttle = new Shuttle("East", false);
@@ -152,17 +155,19 @@ public class MapState {
             while (eventType != XmlPullParser.END_DOCUMENT) {
                 if (eventType == XmlPullParser.START_DOCUMENT) {
                 } else if (eventType == XmlPullParser.START_TAG) {
-                    if(!readUrls) {
+                    if (!readUrls) {
                         if (xpp.getName().equals("NorthRoute")) {
                             parseRoute(xpp, "North");
                         } else if (xpp.getName().equals("WestRoute")) {
                             parseRoute(xpp, "West");
                         } else if (xpp.getName().equals("EastRoute")) {
                             parseRoute(xpp, "East");
+                        } else if (xpp.getName().equals("West2Route")) {
+                            parseRoute(xpp, "West2");
                         } else if (xpp.getName().equals("StopNames")) {
                             parseStopNames(xpp);
                         }
-                    } else if (xpp.getName().equals("Urls")){
+                    } else if (xpp.getName().equals("Urls")) {
                         parseUrls(xpp);
                     }
                 } else if (eventType == XmlPullParser.END_TAG) {
@@ -179,13 +184,13 @@ public class MapState {
         }
     }
 
-    private void parseUrls(XmlResourceParser xpp) throws  IOException, XmlPullParserException {
-        while(xpp.nextTag() == XmlPullParser.START_TAG){
-            if(xpp.getName().equals("StopLocations")){
+    private void parseUrls(XmlResourceParser xpp) throws IOException, XmlPullParserException {
+        while (xpp.nextTag() == XmlPullParser.START_TAG) {
+            if (xpp.getName().equals("StopLocations")) {
                 setStopLocationsUrl(xpp.nextText());
-            } else if(xpp.getName().equals("ShuttleLocations")){
+            } else if (xpp.getName().equals("ShuttleLocations")) {
                 setShuttleLocationsUrl(xpp.nextText());
-            } else if(xpp.getName().equals("ShuttleEstimates")){
+            } else if (xpp.getName().equals("ShuttleEstimates")) {
                 setShuttleEstimatesUrl(xpp.nextText());
             }
         }
@@ -213,8 +218,8 @@ public class MapState {
                 }
             }
         }
-        for (Stop stop : mStops){
-            if(stop.getName().toCharArray()[1] == '-'){
+        for (Stop stop : mStops) {
+            if (stop.getName().toCharArray()[1] == '-') {
                 Log.d(TAG, "Stop: " + stop.getName() + " = " + stop.getLatLng());
             }
         }
@@ -272,10 +277,11 @@ public class MapState {
     //Uses shuttleETAs to determine which stops belong to each route.
     public void initStopsArrays() {
         //TODO 12/11/2014: Unsure if run when need - case shuttles offline on initial launch, index arrays will be inited to empty
-        if (mNorthStopIndex == null || mWestStopIndex == null || mEastStopIndex == null) {
+        if (mNorthStopIndex == null || mWestStopIndex == null || mEastStopIndex == null || mWest2StopIndex == null) {
             mNorthStopIndex = new ArrayList<Integer>();
             mWestStopIndex = new ArrayList<Integer>();
             mEastStopIndex = new ArrayList<Integer>();
+            mWest2StopIndex = new ArrayList<Integer>();
 
             for (Stop stop : mStops) {
                 int[] shuttleETAs = stop.getShuttleETAs();
@@ -288,6 +294,9 @@ public class MapState {
                                 break;
                             case 1:
                                 mWestStopIndex.add(index);
+                                break;
+                            case 2:
+                                mWest2StopIndex.add(index);
                                 break;
                             case 3:
                                 mEastStopIndex.add(index);
@@ -319,6 +328,7 @@ public class MapState {
             mDrawerItems.add(new DrawerItem(0, "STOPS"));
             mDrawerItems.add(new DrawerItem(2, "North Route", mNorthStopIndex));
             mDrawerItems.add(new DrawerItem(2, "West Route", mWestStopIndex));
+            mDrawerItems.add(new DrawerItem(2, "West 2 Route", mWest2StopIndex));
             mDrawerItems.add(new DrawerItem(2, "East Route", mEastStopIndex));
             return true;
         }
@@ -372,6 +382,14 @@ public class MapState {
         this.eastStops = eastStops;
     }
 
+    public ArrayList<Stop> getWest2Stops() {
+        return west2Stops;
+    }
+
+    public void setWest2Stops(ArrayList<Stop> west2Stops) {
+        this.west2Stops = west2Stops;
+    }
+
     public Polyline getPolyline(String route) {
         if (route.equals("North"))
             return northPolyline;
@@ -379,6 +397,8 @@ public class MapState {
             return westPolyline;
         else if (route.equals("East"))
             return eastPolyline;
+        else if (route.equals("West2"))
+            return west2Polyline;
         return null;
     }
 
@@ -387,6 +407,8 @@ public class MapState {
             northPolyline = polyline;
         } else if (route.equals("West")) {
             westPolyline = polyline;
+        } else if (route.equals("West2")) {
+            west2Polyline = polyline;
         } else if (route.equals("East")) {
             eastPolyline = polyline;
         }
@@ -394,8 +416,10 @@ public class MapState {
 
 
     public void invalidateStopETAs() {
-        for (Stop stop : mStops) {
-            stop.invalidateShuttleETAs();
+        if (mStops != null) {
+            for (Stop stop : mStops) {
+                stop.invalidateShuttleETAs();
+            }
         }
     }
 

@@ -20,8 +20,8 @@
     <color name="shuttle_purple">#aa66cd</color>
     <color name="shuttle_orange">#e0aa0f</color>
 
-    <color name="shuttle_orange_light">#e0bb0f</color>
-    <color name="shuttle_orange_dark">#e0990f</color>
+    <color name="shuttle_orange_light">#ffff00</color>
+    <color name="shuttle_orange_dark">#999900</color>
 
 
 

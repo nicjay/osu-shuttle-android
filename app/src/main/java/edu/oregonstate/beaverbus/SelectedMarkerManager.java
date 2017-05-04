@@ -26,6 +26,7 @@ public class SelectedMarkerManager {
     private Polyline polylineNorth;
     private Polyline polylineWest;
     private Polyline polylineEast;
+    private Polyline polylineWest2;
 
     public SelectedMarkerManager(MapsActivity activity) {
         mActivity = activity;
@@ -38,7 +39,7 @@ public class SelectedMarkerManager {
 
 
     public void onMapClick() {
-        setRouteLineWidthToDefault();
+        //setRouteLineWidthToDefault();
         if (selectedMarker != null) {
             if (!sMapState.isStopsVisible() && showSelectedInfoWindow) {
                 selectedMarker.setVisible(false);
@@ -56,7 +57,7 @@ public class SelectedMarkerManager {
     public Boolean onMarkerClick(Marker marker) {
         Boolean isShuttle = marker.isFlat();
 
-        setRouteLineWidthToDefault();
+        //setRouteLineWidthToDefault();
 
         if (selectedMarker != null && !sMapState.isStopsVisible() && showSelectedInfoWindow) {
             selectedMarker.setVisible(false);
@@ -184,12 +185,14 @@ public class SelectedMarkerManager {
         if (polylineNorth.getWidth() > 10) polylineNorth.setWidth(10);
         if (polylineEast.getWidth() > 10) polylineEast.setWidth(10);
         if (polylineWest.getWidth() > 10) polylineWest.setWidth(10);
+        if (polylineWest2.getWidth() > 10) polylineWest2.setWidth(10);
     }
 
     public void setPolylines() {
         polylineNorth = sMapState.getPolyline("North");
         polylineWest = sMapState.getPolyline("West");
         polylineEast = sMapState.getPolyline("East");
+        polylineWest2 = sMapState.getPolyline("West2");
     }
 
 }

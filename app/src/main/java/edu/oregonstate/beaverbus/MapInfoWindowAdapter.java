@@ -57,10 +57,10 @@ public class MapInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
                                 square.setBackgroundColor(mContext.getResources().getColor(R.color.shuttle_green));
                                 break;
                             case 1:
-                                square.setBackgroundColor(mContext.getResources().getColor(R.color.shuttle_orange_dark));
+                                square.setBackgroundColor(mContext.getResources().getColor(R.color.shuttle_orange_light));
                                 break;
                             case 2:
-                                square.setBackgroundColor(mContext.getResources().getColor(R.color.shuttle_orange_light));
+                                square.setBackgroundColor(mContext.getResources().getColor(R.color.shuttle_orange_dark));
                                 break;
                             case 3:
                                 square.setBackgroundColor(mContext.getResources().getColor(R.color.shuttle_purple));

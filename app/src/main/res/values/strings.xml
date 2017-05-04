@@ -12,5 +12,5 @@
     <string name="hide_stops">Hide Stops</string>
     <string name="show_stops">Show Stops</string>
     <string name="bus_info_message">"<b>Hours of Operation:</b>\n7:00 AM to 7:00 PM\n\n<b>Estimated loop times:</b>\n5 to 14 minutes"</string>
-    <string name="bus_info_note">"*Estimates may not be accurate"</string>
+    <string name="bus_info_note">"*Buses may sometimes report inaccurate times"</string>
 </resources>

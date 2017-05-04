@@ -94,13 +94,13 @@ public class Shuttle {
                     mMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.bus_green_marker));
                     break;
                 case 9:
-                    int drawableResourceId;
-                    if(Name == "West 1") drawableResourceId = R.drawable.bus_orange_marker_dark;
-                    else drawableResourceId = R.drawable.bus_orange_marker_light;
-                    mMarker.setIcon(BitmapDescriptorFactory.fromResource(drawableResourceId));
+                    mMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.bus_orange_marker_light));
                     break;
                 case 8:
                     mMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.bus_purple_marker));
+                    break;
+                case 13:
+                    mMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.bus_orange_marker_dark));
                     break;
             }
         }
@@ -126,13 +126,13 @@ public class Shuttle {
                                     mMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.bus_green_square));
                                     break;
                                 case 9:
-                                    int drawableResourceId;
-                                    if(Name == "West 1") drawableResourceId = R.drawable.bus_orange_square_dark;
-                                    else drawableResourceId = R.drawable.bus_orange_square_light;
-                                    mMarker.setIcon(BitmapDescriptorFactory.fromResource(drawableResourceId));
+                                    mMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.bus_orange_square_light));
                                     break;
                                 case 8:
                                     mMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.bus_purple_square));
+                                    break;
+                                case 13:
+                                    mMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.bus_orange_square_dark));
                                     break;
                             }
                             Heading = 0;

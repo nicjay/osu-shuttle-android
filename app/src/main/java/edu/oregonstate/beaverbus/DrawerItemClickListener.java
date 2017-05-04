@@ -1,6 +1,7 @@
 package edu.oregonstate.beaverbus;
 
 import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
 import android.view.View;
 import android.widget.ExpandableListView;
 
@@ -20,7 +21,7 @@ public class DrawerItemClickListener implements ExpandableListView.OnGroupClickL
 
     private MapsActivity activity;
 
-    private static final int NORTH = 6, WEST = 7, EAST = 8; //Indices for expandable list headers
+    private static final int NORTH = 6, WEST = 7, EAST = 9, WEST2 = 8; //Indices for expandable list headers
 
     public DrawerItemClickListener(MapsActivity activity, DrawerLayout layout, ExpandableListView listView) {
         super();
@@ -63,6 +64,9 @@ public class DrawerItemClickListener implements ExpandableListView.OnGroupClickL
                 break;
             case WEST:
                 marker = sMapState.getWestStops().get(childPosition).getMarker();
+                break;
+            case WEST2:
+                marker = sMapState.getWest2Stops().get(childPosition).getMarker();
                 break;
             case EAST:
                 marker = sMapState.getEastStops().get(childPosition).getMarker();

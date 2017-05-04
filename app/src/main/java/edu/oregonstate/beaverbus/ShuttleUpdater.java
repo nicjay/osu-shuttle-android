@@ -34,7 +34,7 @@ public class ShuttleUpdater {
     private static String shuttleUrl;
     private static String estimatesUrl;
 
-    private static final int NORTH_ROUTE_ID = 7, EAST_ROUTE_ID = 8, WEST_ROUTE_ID = 9;
+    private static final int NORTH_ROUTE_ID = 7, EAST_ROUTE_ID = 8, WEST_ROUTE_ID = 9, WEST2_ROUTE_ID = 13;
 
     public interface OnMapStateUpdate {
         void onPostShuttleRequest(boolean success);
@@ -150,8 +150,11 @@ public class ShuttleUpdater {
                                 sMapState.setShuttle(0, shuttle);
                                 onlineStates[0] = true;
                                 break;
-                            case WEST_ROUTE_ID:  //Double route
-                                if (sMapState.getShuttles().get(1).getVehicleId() == shuttle.getVehicleId()) {
+                            case WEST_ROUTE_ID:
+                                sMapState.setShuttle(1, shuttle);
+                                onlineStates[1] = true;
+                                break;
+                               /* if (sMapState.getShuttles().get(1).getVehicleId() == shuttle.getVehicleId()) {
                                     sMapState.setShuttle(1, shuttle);
                                     onlineStates[1] = true;
                                 } else if (sMapState.getShuttles().get(2).getVehicleId() == shuttle.getVehicleId()) {
@@ -164,10 +167,14 @@ public class ShuttleUpdater {
                                     sMapState.setShuttle(2, shuttle);
                                     onlineStates[2] = true;
                                 }
-                                break;
+                                break;*/
                             case EAST_ROUTE_ID:
                                 sMapState.setShuttle(3, shuttle);
                                 onlineStates[3] = true;
+                                break;
+                            case WEST2_ROUTE_ID:
+                                sMapState.setShuttle(2, shuttle);
+                                onlineStates[2] = true;
                                 break;
                         }
                     }
@@ -225,7 +232,9 @@ public class ShuttleUpdater {
                                     stop.setShuttleETA(3, estimate0[1]);
                                     break;
                                 case WEST_ROUTE_ID:   //West
-                                    if (shuttles.get(1).getVehicleId() == estimate0[0]) {
+                                    stop.setShuttleETA(1, estimate0[1]);
+                                    break;
+                                   /* if (shuttles.get(1).getVehicleId() == estimate0[0]) {
                                         stop.setShuttleETA(1, estimate0[1]);
                                     } else if (shuttles.get(1).getVehicleId() == estimate1[0]) {
                                         stop.setShuttleETA(1, estimate1[1]);
@@ -234,7 +243,9 @@ public class ShuttleUpdater {
                                         stop.setShuttleETA(2, estimate0[1]);
                                     } else if (shuttles.get(2).getVehicleId() == estimate1[0]) {
                                         stop.setShuttleETA(2, estimate1[1]);
-                                    }
+                                    }*/
+                                case WEST2_ROUTE_ID:
+                                    stop.setShuttleETA(2, estimate0[1]);
                                     break;
                                 default:
                             }

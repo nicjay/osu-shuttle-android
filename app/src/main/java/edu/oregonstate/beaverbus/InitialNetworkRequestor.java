@@ -34,11 +34,12 @@ public class InitialNetworkRequestor extends AsyncTask<Void, Void, Boolean> {
     private static final int NORTH_ROUTE_ID = 7;
     private static final int WEST_ROUTE_ID = 9;
     private static final int EAST_ROUTE_ID = 8;
+    private static final int WEST2_ROUTE_ID = 13;
 
     private ArrayList<Stop> northStops = new ArrayList<Stop>();
     private ArrayList<Stop> westStops = new ArrayList<Stop>();
     private ArrayList<Stop> eastStops = new ArrayList<Stop>();
-
+    private ArrayList<Stop> west2Stops = new ArrayList<Stop>();
 
     //Interface to handle callback of 'network request' in MapsActivity
     private OnInitialRequestComplete listener;
@@ -158,8 +159,11 @@ public class InitialNetworkRequestor extends AsyncTask<Void, Void, Boolean> {
                         sMapState.setShuttle(0, shuttle);
                         onlineStates[0] = true;
                         break;
-                    case WEST_ROUTE_ID:  //Double WEST route
-                        //If index 1 has vehicleId
+                    case WEST_ROUTE_ID:
+                        sMapState.setShuttle(1, shuttle);
+                        onlineStates[1] = true;
+                        break;
+                       /* //If index 1 has vehicleId
                         if (shuttles.get(1).getVehicleId() == shuttle.getVehicleId()) {
                             sMapState.setShuttle(1, shuttle);
                             onlineStates[1] = true;
@@ -179,10 +183,14 @@ public class InitialNetworkRequestor extends AsyncTask<Void, Void, Boolean> {
                             sMapState.setShuttle(2, shuttle);
                             onlineStates[2] = true;
                         }
-                        break;
+                        break;*/
                     case EAST_ROUTE_ID:
                         sMapState.setShuttle(3, shuttle);
                         onlineStates[3] = true;
+                        break;
+                    case WEST2_ROUTE_ID:
+                        sMapState.setShuttle(2, shuttle);
+                        onlineStates[2] = true;
                         break;
                 }
             }
@@ -198,7 +206,7 @@ public class InitialNetworkRequestor extends AsyncTask<Void, Void, Boolean> {
         sMapState.setNorthStops(northStops);
         sMapState.setWestStops(westStops);
         sMapState.setEastStops(eastStops);
-
+        sMapState.setWest2Stops(west2Stops);
         return true;
     }
 
@@ -215,6 +223,9 @@ public class InitialNetworkRequestor extends AsyncTask<Void, Void, Boolean> {
                 break;
             case EAST_ROUTE_ID:
                 eastStops.add(stop);
+                break;
+            case WEST2_ROUTE_ID:
+                west2Stops.add(stop);
                 break;
         }
     }

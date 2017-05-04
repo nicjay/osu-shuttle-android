@@ -21,7 +21,7 @@ public class ExpandableDrawerAdapter extends BaseExpandableListAdapter {
     private ArrayList<DrawerItem> mDrawerItems;
     private static MapState sMapState;
 
-    private static final int NORTH = 6, WEST = 7, EAST = 8; //Indices for expandable list headers
+    private static final int NORTH = 6, WEST = 7, EAST = 9, WEST2 = 8; //Indices for expandable list headers
 
     public ExpandableDrawerAdapter(Context context, ArrayList<DrawerItem> drawerItems) {
         super();
@@ -79,11 +79,11 @@ public class ExpandableDrawerAdapter extends BaseExpandableListAdapter {
                         break;
                     case 2:
                         //West 1
-                        square.setBackgroundResource(R.color.shuttle_orange_dark);
+                        square.setBackgroundResource(R.color.shuttle_orange_light);
                         break;
                     case 3:
                         //West 2
-                        square.setBackgroundResource(R.color.shuttle_orange_light);
+                        square.setBackgroundResource(R.color.shuttle_orange_dark);
                         break;
                     case 4:
                         //East
@@ -141,6 +141,9 @@ public class ExpandableDrawerAdapter extends BaseExpandableListAdapter {
             case WEST:
                 childTitle.setText(sMapState.getWestStops().get(childPosition).getName());
                 break;
+            case WEST2:
+                childTitle.setText(sMapState.getWest2Stops().get(childPosition).getName());
+                break;
             case EAST:
                 childTitle.setText(sMapState.getEastStops().get(childPosition).getName());
                 break;
@@ -162,6 +165,8 @@ public class ExpandableDrawerAdapter extends BaseExpandableListAdapter {
                 return sMapState.getNorthStops().size();
             case WEST:
                 return sMapState.getWestStops().size();
+            case WEST2:
+                return sMapState.getWest2Stops().size();
             case EAST:
                 return sMapState.getEastStops().size();
             default:

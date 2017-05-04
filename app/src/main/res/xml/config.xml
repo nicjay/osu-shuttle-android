@@ -28,11 +28,11 @@
         <LatLng>44.563829, -123.279737</LatLng><LatLng>44.564158, -123.279826</LatLng>
         <LatLng>44.564495, -123.279901</LatLng><LatLng>44.564500, -123.284775</LatLng>
         <LatLng>44.562234, -123.284775</LatLng><LatLng>44.561965, -123.284625</LatLng>
-        <LatLng>44.560529, -123.284625</LatLng><LatLng>44.560529, -123.283717</LatLng>
-        <LatLng>44.559747, -123.283806</LatLng><LatLng>44.559695, -123.283140</LatLng>
-        <LatLng>44.559246, -123.283160</LatLng><LatLng>44.558254, -123.281967</LatLng>
-        <LatLng>44.558305, -123.280559</LatLng><LatLng>44.558993, -123.279550</LatLng>
-        <Color>#BDE0AA0F</Color>
+        <LatLng>44.560529, -123.284625</LatLng><LatLng>44.560533, -123.282410</LatLng>
+        <LatLng>44.559957, -123.283075</LatLng>
+        <LatLng>44.559286, -123.283075</LatLng><LatLng>44.558364, -123.281967</LatLng>
+        <LatLng>44.558394, -123.280559</LatLng><LatLng>44.558993, -123.279550</LatLng>
+        <Color>#ffff00</Color>
         <Width>10</Width>
     </WestRoute>
     <EastRoute>
@@ -41,7 +41,7 @@
         <LatLng>44.563829, -123.279917</LatLng><LatLng>44.563401, -123.279700</LatLng>
         <LatLng>44.563371, -123.279686</LatLng><LatLng>44.561972, -123.279700</LatLng>
         <LatLng>44.560713, -123.279700</LatLng><LatLng>44.560713, -123.281585</LatLng>
-        <LatLng>44.560538, -123.282356</LatLng><LatLng>44.559992, -123.282962</LatLng>
+        <LatLng>44.560538, -123.282356</LatLng><LatLng>44.559962, -123.282982</LatLng>
         <LatLng>44.559296, -123.283010</LatLng><LatLng>44.558409, -123.281948</LatLng>
         <LatLng>44.558455, -123.280609</LatLng><LatLng>44.559033, -123.279740</LatLng>
         <LatLng>44.557859, -123.279679</LatLng><LatLng>44.559460, -123.276646</LatLng>
@@ -50,7 +50,21 @@
         <Color>#BDAA66CD</Color>
         <Width>10</Width>
     </EastRoute>
-
+    <West2Route>
+        <LatLng>44.560760, -123.279621</LatLng><LatLng>44.561972, -123.279600</LatLng>
+        <LatLng>44.563391, -123.279600</LatLng><LatLng>44.563401, -123.279600</LatLng>
+        <LatLng>44.563829, -123.279800</LatLng><LatLng>44.564158, -123.279900</LatLng>
+        <LatLng>44.564560, -123.279970</LatLng><LatLng>44.564560, -123.284388</LatLng>
+        <LatLng>44.562116, -123.284413</LatLng><LatLng>44.561990, -123.284561</LatLng>
+        <LatLng>44.556901, -123.284600</LatLng><LatLng>44.556923, -123.282392</LatLng>
+        <LatLng>44.557469, -123.280556</LatLng><LatLng>44.557654, -123.280683</LatLng>
+        <LatLng>44.558320, -123.280694</LatLng><LatLng>44.558320, -123.282037</LatLng>
+        <LatLng>44.559273, -123.283126</LatLng><LatLng>44.559978, -123.283144</LatLng>
+        <LatLng>44.560613, -123.282352</LatLng><LatLng>44.560760, -123.281585</LatLng>
+        <LatLng>44.560760, -123.279621</LatLng>
+        <Color>#999900</Color>
+        <Width>10</Width>
+    </West2Route>
 
     <!--Maps stop names to same coordinates retrieved from RideSystems JSON -->
 

@@ -69,7 +69,7 @@ public class FavoriteManager {
 
             for (int j = 0; j < shuttleETAs.length; j++) {
                 if (shuttleETAs[j] == -1) continue;
-                String etaText = String.valueOf(shuttleETAs[j]);
+                String etaText = String.valueOf(shuttleETAs[j]) + " min";
                 textViews[j].setText(etaText);
                 favStopETAContainers[j].setVisibility(View.VISIBLE);
                 timeSet = true;
@@ -169,7 +169,8 @@ public class FavoriteManager {
 
             if (newStop.getShuttleETA(i) != -1) {
                 isSet = true;
-                stopETA.setText(Integer.toString(newStop.getShuttleETA(i)));
+                String etaText = Integer.toString(newStop.getShuttleETA(i)) + " min";
+                stopETA.setText(etaText);
             }else{
                 newTime.setVisibility(View.GONE);
             }
@@ -180,10 +181,10 @@ public class FavoriteManager {
                     etaColor = mContext.getResources().getColor(R.color.shuttle_green);
                     break;
                 case 1:
-                    etaColor = mContext.getResources().getColor(R.color.shuttle_orange_dark);
+                    etaColor = mContext.getResources().getColor(R.color.shuttle_orange_light);
                     break;
                 case 2:
-                    etaColor = mContext.getResources().getColor(R.color.shuttle_orange_light);
+                    etaColor = mContext.getResources().getColor(R.color.shuttle_orange_dark);
                     break;
                 case 3:
                     etaColor = mContext.getResources().getColor(R.color.shuttle_purple);
